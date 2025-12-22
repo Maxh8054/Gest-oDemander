@@ -1,0 +1,3137 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal do Gestor - Sistema Corporativo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #004085;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --gray-color: #6c757d;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            --routine-color: #9c27b0;
+            --overdue-color: #ff5252;
+            --info-color: #17a2b8;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Tela de Login */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-card h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .login-card p {
+            color: var(--gray-color);
+            margin-bottom: 30px;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .login-form input, .login-form select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .login-form input:focus, .login-form select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 86, 179, 0.3);
+        }
+
+        .user-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Sistema Principal */
+        .main-container {
+            display: none;
+            background-color: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        body.dark-mode {
+            background-color: #1a1a2e;
+            color: #eee;
+        }
+
+        body.dark-mode .card,
+        body.dark-mode .stat-card,
+        body.dark-mode .chart-container,
+        body.dark-mode .ranking-container,
+        body.dark-mode .modal-content {
+            background-color: #16213e;
+            color: #eee;
+        }
+
+        body.dark-mode .demanda-item {
+            background-color: #0f3460;
+            color: #eee;
+        }
+
+        body.dark-mode .tab-content {
+            background-color: #16213e;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 30px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        header p {
+            margin-top: 10px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .header-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-badge.gestor {
+            background: rgba(255, 193, 7, 0.3);
+            border: 1px solid rgba(255, 193, 7, 0.5);
+        }
+
+        .header-controls button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .header-controls button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .filter-container {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-container label {
+            font-weight: bold;
+            color: var(--dark-color);
+            white-space: nowrap;
+        }
+
+        .filter-container select,
+        .filter-container input {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-color);
+        }
+
+        .stat-card.success::before { background: var(--success-color); }
+        .stat-card.warning::before { background: var(--warning-color); }
+        .stat-card.danger::before { background: var(--danger-color); }
+        .stat-card.info::before { background: var(--info-color); }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .stat-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: inherit;
+            opacity: 0.1;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.1); opacity: 0.05; }
+            100% { transform: scale(1); opacity: 0.1; }
+        }
+
+        .stat-icon.primary {
+            background-color: rgba(0, 86, 179, 0.1);
+            color: var(--primary-color);
+        }
+
+        .stat-icon.success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+        }
+
+        .stat-icon.warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: var(--warning-color);
+        }
+
+        .stat-icon.danger {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+        }
+
+        .stat-icon.info {
+            background-color: rgba(23, 162, 184, 0.1);
+            color: var(--info-color);
+        }
+
+        .stat-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .trend-indicator {
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-weight: normal;
+        }
+
+        .trend-up {
+            background: rgba(40, 167, 69, 0.2);
+            color: var(--success-color);
+        }
+
+        .trend-down {
+            background: rgba(220, 53, 69, 0.2);
+            color: var(--danger-color);
+        }
+
+        .stat-info p {
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+            border-left: 5px solid var(--primary-color);
+            position: relative;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            margin: 0;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .card-actions button {
+            padding: 5px 10px;
+            font-size: 12px;
+            background: var(--light-color);
+            color: var(--dark-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .card-actions button:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .dias-semana-group {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+        }
+
+        .dias-semana-group label {
+            display: inline-block;
+            margin-right: 10px;
+            font-weight: normal;
+        }
+
+        .dias-semana-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 5px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        button.danger {
+            background-color: var(--danger-color);
+        }
+
+        button.danger:hover {
+            background-color: #c82333;
+        }
+
+        button.success {
+            background-color: var(--success-color);
+        }
+
+        button.success:hover {
+            background-color: #218838;
+        }
+
+        button.secondary {
+            background-color: var(--gray-color);
+        }
+
+        button.secondary:hover {
+            background-color: #5a6268;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .demanda-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background-color: var(--light-color);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .demanda-item:hover {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+
+        .demanda-item.pendente { border-left: 5px solid var(--warning-color); }
+        .demanda-item.aprovada { border-left: 5px solid var(--success-color); }
+        .demanda-item.reprovada { border-left: 5px solid var(--danger-color); }
+        .demanda-item.finalizado_pendente_aprovacao { border-left: 5px solid var(--primary-color); }
+        .demanda-item.atrasado { 
+            border-left: 5px solid var(--overdue-color); 
+            background-color: rgba(255, 82, 82, 0.1);
+        }
+        .demanda-item.rotina { 
+            border-left: 5px solid var(--routine-color); 
+            background-color: rgba(156, 39, 176, 0.1);
+        }
+        .demanda-item.rotina .demanda-info strong {
+            color: var(--routine-color);
+        }
+        .demanda-item.atrasado .demanda-info .time-remaining {
+            color: var(--overdue-color);
+            font-weight: bold;
+        }
+
+        .demanda-priority {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .priority-high {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .priority-medium {
+            background: var(--warning-color);
+            color: var(--dark-color);
+        }
+
+        .priority-low {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .demanda-info {
+            flex-grow: 1;
+        }
+
+        .demanda-info strong {
+            display: block;
+            font-size: 1.1em;
+        }
+
+        .demanda-info small {
+            color: var(--gray-color);
+            display: block;
+            margin-top: 5px;
+        }
+
+        .time-remaining {
+            font-weight: bold;
+            margin-top: 5px;
+            padding: 5px 10px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .acoes-demandas {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .acoes-demandas button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .import-area {
+            border: 2px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .import-area.highlight {
+            border-color: var(--primary-color);
+            background-color: #e9f5ff;
+        }
+
+        .import-area i {
+            font-size: 3em;
+            color: var(--gray-color);
+            margin-bottom: 15px;
+        }
+
+        .import-area p {
+            margin: 0;
+            color: var(--gray-color);
+        }
+
+        .import-area #importStatus {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .ranking-container {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+        }
+
+        .ranking-container h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ranking-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+
+        .ranking-item:hover {
+            background: var(--light-color);
+            transform: translateX(5px);
+        }
+
+        .ranking-item:last-child {
+            border-bottom: none;
+        }
+
+        .ranking-position {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
+
+        .ranking-position.gold {
+            background: linear-gradient(135deg, var(--gold), #ffed4e);
+            color: #333;
+            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .ranking-position.silver {
+            background: linear-gradient(135deg, var(--silver), #e8e8e8);
+            color: #333;
+            box-shadow: 0 4px 8px rgba(192, 192, 192, 0.3);
+        }
+
+        .ranking-position.bronze {
+            background: linear-gradient(135deg, var(--bronze), #e6a157);
+            color: white;
+            box-shadow: 0 4px 8px rgba(205, 127, 50, 0.3);
+        }
+
+        .ranking-info {
+            flex-grow: 1;
+        }
+
+        .ranking-info strong {
+            display: block;
+            font-size: 1.1rem;
+        }
+
+        .ranking-info small {
+            color: var(--gray-color);
+        }
+
+        .ranking-score {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .ranking-badges {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .badge {
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .badge-gold {
+            background: var(--gold);
+            color: #333;
+        }
+
+        .badge-fire {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .badge-star {
+            background: var(--info-color);
+            color: white;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .tab:hover {
+            background-color: rgba(0, 86, 179, 0.05);
+        }
+
+        .tab.active {
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .tab .badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 0.6rem;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+        }
+
+        .chart-container h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .chart-actions button {
+            padding: 5px 10px;
+            font-size: 12px;
+            background: var(--light-color);
+            color: var(--dark-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .chart-actions button:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 2% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 800px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--danger-color);
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1001;
+            max-width: 350px;
+            display: none;
+            border-left: 5px solid var(--primary-color);
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        .notification.success {
+            border-left-color: var(--success-color);
+        }
+
+        .notification.error {
+            border-left-color: var(--danger-color);
+        }
+
+        .notification.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .notification h4 {
+            margin: 0 0 10px 0;
+            color: var(--dark-color);
+        }
+
+        .notification p {
+            margin: 0;
+            color: var(--gray-color);
+        }
+
+        .search-bar {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+        }
+
+        .search-bar i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-color);
+        }
+
+        .floating-action-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .floating-action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-container select {
+                max-width: 100%;
+            }
+            
+            .header-controls {
+                position: static;
+                margin-top: 15px;
+                justify-content: center;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+            }
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(0,0,0,0.1);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray-color);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .password-modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .password-modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .password-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .server-status {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 10000;
+        }
+
+        .server-status.connected {
+            background: rgba(40, 167, 69, 0.8);
+        }
+
+        .server-status.disconnected {
+            background: rgba(220, 53, 69, 0.8);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Indicador de Status do Servidor -->
+<div class="server-status" id="serverStatus">
+    <i class="fas fa-circle"></i> <span id="serverStatusText">Verificando servidor...</span>
+</div>
+
+<!-- Tela de Login -->
+<div class="login-container" id="loginContainer">
+    <div class="login-card">
+        <h1><i class="fas fa-chart-line"></i> Portal do Gestor</h1>
+        <p>Sistema Corporativo de Gestão de Demandas</p>
+        
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label for="userSelect">Selecione seu nome:</label>
+                <select id="userSelect" required>
+                    <option value="">Clique para selecionar...</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="passwordInput">Senha:</label>
+                <input type="password" id="passwordInput" placeholder="Digite sua senha" required>
+            </div>
+            
+            <div class="user-info">
+                <small><i class="fas fa-info-circle"></i> Funcionários: use sua senha padrão</small><br>
+                <small><i class="fas fa-shield-alt"></i> Gestor: senha de administrador</small>
+            </div>
+            
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Entrar no Sistema
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Sistema Principal -->
+<div class="main-container" id="mainContainer">
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-chart-line"></i> Portal do Gestor Corporativo</h1>
+            <p>Sistema Avançado de Gestão de Demandas</p>
+            <div class="header-controls">
+                <div class="user-badge" id="userBadge">
+                    <i class="fas fa-user"></i>
+                    <span id="userName">Carregando...</span>
+                </div>
+                <button onclick="toggleDarkMode()" title="Modo Escuro">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button onclick="showNotifications()" title="Notificações">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                <button onclick="logout()" title="Sair">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Barra de Pesquisa Rápida -->
+        <div class="search-bar">
+            <input type="text" placeholder="Pesquisar demandas, funcionários, categorias..." id="globalSearch">
+            <i class="fas fa-search"></i>
+        </div>
+
+        <main>
+            <!-- Dashboard com estatísticas -->
+            <div class="dashboard">
+                <div class="stat-card" onclick="drillDown('total')">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalDemandas">0</h3>
+                        <span class="trend-indicator trend-up">+12%</span>
+                        <p>Total de Demandas</p>
+                    </div>
+                </div>
+                <div class="stat-card warning" onclick="drillDown('pending')">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pendentesCount">0</h3>
+                        <span class="trend-indicator trend-down">-5%</span>
+                        <p>Em Andamento</p>
+                    </div>
+                </div>
+                <div class="stat-card danger" onclick="drillDown('overdue')">
+                    <div class="stat-icon danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="atrasadasCount">0</h3>
+                        <span class="trend-indicator trend-up">+2</span>
+                        <p>Atrasadas</p>
+                    </div>
+                </div>
+                <div class="stat-card success" onclick="drillDown('completed')">
+                    <div class="stat-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="aprovadasCount">0</h3>
+                        <span class="trend-indicator trend-up">+18%</span>
+                        <p>Concluídas</p>
+                    </div>
+                </div>
+                <div class="stat-card info" onclick="drillDown('routine')">
+                    <div class="stat-icon info">
+                        <i class="fas fa-redo"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="rotinaCount">0</h3>
+                        <span class="trend-indicator trend-up">+8%</span>
+                        <p>Tarefas de Rotina</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Abas para diferentes funcionalidades -->
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('dashboard')">
+                    <i class="fas fa-chart-pie"></i> Dashboard
+                    <span class="badge" id="dashboardBadge" style="display: none;">0</span>
+                </div>
+                <div class="tab" onclick="switchTab('nova')">
+                    <i class="fas fa-plus-circle"></i> Nova Demanda
+                </div>
+                <div class="tab" onclick="switchTab('pendentes')">
+                    <i class="fas fa-clock"></i> Em Análise
+                    <span class="badge" id="pendingBadge" style="display: none;">0</span>
+                </div>
+                <div class="tab" onclick="switchTab('atrasadas')">
+                    <i class="fas fa-exclamation-triangle"></i> Atrasadas
+                    <span class="badge" id="overdueBadge" style="display: none;">0</span>
+                </div>
+                <div class="tab" onclick="switchTab('aprovadas')">
+                    <i class="fas fa-check-circle"></i> Concluídas
+                </div>
+                <div class="tab" onclick="switchTab('ranking')">
+                    <i class="fas fa-trophy"></i> Ranking
+                </div>
+                <div class="tab" id="gestorTab" style="display: none;" onclick="switchTab('exportar')">
+                    <i class="fas fa-download"></i> Exportar
+                </div>
+            </div>
+
+            <!-- Conteúdo das abas -->
+            <div id="dashboard" class="tab-content active">
+                <!-- Filtros Avançados -->
+                <div class="filter-container">
+                    <label for="filtroFuncionario">Filtrar por Funcionário:</label>
+                    <select id="filtroFuncionario" onchange="filtrarDashboard()">
+                        <option value="todos">Todos os Funcionários</option>
+                    </select>
+                    
+                    <label for="filtroPeriodo">Período:</label>
+                    <select id="filtroPeriodo" onchange="filtrarDashboard()">
+                        <option value="7">Últimos 7 dias</option>
+                        <option value="30">Últimos 30 dias</option>
+                        <option value="90">Últimos 90 dias</option>
+                        <option value="365">Último ano</option>
+                    </select>
+                    
+                    <label for="filtroCategoria">Categoria:</label>
+                    <select id="filtroCategoria" onchange="filtrarDashboard()">
+                        <option value="todas">Todas</option>
+                        <option value="Prospecção">Prospecção</option>
+                        <option value="Reunião">Reunião</option>
+                        <option value="Relatório">Relatório</option>
+                        <option value="Suporte">Suporte</option>
+                        <option value="Desenvolvimento">Desenvolvimento</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                    
+                    <label for="filtroPrioridade">Prioridade:</label>
+                    <select id="filtroPrioridade" onchange="filtrarDashboard()">
+                        <option value="todas">Todas</option>
+                        <option value="Importante">Importante</option>
+                        <option value="Média">Média</option>
+                        <option value="Relevante">Relevante</option>
+                    </select>
+                    
+                    <button onclick="resetFilters()">
+                        <i class="fas fa-undo"></i> Resetar
+                    </button>
+                </div>
+
+                <!-- Gráficos Interativos -->
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3>
+                            <span><i class="fas fa-chart-pie"></i> Distribuição de Status</span>
+                            <div class="chart-actions">
+                                <button onclick="refreshChart('status')">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                                <button onclick="downloadChart('status')">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </h3>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>
+                            <span><i class="fas fa-chart-bar"></i> Demandas por Categoria</span>
+                            <div class="chart-actions">
+                                <button onclick="refreshChart('categoria')">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                                <button onclick="downloadChart('categoria')">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </h3>
+                        <canvas id="categoriaChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>
+                            <span><i class="fas fa-chart-bar"></i> Produtividade por Funcionário</span>
+                            <div class="chart-actions">
+                                <button onclick="refreshChart('productivity')">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                                <button onclick="downloadChart('productivity')">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </h3>
+                        <canvas id="productivityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Nova Demanda -->
+            <div id="nova" class="tab-content">
+                <div class="card">
+                    <h2><i class="fas fa-plus-circle"></i> Registrar Nova Demanda</h2>
+                    <form id="demandaForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="categoriaSelect">Categoria:</label>
+                                <select id="categoriaSelect" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Prospecção">Prospecção</option>
+                                    <option value="Reunião">Reunião</option>
+                                    <option value="Relatório">Relatório</option>
+                                    <option value="Suporte">Suporte</option>
+                                    <option value="Desenvolvimento">Desenvolvimento</option>
+                                    <option value="Outros">Outros</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="prioridadeSelect">Prioridade:</label>
+                                <select id="prioridadeSelect" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Importante">Importante</option>
+                                    <option value="Média">Média</option>
+                                    <option value="Relevante">Relevante</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="complexidadeSelect">Complexidade:</label>
+                                <select id="complexidadeSelect" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Baixa">Baixa (1-2 dias)</option>
+                                    <option value="Média">Média (3-5 dias)</option>
+                                    <option value="Alta">Alta (6-10 dias)</option>
+                                    <option value="Crítica">Crítica (10+ dias)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="localSelect">Local:</label>
+                                <select id="localSelect" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Lundin">Lundin</option>
+                                    <option value="R&D">R&D</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="demandaInput">Descrição da Demanda:</label>
+                            <textarea id="demandaInput" rows="3" required placeholder="Descreva detalhadamente a demanda..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="dataLimiteInput">Data Limite:</label>
+                            <input type="date" id="dataLimiteInput" required onchange="validateDeadline()">
+                        </div>
+                        
+                        <!-- Tarefa de Rotina -->
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="rotinaCheckbox" onchange="toggleRoutineFields()">
+                            <label for="rotinaCheckbox">Esta é uma tarefa de rotina</label>
+                        </div>
+                        
+                        <div class="dias-semana-group" id="diasSemanaGroup">
+                            <label>Selecione os dias da semana:</label>
+                            <div>
+                                <label><input type="checkbox" name="diaSemana" value="0"> Domingo</label>
+                                <label><input type="checkbox" name="diaSemana" value="1"> Segunda-feira</label>
+                                <label><input type="checkbox" name="diaSemana" value="2"> Terça-feira</label>
+                                <label><input type="checkbox" name="diaSemana" value="3"> Quarta-feira</label>
+                                <label><input type="checkbox" name="diaSemana" value="4"> Quinta-feira</label>
+                                <label><input type="checkbox" name="diaSemana" value="5"> Sexta-feira</label>
+                                <label><input type="checkbox" name="diaSemana" value="6"> Sábado</label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit">
+                            <i class="fas fa-save"></i> Registrar Demanda
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Aba Pendentes -->
+            <div id="pendentes" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-clock"></i> Demandas em Análise</h2>
+                        <div class="card-actions" id="gestorActions" style="display: none;">
+                            <button onclick="bulkApprove()">
+                                <i class="fas fa-check-double"></i> Aprovar em Lote
+                            </button>
+                            <button onclick="bulkReject()">
+                                <i class="fas fa-times-double"></i> Reprovar em Lote
+                            </button>
+                        </div>
+                    </div>
+                    <div id="pendentesContainer"></div>
+                </div>
+            </div>
+
+            <!-- Aba Atrasadas -->
+            <div id="atrasadas" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-exclamation-triangle"></i> Demandas Atrasadas</h2>
+                        <div class="card-actions" id="gestorActions2" style="display: none;">
+                            <button onclick="reassignOverdue()">
+                                <i class="fas fa-user-plus"></i> Reatribuir
+                            </button>
+                            <button onclick="extendDeadlines()">
+                                <i class="fas fa-calendar-plus"></i> Estender Prazos
+                            </button>
+                        </div>
+                    </div>
+                    <div id="atrasadasContainer"></div>
+                </div>
+            </div>
+
+            <!-- Aba Concluídas -->
+            <div id="aprovadas" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-check-circle"></i> Demandas Concluídas</h2>
+                        <div class="card-actions" id="gestorActions3" style="display: none;">
+                            <button onclick="exportCompleted()">
+                                <i class="fas fa-download"></i> Exportar Concluídas
+                            </button>
+                            <button onclick="archiveCompleted()">
+                                <i class="fas fa-archive"></i> Arquivar
+                            </button>
+                        </div>
+                    </div>
+                    <div id="aprovadasContainer"></div>
+                </div>
+            </div>
+
+            <!-- Aba Ranking -->
+            <div id="ranking" class="tab-content">
+                <div class="ranking-container">
+                    <div class="card-header">
+                        <h2><i class="fas fa-trophy"></i> Ranking de Produtividade</h2>
+                        <div class="card-actions">
+                            <button onclick="changeRankingPeriod()">
+                                <i class="fas fa-calendar"></i> Período
+                            </button>
+                            <button onclick="exportRanking()" id="exportRankingBtn" style="display: none;">
+                                <i class="fas fa-download"></i> Exportar
+                            </button>
+                        </div>
+                    </div>
+                    <ul class="ranking-list" id="rankingList"></ul>
+                </div>
+            </div>
+
+            <!-- Aba Exportar (apenas gestor) -->
+            <div id="exportar" class="tab-content">
+                <div class="card">
+                    <h2><i class="fas fa-download"></i> Exportar Dados</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="exportFormat">Formato:</label>
+                            <select id="exportFormat">
+                                <option value="csv">CSV</option>
+                                <option value="excel">Excel</option>
+                                <option value="pdf">PDF</option>
+                                <option value="json">JSON</option>
+                                <option value="xml">XML</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="exportPeriod">Período:</label>
+                            <select id="exportPeriod">
+                                <option value="7">Últimos 7 dias</option>
+                                <option value="30">Últimos 30 dias</option>
+                                <option value="90">Últimos 90 dias</option>
+                                <option value="365">Último ano</option>
+                                <option value="all">Todo o período</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="includeCharts" checked>
+                        <label for="includeCharts">Incluir gráficos</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="includeComments" checked>
+                        <label for="includeComments">Incluir comentários</label>
+                    </div>
+                    <button onclick="exportData()">
+                        <i class="fas fa-download"></i> Exportar Dados
+                    </button>
+                    <button onclick="scheduleExport()">
+                        <i class="fas fa-clock"></i> Agendar Exportação
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Modal de Senha para Aprovação -->
+<div id="passwordModal" class="password-modal">
+    <div class="password-modal-content">
+        <h3><i class="fas fa-lock"></i> Autenticação Requerida</h3>
+        <p>Apenas o gestor pode aprovar ou reprovar demandas.</p>
+        <input type="password" id="passwordConfirm" class="password-input" placeholder="Digite a senha do gestor">
+        <div class="password-buttons">
+            <button onclick="confirmPassword()" class="success">
+                <i class="fas fa-check"></i> Confirmar
+            </button>
+            <button onclick="closePasswordModal()" class="danger">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Sistema de Notificações -->
+<div id="notification" class="notification">
+    <h4><i class="fas fa-bell"></i> <span id="notificationTitle">Notificação</span></h4>
+    <p id="notificationMessage">Mensagem da notificação</p>
+</div>
+
+<!-- Modal para Detalhes -->
+<div id="detailModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('detailModal')">&times;</span>
+        <h2 id="modalTitle">Detalhes da Demanda</h2>
+        <div id="modalBody">
+            <!-- Conteúdo dinâmico -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Sistema de Usuários
+    const usuarios = [
+        { 
+            id: 1, 
+            nome: 'Ranielly Miranda De Souza', 
+            email: 'ranielly-s@zaminebrasil.com', 
+            nivel: 'Senior', 
+            pontos: 450, 
+            conquistas: ['star', 'fire', 'gold'],
+            senha: '123456',
+            role: 'funcionario'
+        },
+        { 
+            id: 2, 
+            nome: 'Girlene da Silva Nogueira', 
+            email: 'girlene-n@zaminebrasil.com', 
+            nivel: 'Pleno', 
+            pontos: 380, 
+            conquistas: ['star', 'silver'],
+            senha: '123456',
+            role: 'funcionario'
+        },
+        { 
+            id: 3, 
+            nome: 'Rafaela Cristine da Silva Martins', 
+            email: 'rafaela-m@zaminebrasil.com', 
+            nivel: 'Senior', 
+            pontos: 520, 
+            conquistas: ['star', 'fire', 'gold'],
+            senha: '123456',
+            role: 'funcionario'
+        },
+        { 
+            id: 4, 
+            nome: 'Alvino Alberto Junior', 
+            email: 'alvino-j@zaminebrasil.com', 
+            nivel: 'Pleno', 
+            pontos: 320, 
+            conquistas: ['star'],
+            senha: '123456',
+            role: 'funcionario'
+        },
+        { 
+            id: 5, 
+            nome: 'Marcos Antônio Lino Rosa', 
+            email: 'marcos-a@zaminebrasil.com', 
+            nivel: 'Junior', 
+            pontos: 280, 
+            conquistas: ['star'],
+            senha: '123456',
+            role: 'funcionario'
+        },
+        { 
+            id: 6, 
+            nome: 'Marcos Paulo Moraes Borges', 
+            email: 'marcos-b@zaminebrasil.com', 
+            nivel: 'Pleno', 
+            pontos: 410, 
+            conquistas: ['star', 'silver'],
+            senha: '123456',
+            role: 'funcionario'
+        },
+        { 
+            id: 7, 
+            nome: 'Marcelo Goncalves de Paula', 
+            email: 'marcelo-p@zaminebrasil.com', 
+            nivel: 'Senior', 
+            pontos: 480, 
+            conquistas: ['star', 'fire', 'gold'],
+            senha: '123456',
+            role: 'funcionario'
+        },
+        { 
+            id: 8, 
+            nome: 'Higor Ataides Macedo', 
+            email: 'higor-a@zaminebrasil.com', 
+            nivel: 'Junior', 
+            pontos: 250, 
+            conquistas: ['star'],
+            senha: '123456',
+            role: 'funcionario'
+        },
+        { 
+            id: 9, 
+            nome: 'Weslley Ferreira de Siqueira', 
+            email: 'weslley-f@zaminebrasil.com', 
+            nivel: 'Pleno', 
+            pontos: 360, 
+            conquistas: ['star', 'silver'],
+            senha: '123456',
+            role: 'funcionario'
+        },
+        { 
+            id: 10, 
+            nome: 'Jadson Joao Romano', 
+            email: 'jadson-r@zaminebrasil.com', 
+            nivel: 'Senior', 
+            pontos: 440, 
+            conquistas: ['star', 'fire', 'gold'],
+            senha: '123456',
+            role: 'funcionario'
+        },
+        { 
+            id: 11, 
+            nome: 'Charles de Andrade', 
+            email: 'charles-a@zaminebrasil.com', 
+            nivel: 'Pleno', 
+            pontos: 390, 
+            conquistas: ['star', 'silver'],
+            senha: '123456',
+            role: 'funcionario'
+        },
+        { 
+            id: 12, 
+            nome: 'Jose Carlos Rodrigues de Santana', 
+            email: 'jose-s@zaminebrasil.com', 
+            nivel: 'Junior', 
+            pontos: 220, 
+            conquistas: ['star'],
+            senha: '123456',
+            role: 'funcionario'
+        },
+        { 
+            id: 13, 
+            nome: 'Max Henrique Araujo', 
+            email: 'max-r@zaminebrasil.com', 
+            nivel: 'Pleno', 
+            pontos: 340, 
+            conquistas: ['star', 'silver'],
+            senha: '123456',
+            role: 'funcionario'
+        },
+        { 
+            id: 14, 
+            nome: 'Demetrius Rufino', 
+            email: 'demetrius-r@zaminebrasil.com', 
+            nivel: 'Senior', 
+            pontos: 460, 
+            conquistas: ['star', 'fire', 'gold'],
+            senha: '123456',
+            role: 'funcionario'
+        },
+        { 
+            id: 99, 
+            nome: 'Gestor do Sistema', 
+            email: 'gestor@zaminebrasil.com', 
+            nivel: 'Administrador', 
+            pontos: 999, 
+            conquistas: ['star', 'fire', 'gold', 'crown'],
+            senha: 'admin123',
+            role: 'gestor'
+        }
+    ];
+
+    // Variáveis globais
+    let usuarioLogado = null;
+    let todasDemandas = [];
+    let timerInterval;
+    let charts = {};
+    let filtroFuncionarioAtual = 'todos';
+    let darkMode = false;
+    let notifications = [];
+    let pendingAction = null;
+
+    // URL do servidor (altere para o IP do servidor)
+   const SERVER_URL = window.location.origin;
+
+    // Status do servidor
+    let serverConnected = false;
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('Inicializando sistema...');
+        carregarUsuariosNoSelect();
+        inicializarEventListeners();
+        verificarStatusServidor();
+        
+        // Verifica se há sessão salva
+        const sessao = sessionStorage.getItem('usuarioLogado');
+        if (sessao) {
+            usuarioLogado = JSON.parse(sessao);
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+            configurarInterfaceUsuario();
+            inicializarSistemaPrincipal();
+        }
+        
+        console.log('Sistema inicializado com sucesso!');
+    });
+
+    // Verificar status do servidor
+    async function verificarStatusServidor() {
+        const statusElement = document.getElementById('serverStatus');
+        const statusText = document.getElementById('serverStatusText');
+        
+        try {
+            const response = await fetch(`${SERVER_URL}/api/demandas`);
+            if (response.ok) {
+                serverConnected = true;
+                statusElement.className = 'server-status connected';
+                statusText.textContent = 'Servidor conectado';
+            } else {
+                throw new Error('Servidor não respondeu');
+            }
+        } catch (error) {
+            serverConnected = false;
+            statusElement.className = 'server-status disconnected';
+            statusText.textContent = 'Servidor desconectado';
+        }
+        
+        // Tenta reconectar a cada 30 segundos
+        setTimeout(verificarStatusServidor, 30000);
+    }
+
+    // Carregar usuários no select de login
+    function carregarUsuariosNoSelect() {
+        console.log('Carregando usuários no select...');
+        const userSelect = document.getElementById('userSelect');
+        if (userSelect) {
+            usuarios.forEach(usuario => {
+                const option = new Option(usuario.nome, usuario.id);
+                userSelect.add(option);
+            });
+            console.log('Usuários carregados no select de login');
+        }
+    }
+
+    // Sistema de Login
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const userId = document.getElementById('userSelect').value;
+        const password = document.getElementById('passwordInput').value;
+        
+        const usuario = usuarios.find(u => u.id == userId);
+        
+        if (!usuario) {
+            showNotification('error', 'Erro de Login', 'Usuário não encontrado');
+            return;
+        }
+        
+        if (usuario.senha !== password) {
+            showNotification('error', 'Erro de Login', 'Senha incorreta');
+            return;
+        }
+        
+        // Login bem sucedido
+        usuarioLogado = usuario;
+        console.log('Login bem sucedido:', usuarioLogado.nome);
+        
+        // Salva sessão
+        sessionStorage.setItem('usuarioLogado', JSON.stringify(usuario));
+        
+        // Mostra sistema principal
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('mainContainer').style.display = 'block';
+        
+        // Configura interface baseado no papel do usuário
+        configurarInterfaceUsuario();
+        
+        // Inicializa sistema
+        inicializarSistemaPrincipal();
+        
+        showNotification('success', 'Bem-vindo!', `Olá, ${usuario.nome}! Você está logado como ${usuario.role === 'gestor' ? 'Gestor' : 'Funcionário'}`);
+    });
+
+    // Configurar interface baseado no papel do usuário
+    function configurarInterfaceUsuario() {
+        const userBadge = document.getElementById('userBadge');
+        const userName = document.getElementById('userName');
+        
+        if (userBadge && userName) {
+            userName.textContent = usuarioLogado.nome;
+            
+            if (usuarioLogado.role === 'gestor') {
+                userBadge.classList.add('gestor');
+                userBadge.innerHTML = '<i class="fas fa-user-shield"></i> <span>' + usuarioLogado.nome + ' (Gestor)</span>';
+                
+                // Mostra abas e ações do gestor
+                document.getElementById('gestorTab').style.display = 'block';
+                document.getElementById('gestorActions').style.display = 'flex';
+                document.getElementById('gestorActions2').style.display = 'flex';
+                document.getElementById('gestorActions3').style.display = 'flex';
+                document.getElementById('exportRankingBtn').style.display = 'inline-block';
+            } else {
+                userBadge.innerHTML = '<i class="fas fa-user"></i> <span>' + usuarioLogado.nome + '</span>';
+            }
+        }
+    }
+
+    // Inicializar sistema principal após login
+    async function inicializarSistemaPrincipal() {
+        carregarFuncionariosNosSelect();
+        await carregarDadosDoServidor();
+        inicializarImportacaoJSON();
+        atualizarDashboard();
+        atualizarRanking();
+        inicializarGraficos();
+        
+        // Inicia o contador de tempo
+        timerInterval = setInterval(atualizarTemposRestantes, 1000);
+        
+        // Inicializa notificações em tempo real
+        inicializarNotificacoesTempoReal();
+    }
+
+    // Logout
+    function logout() {
+        if (confirm('Tem certeza que deseja sair do sistema?')) {
+            sessionStorage.removeItem('usuarioLogado');
+            location.reload();
+        }
+    }
+
+    // Carregar funcionários nos selects (exceto login)
+    function carregarFuncionariosNosSelect() {
+        console.log('Carregando funcionários nos selects...');
+        const selects = ['filtroFuncionario'];
+        
+        selects.forEach(selectId => {
+            const select = document.getElementById(selectId);
+            if (select) {
+                usuarios.filter(u => u.role === 'funcionario').forEach(func => {
+                    const option = new Option(`${func.nome} (${func.nivel})`, func.id);
+                    select.add(option);
+                });
+                console.log(`Funcionários carregados no select: ${selectId}`);
+            }
+        });
+    }
+
+    // Carregar dados do servidor
+    async function carregarDadosDoServidor() {
+        console.log('Carregando dados do servidor...');
+        try {
+            const response = await fetch(`${SERVER_URL}/api/demandas`);
+            if (response.ok) {
+                todasDemandas = await response.json();
+                console.log(`Carregadas ${todasDemandas.length} demandas do servidor`);
+            } else {
+                console.error('Erro ao carregar demandas do servidor');
+                showNotification('error', 'Erro de Conexão', 'Não foi possível conectar ao servidor. Verifique se o servidor está rodando.');
+            }
+        } catch (error) {
+            console.error('Erro de conexão com o servidor:', error);
+            showNotification('error', 'Erro de Conexão', 'Não foi possível conectar ao servidor. Verifique se o servidor está rodando.');
+        }
+        
+        renderizarDemandas();
+        atualizarBadges();
+    }
+
+    // Salvar dados no servidor
+    async function salvarDemandaNoServidor(demanda) {
+        console.log('Salvando demanda no servidor...');
+        try {
+            const response = await fetch(`${SERVER_URL}/api/demandas`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(demanda)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    console.log('Demanda salva com sucesso no servidor');
+                    return true;
+                }
+            }
+        } catch (error) {
+            console.error('Erro ao salvar demanda no servidor:', error);
+            showNotification('error', 'Erro ao Salvar', 'Não foi possível salvar a demanda no servidor.');
+        }
+        
+        return false;
+    }
+
+    // Atualizar demanda no servidor
+    async function atualizarDemandaNoServidor(id, dadosAtualizados) {
+        console.log('Atualizando demanda no servidor...');
+        try {
+            const response = await fetch(`${SERVER_URL}/api/demandas/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dadosAtualizados)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    console.log('Demanda atualizada com sucesso no servidor');
+                    return true;
+                }
+            }
+        } catch (error) {
+            console.error('Erro ao atualizar demanda no servidor:', error);
+            showNotification('error', 'Erro ao Atualizar', 'Não foi possível atualizar a demanda no servidor.');
+        }
+        
+        return false;
+    }
+
+    // Deletar demanda do servidor
+    async function deletarDemandaDoServidor(id) {
+        console.log('Deletando demanda do servidor...');
+        try {
+            const response = await fetch(`${SERVER_URL}/api/demandas/${id}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    console.log('Demanda deletada com sucesso do servidor');
+                    return true;
+                }
+            }
+        } catch (error) {
+            console.error('Erro ao deletar demanda do servidor:', error);
+            showNotification('error', 'Erro ao Deletar', 'Não foi possível deletar a demanda do servidor.');
+        }
+        
+        return false;
+    }
+
+    // Atualizar badges nas abas
+    function atualizarBadges() {
+        const pendentes = todasDemandas.filter(d => d.status === 'pendente' || d.status === 'finalizado_pendente_aprovacao').length;
+        const atrasadas = todasDemandas.filter(d => {
+            if (d.status === 'aprovada') return false;
+            const dataLimite = new Date(d.dataLimite);
+            const hoje = new Date();
+            return dataLimite < hoje;
+        }).length;
+        
+        updateBadge('pendingBadge', pendentes);
+        updateBadge('overdueBadge', atrasadas);
+        updateBadge('dashboardBadge', Math.floor(Math.random() * 10)); // Simulado
+    }
+
+    function updateBadge(badgeId, count) {
+        const badge = document.getElementById(badgeId);
+        if (badge) {
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    }
+
+    // Modo escuro
+    function toggleDarkMode() {
+        darkMode = !darkMode;
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', darkMode);
+        
+        // Atualiza ícone
+        const icon = document.querySelector('.header-controls button i.fa-moon, .header-controls button i.fa-sun');
+        if (icon) {
+            icon.className = darkMode ? 'fas fa-sun' : 'fas fa-moon';
+        }
+    }
+
+    // Mostrar notificações
+    function showNotifications() {
+        showNotification('info', 'Notificações', 'Você não possui notificações no momento.');
+    }
+
+    // Funções de Dashboard
+    function filtrarDashboard() {
+        filtroFuncionarioAtual = document.getElementById('filtroFuncionario').value;
+        atualizarDashboard();
+        atualizarGraficos();
+    }
+
+    function getDemandasFiltradas() {
+        if (filtroFuncionarioAtual === 'todos') {
+            return todasDemandas;
+        }
+        return todasDemandas.filter(d => d.funcionarioId == filtroFuncionarioAtual);
+    }
+
+    function atualizarDashboard() {
+        const demandasFiltradas = getDemandasFiltradas();
+        const totalDemandas = demandasFiltradas.length;
+        const pendentes = demandasFiltradas.filter(d => d.status === 'pendente' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'reprovada').length;
+        const atrasadas = demandasFiltradas.filter(d => {
+            if (d.status === 'aprovada') return false;
+            const dataLimite = new Date(d.dataLimite);
+            const hoje = new Date();
+            return dataLimite < hoje;
+        }).length;
+        const aprovadas = demandasFiltradas.filter(d => d.status === 'aprovada').length;
+        const rotina = demandasFiltradas.filter(d => d.isRotina).length;
+
+        // Atualiza cards com animação
+        animateValue('totalDemandas', totalDemandas);
+        animateValue('pendentesCount', pendentes);
+        animateValue('atrasadasCount', atrasadas);
+        animateValue('aprovadasCount', aprovadas);
+        animateValue('rotinaCount', rotina);
+    }
+
+    function animateValue(elementId, value) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        
+        const current = parseInt(element.textContent) || 0;
+        const increment = value > current ? 1 : -1;
+        const duration = 500;
+        const steps = Math.abs(value - current);
+        
+        if (steps === 0) return;
+        
+        const stepDuration = duration / steps;
+        let step = 0;
+        
+        const timer = setInterval(() => {
+            step++;
+            element.textContent = current + (increment * step);
+            
+            if (step >= steps) {
+                clearInterval(timer);
+                element.textContent = value;
+            }
+        }, stepDuration);
+    }
+
+    // Inicializar gráficos
+    function inicializarGraficos() {
+        if (typeof Chart === 'undefined') {
+            console.log('Chart.js não carregado, pulando inicialização dos gráficos');
+            return;
+        }
+        
+        Chart.register(ChartDataLabels);
+
+        // Gráfico de pizza - Status
+        const statusCtx = document.getElementById('statusChart');
+        if (statusCtx) {
+            charts.status = new Chart(statusCtx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Em Andamento', 'Aprovadas', 'Reprovadas', 'Em Análise'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: [
+                            'rgba(255,193, 7, 0.8)',
+                            'rgba(40, 167, 69, 0.8)',
+                            'rgba(220, 53, 69, 0.8)',
+                            'rgba(0, 86, 179, 0.8)'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            font: {
+                                weight: 'bold',
+                                size: 14
+                            },
+                            formatter: (value, ctx) => {
+                                const sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = sum > 0 ? ((value / sum) * 100).toFixed(1) + '%' : '0%';
+                                return percentage;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Gráfico de barras - Categorias
+        const categoriaCtx = document.getElementById('categoriaChart');
+        if (categoriaCtx) {
+            charts.categoria = new Chart(categoriaCtx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Prospecção', 'Reunião', 'Relatório', 'Suporte', 'Desenvolvimento', 'Outros'],
+                    datasets: [{
+                        label: 'Demandas',
+                        data: [0, 0, 0, 0, 0, 0],
+                        backgroundColor: 'rgba(0, 86, 179, 0.8)',
+                        borderColor: 'rgba(0, 86, 179, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            color: '#333',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Gráfico de produtividade
+        const productivityCtx = document.getElementById('productivityChart');
+        if (productivityCtx) {
+            charts.productivity = new Chart(productivityCtx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: usuarios.filter(u => u.role === 'funcionario').map(f => f.nome.split(' ')[0]),
+                    datasets: [{
+                        label: 'Demandas Concluídas',
+                        data: usuarios.filter(u => u.role === 'funcionario').map(f => Math.floor(Math.random() * 20) + 5),
+                        backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            color: '#333',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        atualizarGraficos();
+    }
+
+    function atualizarGraficos() {
+        if (!charts.status) return;
+
+        const demandasFiltradas = getDemandasFiltradas();
+
+        // Atualizar gráfico de status
+        const statusData = [
+            demandasFiltradas.filter(d => d.status === 'pendente').length,
+            demandasFiltradas.filter(d => d.status === 'aprovada').length,
+            demandasFiltradas.filter(d => d.status === 'reprovada').length,
+            demandasFiltradas.filter(d => d.status === 'finalizado_pendente_aprovacao').length
+        ];
+        charts.status.data.datasets[0].data = statusData;
+        charts.status.update();
+
+        // Atualizar gráfico de categorias
+        const categorias = ['Prospecção', 'Reunião', 'Relatório', 'Suporte', 'Desenvolvimento', 'Outros'];
+        const categoriaData = categorias.map(cat => 
+            demandasFiltradas.filter(d => d.categoria === cat).length
+        );
+        charts.categoria.data.datasets[0].data = categoriaData;
+        charts.categoria.update();
+
+        // Atualizar gráfico de produtividade
+        charts.productivity.data.datasets[0].data = usuarios.filter(u => u.role === 'funcionario').map(f => 
+            demandasFiltradas.filter(d => d.funcionarioId === f.id && d.status === 'aprovada').length
+        );
+        charts.productivity.update();
+    }
+
+    // Funções utilitárias
+    function formatDate(date) {
+        return new Date(date).toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function switchTab(tabName) {
+        console.log(`Mudando para aba: ${tabName}`);
+        
+        // Remove a classe active de todas as abas e conteúdos
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        // Encontra a aba correta pelo atributo onclick ou pelo texto
+        let targetTab = null;
+        document.querySelectorAll('.tab').forEach(tab => {
+            if (tab.onclick && tab.onclick.toString().includes(tabName)) {
+                targetTab = tab;
+            } else if (tab.textContent.toLowerCase().includes('análise') && tabName === 'pendentes') {
+                targetTab = tab;
+            } else if (tab.textContent.toLowerCase().includes('nova') && tabName === 'nova') {
+                targetTab = tab;
+            }
+        });
+        
+        // Se não encontrar, tenta pelo índice
+        if (!targetTab) {
+            const tabNames = ['dashboard', 'nova', 'pendentes', 'atrasadas', 'aprovadas', 'ranking', 'exportar'];
+            const index = tabNames.indexOf(tabName);
+            if (index !== -1) {
+                targetTab = document.querySelectorAll('.tab')[index];
+            }
+        }
+        
+        if (targetTab) {
+            targetTab.classList.add('active');
+            console.log('Aba ativada:', targetTab.textContent);
+        }
+        
+        // Ativa o conteúdo correspondente
+        const contentElement = document.getElementById(tabName);
+        if (contentElement) {
+            contentElement.classList.add('active');
+            console.log('Conteúdo ativado:', tabName);
+            
+            // Se for a aba de pendentes, renderiza novamente
+            if (tabName === 'pendentes') {
+                setTimeout(() => {
+                    renderizarDemandas();
+                }, 100);
+            }
+        } else {
+            console.error('Conteúdo não encontrado:', tabName);
+        }
+
+        // Se for a aba de dashboard, atualiza os gráficos
+        if (tabName === 'dashboard') {
+            setTimeout(() => {
+                atualizarGraficos();
+            }, 100);
+        }
+    }
+
+    function showModal(modalId, title, content) {
+        const modal = document.getElementById(modalId);
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        
+        if (modal && modalTitle && modalBody) {
+            modalTitle.textContent = title;
+            modalBody.innerHTML = content;
+            modal.style.display = 'block';
+        }
+    }
+
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    function quickAction() {
+        switchTab('nova');
+    }
+
+    // Inicializar event listeners
+    function inicializarEventListeners() {
+        console.log('Inicializando event listeners...');
+        
+        // Formulário de demanda
+        const form = document.getElementById('demandaForm');
+        if (form) {
+            console.log('Formulário encontrado, adicionando listener...');
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                console.log('Formulário submetido!');
+                
+                // Coleta os dados do formulário
+                const categoria = document.getElementById('categoriaSelect').value;
+                const prioridade = document.getElementById('prioridadeSelect').value;
+                const complexidade = document.getElementById('complexidadeSelect').value;
+                const descricao = document.getElementById('demandaInput').value;
+                const local = document.getElementById('localSelect').value;
+                const dataLimite = document.getElementById('dataLimiteInput').value;
+                const isRotina = document.getElementById('rotinaCheckbox').checked;
+                
+                console.log('Dados coletados:', {
+                    categoria, prioridade, complexidade, descricao, local, dataLimite, isRotina
+                });
+                
+                // Validação básica
+                if (!categoria || !prioridade || !complexidade || !descricao || !local || !dataLimite) {
+                    showNotification('error', 'Erro', 'Por favor, preencha todos os campos obrigatórios');
+                    return;
+                }
+                
+                // Coleta os dias da semana se for tarefa de rotina
+                let diasSemana = [];
+                if (isRotina) {
+                    const checkboxes = document.querySelectorAll('input[name="diaSemana"]:checked');
+                    diasSemana = Array.from(checkboxes).map(cb => parseInt(cb.value));
+                }
+                
+                // Cria o objeto da demanda
+                const novaDemanda = {
+                    funcionarioId: usuarioLogado.id,
+                    nomeFuncionario: usuarioLogado.nome,
+                    emailFuncionario: usuarioLogado.email,
+                    categoria,
+                    prioridade,
+                    complexidade,
+                    descricao,
+                    local,
+                    dataLimite,
+                    dataCriacao: new Date().toISOString(),
+                    status: 'pendente', // Status inicial como pendente
+                    isRotina,
+                    diasSemana,
+                    tag: `DEM-${Date.now()}`, // TAG única
+                    comentarios: '',
+                    comentarioGestor: ''
+                };
+                
+                console.log('Nova demanda criada:', novaDemanda);
+                
+                // Salva no servidor
+                const sucesso = await salvarDemandaNoServidor(novaDemanda);
+                
+                if (sucesso) {
+                    // Recarrega dados do servidor
+                    await carregarDadosDoServidor();
+                    
+                    // Envia notificação para o gestor
+                    notificarGestorNovaDemanda(novaDemanda);
+                    
+                    // Limpa o formulário
+                    form.reset();
+                    
+                    // Mostra notificação de sucesso
+                    showNotification('success', 'Demanda Registrada', `Sua demanda "${descricao}" foi registrada com sucesso! Aguarde a análise do gestor.`);
+                    
+                    // Muda para a aba de pendentes automaticamente
+                    setTimeout(() => {
+                        switchTab('pendentes');
+                    }, 1000);
+                    
+                    console.log('Processo de registro concluído com sucesso!');
+                }
+            });
+        } else {
+            console.error('Formulário não encontrado!');
+        }
+        
+        // Busca global
+        const searchInput = document.getElementById('globalSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                console.log('Buscando por:', term);
+            });
+        }
+        
+        // Modo escuro
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+        
+        console.log('Event listeners inicializados!');
+    }
+
+    // Notificar gestor sobre nova demanda
+    function notificarGestorNovaDemanda(demanda) {
+        // Envia email para o gestor
+        const gestor = usuarios.find(u => u.role === 'gestor');
+        if (gestor) {
+            const assunto = encodeURIComponent(`Nova Demanda Registrada: ${demanda.descricao}`);
+            const corpo = encodeURIComponent(`Prezado Gestor,\n\nUma nova demanda foi registrada por ${demanda.nomeFuncionario}:\n\n--- Detalhes da Demanda ---\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nPrioridade: ${demanda.prioridade}\nComplexidade: ${demanda.complexidade}\nLocal: ${demanda.local}\nData Limite: ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n\nPor favor, acesse o sistema para analisar e aprovar ou reprovar esta demanda.\n\nAtenciosamente,\nSistema Automático`);
+            
+            // Abre o cliente de email padrão
+            window.open(`mailto:${gestor.email}?subject=${assunto}&body=${corpo}`, '_blank');
+        }
+    }
+
+    // Continuação das funções existentes...
+    function renderizarDemandas() {
+        console.log('=== RENDERIZANDO DEMANDAS ===');
+        console.log('Total de demandas no sistema:', todasDemandas.length);
+        
+        const pendentesContainer = document.getElementById('pendentesContainer');
+        const aprovadasContainer = document.getElementById('aprovadasContainer');
+        const atrasadasContainer = document.getElementById('atrasadasContainer');
+        
+        // Limpa todos os containers
+        if (pendentesContainer) {
+            pendentesContainer.innerHTML = '';
+            console.log('Container pendentes limpo');
+        } else {
+            console.error('Container pendentes NÃO encontrado');
+        }
+        
+        if (aprovadasContainer) aprovadasContainer.innerHTML = '';
+        if (atrasadasContainer) atrasadasContainer.innerHTML = '';
+
+        // Filtra as demandas pendentes (incluindo reprovadas que precisam ser reavaliadas)
+        const pendentes = todasDemandas.filter(d => {
+            console.log(`Demanda ID ${d.id}: status = ${d.status}`);
+            return d.status === 'pendente' || d.status === 'reprovada' || d.status === 'finalizado_pendente_aprovacao';
+        });
+        
+        console.log('Demandas pendentes encontradas:', pendentes.length);
+        
+        // Filtra as demandas concluídas
+        const concluidas = todasDemandas.filter(d => d.status === 'aprovada');
+        
+        // Filtra as demandas atrasadas
+        const atrasadas = todasDemandas.filter(d => {
+            if (d.status === 'aprovada') return false;
+            const dataLimite = new Date(d.dataLimite);
+            const hoje = new Date();
+            return dataLimite < hoje;
+        });
+
+        console.log(`Resumo: Pendentes=${pendentes.length}, Atrasadas=${atrasadas.length}, Concluídas=${concluidas.length}`);
+
+        // Renderiza as demandas pendentes
+        if (pendentesContainer) {
+            if (pendentes.length === 0) {
+                pendentesContainer.innerHTML = '<p>Nenhuma demanda em análise no momento.</p>';
+            } else {
+                pendentes.forEach((demanda, index) => {
+                    console.log(`Adicionando demanda pendente ${index + 1}: ${demanda.descricao}`);
+                    const elemento = criarElementoDemanda(demanda);
+                    pendentesContainer.appendChild(elemento);
+                });
+                console.log('Todas as demandas pendentes foram adicionadas');
+            }
+        }
+
+        // Renderiza as demandas atrasadas
+        if (atrasadasContainer) {
+            if (atrasadas.length === 0) {
+                atrasadasContainer.innerHTML = '<p>Nenhuma demanda atrasada no momento.</p>';
+            } else {
+                atrasadas.forEach(demanda => {
+                    atrasadasContainer.appendChild(criarElementoDemanda(demanda, true));
+                });
+            }
+        }
+
+        // Renderiza as demandas concluídas
+        if (aprovadasContainer) {
+            if (concluidas.length === 0) {
+                aprovadasContainer.innerHTML = '<p>Nenhuma demanda concluída a ser exibida.</p>';
+            } else {
+                concluidas.forEach(demanda => {
+                    aprovadasContainer.appendChild(criarElementoDemanda(demanda));
+                });
+            }
+        }
+        
+        console.log('=== FIM DA RENDERIZAÇÃO ===');
+    }
+
+    function criarElementoDemanda(demanda, isAtrasada = false) {
+        const div = document.createElement('div');
+        const statusClass = isAtrasada ? 'atrasado' : demanda.status;
+        div.className = `demanda-item ${statusClass} ${demanda.isRotina ? 'rotina' : ''}`;
+        
+        let statusIcon = '⏳';
+        if (demanda.status === 'aprovada') statusIcon = '✅';
+        if (demanda.status === 'reprovada') statusIcon = '❌';
+        if (demanda.status === 'finalizado_pendente_aprovacao') statusIcon = '📋';
+        if (isAtrasada) statusIcon = '⚠️';
+        
+        const dataLimiteFormatada = new Date(demanda.dataLimite).toLocaleDateString('pt-BR');
+        const rotinaInfo = demanda.isRotina ? `<small><i class="fas fa-redo"></i> Tarefa de rotina</small>` : '';
+
+        let infoAdicional = '';
+        if (demanda.status === 'finalizado_pendente_aprovacao') {
+            infoAdicional = `<br><small><strong>Comentários:</strong> ${demanda.comentarios}</small>`;
+        }
+        
+        let diasFormatados = '';
+        if (demanda.isRotina && demanda.diasSemana) {
+            diasFormatados = demanda.diasSemana.map(dia => ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][dia]).join(', ');
+        }
+        
+        // Adiciona o contador de tempo restante
+        const tempoRestante = calcularTempoRestante(demanda.dataLimite);
+        
+        // Badge de prioridade
+        const priorityBadge = demanda.prioridade ? 
+            `<span class="demanda-priority priority-${demanda.prioridade.toLowerCase()}">${demanda.prioridade}</span>` : '';
+        
+        // Verifica se o usuário logado pode aprovar
+        const podeAprovar = usuarioLogado && usuarioLogado.role === 'gestor';
+        
+        div.innerHTML = `
+            ${priorityBadge}
+            <div class="demanda-info">
+                <strong>${demanda.nomeFuncionario} - ${demanda.descricao}</strong>
+                <small>Categoria: ${demanda.categoria} | ${statusIcon} ${demanda.status.replace(/_/g, ' ')} | Local: ${demanda.local || 'N/A'} | Data Limite: ${dataLimiteFormatada}</small>
+                <small><strong>TAG:</strong> ${demanda.tag}</small>
+                ${demanda.comentarioGestor ? `<br><small><strong>Comentário do Gestor:</strong> ${demanda.comentarioGestor}</small>` : ''}
+                ${infoAdicional}
+                ${rotinaInfo}
+                ${diasFormatados ? `<small><strong>Dias da semana:</strong> ${diasFormatados}</small>` : ''}
+                <div class="time-remaining">${isAtrasada ? 'ATRASADA HÁ ' : 'TEMPO RESTANTE: '}${tempoRestante}</div>
+            </div>
+            <div class="acoes-demandas">
+                ${podeAprovar && (demanda.status === 'pendente' || demanda.status === 'finalizado_pendente_aprovacao' || demanda.status === 'reprovada') ? `
+                    <button class="success" onclick="solicitarSenhaParaAprovar(${demanda.id}, '${demanda.nomeFuncionario}')" title="Aprovar">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button class="danger" onclick="solicitarSenhaParaReprovar(${demanda.id}, '${demanda.nomeFuncionario}')" title="Reprovar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                ` : ''}
+                <button class="secondary" onclick="verDetalhes(${demanda.id})" title="Ver Detalhes">
+                    <i class="fas fa-eye"></i>
+                </button>
+                ${podeAprovar ? `
+                    <button class="danger" onclick="apagarDemanda(${demanda.id})" title="Apagar">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                ` : ''}
+            </div>
+        `;
+        return div;
+    }
+
+    // Sistema de senha para aprovação
+    function solicitarSenhaParaAprovar(id, nomeFuncionario) {
+        pendingAction = {
+            type: 'aprovar',
+            id: id,
+            nomeFuncionario: nomeFuncionario
+        };
+        document.getElementById('passwordModal').style.display = 'block';
+        document.getElementById('passwordConfirm').value = '';
+        document.getElementById('passwordConfirm').focus();
+    }
+
+    function solicitarSenhaParaReprovar(id, nomeFuncionario) {
+        pendingAction = {
+            type: 'reprovar',
+            id: id,
+            nomeFuncionario: nomeFuncionario
+        };
+        document.getElementById('passwordModal').style.display = 'block';
+        document.getElementById('passwordConfirm').value = '';
+        document.getElementById('passwordConfirm').focus();
+    }
+
+    function confirmPassword() {
+        const password = document.getElementById('passwordConfirm').value;
+        const gestor = usuarios.find(u => u.role === 'gestor');
+        
+        if (!gestor || password !== gestor.senha) {
+            showNotification('error', 'Senha Incorreta', 'A senha do gestor está incorreta.');
+            return;
+        }
+        
+        // Senha correta, executa a ação pendente
+        if (pendingAction.type === 'aprovar') {
+            aprovarDemanda(pendingAction.id, pendingAction.nomeFuncionario);
+        } else if (pendingAction.type === 'reprovar') {
+            reprovarDemanda(pendingAction.id, pendingAction.nomeFuncionario);
+        }
+        
+        closePasswordModal();
+    }
+
+    function closePasswordModal() {
+        document.getElementById('passwordModal').style.display = 'none';
+        pendingAction = null;
+    }
+
+    function verDetalhes(id) {
+        const demanda = todasDemandas.find(d => d.id === id);
+        if (!demanda) return;
+        
+        const content = `
+            <div class="demanda-details">
+                <h3>${demanda.descricao}</h3>
+                <p><strong>Funcionário:</strong> ${demanda.nomeFuncionario}</p>
+                <p><strong>Categoria:</strong> ${demanda.categoria}</p>
+                <p><strong>Status:</strong> ${demanda.status}</p>
+                <p><strong>Data Limite:</strong> ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}</p>
+                <p><strong>Data Criação:</strong> ${new Date(demanda.dataCriacao).toLocaleDateString('pt-BR')}</p>
+                ${demanda.dataConclusao ? `<p><strong>Data Conclusão:</strong> ${new Date(demanda.dataConclusao).toLocaleDateString('pt-BR')}</p>` : ''}
+                ${demanda.comentarios ? `<p><strong>Comentários:</strong> ${demanda.comentarios}</p>` : ''}
+                ${demanda.isRotina ? `<p><strong>Tipo:</strong> Tarefa de Rotina</p>` : ''}
+            </div>
+        `;
+        
+        showModal('detailModal', 'Detalhes da Demanda', content);
+    }
+
+    function calcularTempoRestante(dataLimite) {
+        const agora = new Date();
+        const limite = new Date(dataLimite);
+        const diferenca = limite - agora;
+        
+        if (diferenca < 0) {
+            // Se a data limite já passou, calcula quanto tempo está atrasada
+            const diasAtraso = Math.floor(Math.abs(diferenca) / (1000 * 60 * 60 * 24));
+            const horasAtraso = Math.floor((Math.abs(diferenca) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutosAtraso = Math.floor((Math.abs(diferenca) % (1000 * 60 * 60)) / (1000 * 60));
+            const segundosAtraso = Math.floor((Math.abs(diferenca) % (1000 * 60)) / 1000);
+            
+            return `${diasAtraso}d ${horasAtraso}h ${minutosAtraso}m ${segundosAtraso}s`;
+        } else {
+            // Calcula o tempo restante
+            const diasRestantes = Math.floor(diferenca / (1000 * 60 * 60 * 24));
+            const horasRestantes = Math.floor((diferenca % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutosRestantes = Math.floor((diferenca % (1000 * 60 * 60)) / (1000 * 60));
+            const segundosRestantes = Math.floor((diferenca % (1000 * 60)) / 1000);
+            
+            return `${diasRestantes}d ${horasRestantes}h ${minutosRestantes}m ${segundosRestantes}s`;
+        }
+    }
+
+    function atualizarTemposRestantes() {
+        // Atualiza todos os elementos com a classe time-remaining
+        document.querySelectorAll('.time-remaining').forEach(element => {
+            const divPai = element.closest('.demanda-item');
+            if (divPai) {
+                const botoes = divPai.querySelectorAll('button');
+                let demandaId = null;
+                
+                // Procura pelo botão que tem o ID da demanda no onclick
+                botoes.forEach(botao => {
+                    const onclick = botao.getAttribute('onclick');
+                    if (onclick && onclick.includes('solicitarSenhaParaAprovar')) {
+                        const match = onclick.match(/solicitarSenhaParaAprovar\((\d+)/);
+                        if (match) demandaId = parseInt(match[1]);
+                    } else if (onclick && onclick.includes('solicitarSenhaParaReprovar')) {
+                        const match = onclick.match(/solicitarSenhaParaReprovar\((\d+)/);
+                        if (match) demandaId = parseInt(match[1]);
+                    } else if (onclick && onclick.includes('apagarDemanda')) {
+                        const match = onclick.match(/apagarDemanda\((\d+)/);
+                        if (match) demandaId = parseInt(match[1]);
+                    }
+                });
+                
+                if (demandaId) {
+                    const demanda = todasDemandas.find(d => d.id === demandaId);
+                    
+                    if (demanda) {
+                        const isAtrasado = divPai.classList.contains('atrasado');
+                        const tempoRestante = calcularTempoRestante(demanda.dataLimite);
+                        element.textContent = `${isAtrasado ? 'ATRASADA HÁ ' : 'TEMPO RESTANTE: '}${tempoRestante}`;
+                    }
+                }
+            }
+        });
+    }
+
+    async function aprovarDemanda(id, nomeFuncionario) {
+        if (!confirm('Tem certeza que deseja aprovar esta demanda?')) return;
+        const demanda = todasDemandas.find(d => d.id === id);
+        if (demanda) {
+            const dadosAtualizados = {
+                status: 'aprovada',
+                dataConclusao: new Date().toISOString()
+            };
+            
+            const sucesso = await atualizarDemandaNoServidor(id, dadosAtualizados);
+            
+            if (sucesso) {
+                await carregarDadosDoServidor();
+                showNotification('success', 'Demanda Aprovada', `Demanda de ${nomeFuncionario} foi aprovada com sucesso!`);
+                
+                // Envia email para o funcionário
+                const funcionario = usuarios.find(u => u.id === demanda.funcionarioId);
+                if (funcionario) {
+                    const assunto = encodeURIComponent(`Sua Demanda Foi Aprovada: ${demanda.descricao}`);
+                    const corpo = encodeURIComponent(`Prezado(a) ${nomeFuncionario},\n\nGostaríamos de informar que sua demanda foi analisada e **aprovada**.\n\n--- Detalhes da Demanda ---\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nLocal: ${demanda.local || 'N/A'}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n\nParabéns pelo excelente trabalho!\n\nAtenciosamente,\nGestão`);
+                    window.open(`mailto:${funcionario.email}?subject=${assunto}&body=${corpo}`, '_blank');
+                }
+            }
+        }
+    }
+
+    async function reprovarDemanda(id, nomeFuncionario) {
+        const motivo = prompt('Por favor, justifique o motivo da reprovação:');
+        if (!motivo) return;
+
+        const demanda = todasDemandas.find(d => d.id === id);
+        if (demanda) {
+            const dadosAtualizados = {
+                status: 'reprovada',
+                dataConclusao: new Date().toISOString(),
+                comentarioGestor: motivo
+            };
+            
+            const sucesso = await atualizarDemandaNoServidor(id, dadosAtualizados);
+            
+            if (sucesso) {
+                await carregarDadosDoServidor();
+                showNotification('warning', 'Demanda Reprovada', `Demanda de ${nomeFuncionario} foi reprovada.`);
+                
+                // Envia email para o funcionário
+                const funcionario = usuarios.find(u => u.id === demanda.funcionarioId);
+                if (funcionario) {
+                    const assunto = encodeURIComponent(`Sua Demanda Foi Reprovada: ${demanda.descricao}`);
+                    const corpo = encodeURIComponent(`Prezado(a) ${nomeFuncionario},\n\nGostaríamos de informar que sua demanda foi analisada e, infelizmente, **reprovada** neste momento.\n\n--- Detalhes da Demanda ---\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nLocal: ${demanda.local || 'N/A'}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n\n--- Motivo da Reprovação ---\n${motivo}\n\nSugerimos que revise os pontos acima e, se necessário, entre em contato para maiores esclarecimentos.\n\nAtenciosamente,\nGestão`);
+                    window.open(`mailto:${funcionario.email}?subject=${assunto}&body=${corpo}`, '_blank');
+                }
+            }
+        }
+    }
+    
+    async function apagarDemanda(id) {
+        if (!confirm('Tem certeza que deseja apagar esta demanda? Esta ação não pode ser desfeita.')) return;
+        
+        const sucesso = await deletarDemandaDoServidor(id);
+        
+        if (sucesso) {
+            await carregarDadosDoServidor();
+            showNotification('info', 'Demanda Apagada', 'Demanda removida com sucesso.');
+        }
+    }
+
+    function atualizarRanking() {
+        // Conta as demandas concluídas por funcionário
+        const ranking = {};
+        
+        usuarios.filter(u => u.role === 'funcionario').forEach(func => {
+            ranking[func.id] = {
+                nome: func.nome,
+                nivel: func.nivel,
+                concluidas: 0,
+                atrasadas: 0,
+                pontos: func.pontos || 0,
+                conquistas: func.conquistas || []
+            };
+        });
+        
+        todasDemandas.forEach(demanda => {
+            if (ranking[demanda.funcionarioId]) {
+                if (demanda.status === 'aprovada') {
+                    ranking[demanda.funcionarioId].concluidas++;
+                    ranking[demanda.funcionarioId].pontos += 10;
+                }
+                
+                const dataLimite = new Date(demanda.dataLimite);
+                const hoje = new Date();
+                if (dataLimite < hoje && demanda.status !== 'aprovada') {
+                    ranking[demanda.funcionarioId].atrasadas++;
+                    ranking[demanda.funcionarioId].pontos -= 5;
+                }
+            }
+        });
+        
+        // Converte o objeto em array e ordena por pontos
+        const rankingArray = Object.values(ranking).sort((a, b) => b.pontos - a.pontos);
+        
+        // Renderiza o ranking
+        const rankingList = document.getElementById('rankingList');
+        if (rankingList) {
+            rankingList.innerHTML = '';
+            
+            rankingArray.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'ranking-item';
+                
+                let positionClass = '';
+                if (index === 0) positionClass = 'gold';
+                else if (index === 1) positionClass = 'silver';
+                else if (index === 2) positionClass = 'bronze';
+                
+                const badges = item.conquistas.map(c => 
+                    `<span class="badge badge-${c}">${c}</span>`
+                ).join(' ');
+                
+                li.innerHTML = `
+                    <div class="ranking-position ${positionClass}">${index + 1}</div>
+                    <div class="ranking-info">
+                        <strong>${item.nome} - ${item.nivel}</strong>
+                        <small>${item.concluidas} concluídas, ${item.atrasadas} atrasadas</small>
+                        <div class="ranking-badges">${badges}</div>
+                    </div>
+                    <div class="ranking-score">${item.pontos} pts</div>
+                `;
+                
+                rankingList.appendChild(li);
+            });
+        }
+    }
+
+    // Funções de validação
+    function validateDeadline() {
+        const deadlineInput = document.getElementById('dataLimiteInput');
+        if (!deadlineInput) return;
+        
+        const deadline = new Date(deadlineInput.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (deadline < today) {
+            showNotification('warning', 'Data Inválida', 'A data limite não pode ser anterior a hoje');
+            deadlineInput.value = '';
+        }
+    }
+
+    // Funções de rotina
+    function toggleRoutineFields() {
+        const rotinaCheckbox = document.getElementById('rotinaCheckbox');
+        const diasSemanaGroup = document.getElementById('diasSemanaGroup');
+        
+        if (diasSemanaGroup) {
+            diasSemanaGroup.style.display = rotinaCheckbox.checked ? 'block' : 'none';
+        }
+    }
+
+    // Sistema de notificações
+    function showNotification(type, title, message) {
+        const notification = document.getElementById('notification');
+        const titleElement = document.getElementById('notificationTitle');
+        const messageElement = document.getElementById('notificationMessage');
+        
+        if (!notification || !titleElement || !messageElement) {
+            console.error('Elementos de notificação não encontrados!');
+            return;
+        }
+        
+        notification.className = `notification ${type} show`;
+        titleElement.textContent = title;
+        messageElement.textContent = message;
+        
+        // Adiciona ao array de notificações
+        notifications.push({
+            tipo: type,
+            titulo: title,
+            mensagem: message,
+            data: new Date()
+        });
+        
+        // Remove notificação após 5 segundos
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 5000);
+    }
+
+    // Funções auxiliares adicionais
+    function resetFilters() {
+        document.getElementById('filtroFuncionario').value = 'todos';
+        document.getElementById('filtroPeriodo').value = '7';
+        document.getElementById('filtroCategoria').value = 'todas';
+        document.getElementById('filtroPrioridade').value = 'todas';
+        
+        filtrarDashboard();
+        showNotification('info', 'Filtros Resetados', 'Todos os filtros foram resetados');
+    }
+
+    function drillDown(type) {
+        showNotification('info', 'Análise Detalhada', `Analisando detalhes de ${type}...`);
+        
+        // Implementar drill down real
+        setTimeout(() => {
+            switchTab('pendentes');
+        }, 1000);
+    }
+
+    function bulkApprove() {
+        showNotification('info', 'Aprovação em Lote', 'Funcionalidade em desenvolvimento');
+    }
+
+    function bulkReject() {
+        showNotification('info', 'Reprovação em Lote', 'Funcionalidade em desenvolvimento');
+    }
+
+    function reassignOverdue() {
+        showNotification('info', 'Reatribuir Atrasadas', 'Funcionalidade em desenvolvimento');
+    }
+
+    function extendDeadlines() {
+        showNotification('info', 'Estender Prazos', 'Funcionalidade em desenvolvimento');
+    }
+
+    function exportCompleted() {
+        showNotification('info', 'Exportar Concluídas', 'Exportando demandas concluídas...');
+    }
+
+    function archiveCompleted() {
+        showNotification('info', 'Arquivar Concluídas', 'Arquivando demandas concluídas...');
+    }
+
+    function changeRankingPeriod() {
+        showNotification('info', 'Alterar Período', 'Selecionando período do ranking...');
+    }
+
+    function exportRanking() {
+        showNotification('info', 'Exportar Ranking', 'Exportando dados do ranking...');
+    }
+
+    function exportData() {
+        showNotification('info', 'Exportação Iniciada', 'Exportando dados...');
+    }
+
+    function scheduleExport() {
+        showNotification('info', 'Agendar Exportação', 'Funcionalidade em desenvolvimento');
+    }
+
+    function refreshChart(chartType) {
+        showNotification('info', 'Atualizando Gráfico', `Atualizando gráfico ${chartType}...`);
+        atualizarGraficos();
+    }
+
+    function downloadChart(chartType) {
+        const chart = charts[chartType];
+        if (chart) {
+            const url = chart.toBase64Image();
+            const link = document.createElement('a');
+            link.download = `chart_${chartType}_${Date.now()}.png`;
+            link.href = url;
+            link.click();
+            
+            showNotification('success', 'Gráfico Baixado', `Gráfico ${chartType} baixado com sucesso!`);
+        }
+    }
+
+    // Funções de importação (mantidas para compatibilidade)
+    function inicializarImportacaoJSON() {
+        // Mantido para compatibilidade futura
+    }
+
+    function inicializarNotificacoesTempoReal() {
+        // Simula chegada de notificações
+        setInterval(() => {
+            if (Math.random() > 0.9) {
+                const tipos = ['success', 'warning', 'info'];
+                const mensagens = [
+                    'Nova demanda concluída',
+                    'Demanda está próxima do prazo',
+                    'Funcionário disponível para nova tarefa',
+                    'Meta semanal alcançada'
+                ];
+                
+                const tipo = tipos[Math.floor(Math.random() * tipos.length)];
+                const mensagem = mensagens[Math.floor(Math.random() * mensagens.length)];
+                
+                showNotification(tipo, 'Notificação do Sistema', mensagem);
+            }
+        }, 45000); // A cada 45 segundos
+    }
+
+    // Tecla Enter no modal de senha
+    document.getElementById('passwordConfirm').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            confirmPassword();
+        }
+    });
+
+    // Tecla Esc para fechar modal de senha
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePasswordModal();
+        }
+    });
+</script>
+
+</body>
+</html>
