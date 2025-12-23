@@ -2332,8 +2332,16 @@
         try {
             const response = await fetch(`${SERVER_URL}/api/demandas`);
             if (response.ok) {
-                todasDemandas = await response.json();
-                console.log(`Carregadas ${todasDemandas.length} demandas do servidor`);
+                const demandasDoServidor = await response.json();
+                
+                // Adiciona novas demandas sem substituir as existentes
+                demandasDoServidor.forEach(demandaServidor => {
+                    if (!todasDemandas.find(d => d.id === demandaServidor.id)) {
+                        todasDemandas.push(demandaServidor);
+                    }
+                });
+                
+                console.log(`Carregadas ${demandasDoServidor.length} demandas do servidor. Total: ${todasDemandas.length}`);
             } else {
                 console.error('Erro ao carregar demandas do servidor');
                 showNotification('error', 'Erro de Conexão', 'Não foi possível conectar ao servidor. Verifique se o servidor está rodando.');
@@ -2874,7 +2882,7 @@
                 // Define o status inicial
                 let statusInicial = 'pendente';
                 if (atribuidos.length > 0 && !atribuidos.some(a => a.id === usuarioLogado.id)) {
-                    statusInicial = 'atribuida_pendente_aceitacao'; // Status para demandas atribuídas a outros
+                    statusInicial = 'pendente'; // Status simplificado, sem necessidade de aceitação
                 }
                 
                 // Cria o objeto da demanda
@@ -3033,7 +3041,7 @@
                 if (atribuido.id !== demanda.funcionarioId) {
                     const assuntoAtribuido = encodeURIComponent(`Nova Demanda Atribuída: ${demanda.nomeDemanda}`);
                     let corpoAtribuido = `Prezado(a) ${atribuido.nome},\n\nUma nova demanda foi atribuída a você por ${demanda.nomeFuncionario}:\n\n--- Detalhes da Demanda ---\nNome: ${demanda.nomeDemanda}\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nPrioridade: ${demanda.prioridade}\nComplexidade: ${demanda.complexidade}\nLocal: ${demanda.local}\nData Limite: ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n`;
-                    corpoAtribuido += `\nPor favor, acesse o sistema para ACEITAR ou REPROVAR esta demanda.\n\nAtenciosamente,\nSistema Automático`;
+                    corpoAtribuido += `\nPor favor, acesse o sistema para começar a trabalhar nesta demanda.\n\nAtenciosamente,\nSistema Automático`;
                     
                     window.open(`mailto:${atribuido.email}?subject=${assuntoAtribuido}&body=${encodeURIComponent(corpoAtribuido)}`, '_blank');
                 }
@@ -3208,7 +3216,7 @@
         // Filtra as demandas pendentes (incluindo as que precisam ser reavaliadas)
         const pendentes = todasDemandas.filter(d => {
             console.log(`Demanda ID ${d.id}: status = ${d.status}`);
-            return d.status === 'pendente' || d.status === 'reprovada' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'atribuida_pendente_aceitacao' || d.status === 'reprovada_pelo_atribuido';
+            return d.status === 'pendente' || d.status === 'reprovada' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'reprovada_pelo_atribuido';
         });
         
         console.log('Demandas pendentes encontradas:', pendentes.length);
@@ -3274,7 +3282,6 @@
         if (demanda.status === 'aprovada') statusIcon = '✅';
         if (demanda.status === 'reprovada' || demanda.status === 'reprovada_pelo_atribuido') statusIcon = '❌';
         if (demanda.status === 'finalizado_pendente_aprovacao') statusIcon = '📋';
-        if (demanda.status === 'atribuida_pendente_aceitacao') statusIcon = '👤';
         if (isAtrasada) statusIcon = '⚠️';
         
         const dataLimiteFormatada = new Date(demanda.dataLimite).toLocaleDateString('pt-BR');
@@ -3338,14 +3345,6 @@
                         <i class="fas fa-tools"></i>
                     </button>
                 ` : ''}
-                ${eAtribuido && demanda.status === 'atribuida_pendente_aceitacao' ? `
-                    <button class="success" onclick="aceitarDemandaAtribuida(${demanda.id})" title="Aceitar Demanda">
-                        <i class="fas fa-check"></i>
-                    </button>
-                    <button class="danger" onclick="abrirModalReprovarAtribuicao(${demanda.id})" title="Reprovar Demanda">
-                        <i class="fas fa-times"></i>
-                    </button>
-                ` : ''}
                 ${podeAprovar && (demanda.status === 'finalizado_pendente_aprovacao') ? `
                     <button class="success" onclick="solicitarSenhaParaAprovar(${demanda.id}, '${demanda.nomeFuncionario}')" title="Aprovar">
                         <i class="fas fa-check"></i>
@@ -3365,33 +3364,6 @@
             </div>
         `;
         return div;
-    }
-
-    // Função para aceitar uma demanda atribuída
-    async function aceitarDemandaAtribuida(demandaId) {
-        if (!confirm('Tem certeza que deseja aceitar esta demanda? Ela passará para o seu status de "Em Andamento".')) return;
-        
-        const demanda = todasDemandas.find(d => d.id === demandaId);
-        if (demanda) {
-            const dadosAtualizados = {
-                status: 'pendente'
-            };
-            
-            const sucesso = await atualizarDemandaNoServidor(demandaId, dadosAtualizados);
-            
-            if (sucesso) {
-                await carregarDadosDoServidor();
-                showNotification('success', 'Demanda Aceita', `Você aceitou a demanda "${demanda.nomeDemanda}". Ela agora está em seu painel para ser resolvida.`);
-                
-                // Notifica o criador da demanda
-                const criador = usuarios.find(u => u.id === demanda.funcionarioId);
-                if (criador) {
-                    const assunto = encodeURIComponent(`Sua Demanda Foi Aceita: ${demanda.nomeDemanda}`);
-                    const corpo = encodeURIComponent(`Prezado(a) ${criador.nome},\n\nTemos uma boa notícia! A demanda "${demanda.nomeDemanda}" que você atribuiu foi **ACEITA**.\n\nEla agora está sendo trabalhada.\n\nAcompanhe o progresso pelo sistema.\n\nAtenciosamente,\nSistema de Gestão`);
-                    window.open(`mailto:${criador.email}?subject=${assunto}&body=${corpo}`, '_blank');
-                }
-            }
-        }
     }
 
     // Função para calcular o desempenho de tempo
@@ -3653,7 +3625,7 @@
             if (ranking[demanda.funcionarioId]) {
                 if (demanda.status === 'aprovada') {
                     ranking[demanda.funcionarioId].concluidas++;
-                } else if (demanda.status === 'pendente' || demanda.status === 'finalizado_pendente_aprovacao' || demanda.status === 'reprovada' || demanda.status === 'atribuida_pendente_aceitacao' || demanda.status === 'reprovada_pelo_atribuido') {
+                } else if (demanda.status === 'pendente' || demanda.status === 'finalizado_pendente_aprovacao' || demanda.status === 'reprovada' || demanda.status === 'reprovada_pelo_atribuido') {
                     ranking[demanda.funcionarioId].andamento++;
                 }
                 
