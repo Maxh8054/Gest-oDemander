@@ -237,11 +237,13 @@
             align-items: center;
         }
 
+        /* MUDANÇA: Ajuste no item de notificação para acomodar o botão */
         .notification-item {
             padding: 12px 15px;
             border-bottom: 1px solid #f0f0f0;
             cursor: pointer;
             transition: background-color 0.2s;
+            position: relative; /* Necessário para posicionar o botão */
         }
 
         .notification-item:hover {
@@ -1892,19 +1894,29 @@
         dropdown.classList.toggle('show');
     }
 
-    function addUserNotification(type, title, message) {
+    // MUDANÇA: A função agora aceita dados extras, como a TAG da demanda
+    function addUserNotification(type, title, message, data = {}) {
         const notification = {
-            id: Date.now(),
+            id: Date.now() + Math.random(), // ID mais único para evitar conflitos
             type: type,
             title: title,
             message: message,
-            date: new Date()
+            date: new Date(),
+            ...data // Adiciona dados extras como a tag
         };
         userNotifications.unshift(notification);
         renderUserNotifications();
         updateNotificationCount();
     }
 
+    // MUDANÇA: Função para marcar uma notificação individual como lida
+    function markAsRead(id) {
+        userNotifications = userNotifications.filter(n => n.id !== id);
+        renderUserNotifications();
+        updateNotificationCount();
+    }
+
+    // MUDANÇA: Renderiza as notificações com o botão "Marcar como lida" e link para a demanda
     function renderUserNotifications() {
         const listContainer = document.getElementById('notificationsList');
         if (!listContainer) return;
@@ -1915,10 +1927,13 @@
         }
 
         listContainer.innerHTML = userNotifications.map(not => `
-            <div class="notification-item" onclick="markAsRead(${not.id})">
+            <div class="notification-item" onclick="goToDemandaFromNotification('${not.tag || ''}')">
                 <h4>${not.title}</h4>
                 <p>${not.message}</p>
                 <small>${formatDate(not.date)}</small>
+                <button class="clear-notifications-btn" onclick="event.stopPropagation(); markAsRead(${not.id})" title="Marcar como lida">
+                    <i class="fas fa-check"></i>
+                </button>
             </div>
         `).join('');
     }
@@ -2039,7 +2054,6 @@
         timerInterval = setInterval(atualizarTemposRestantes, 1000);
         inicializarNotificacoesTempoReal();
         
-        // NOVO: Gera notificações ao logar
         gerarNotificacoesAoLogar();
     }
 
@@ -2150,7 +2164,6 @@
             if (response.ok) {
                 const demandasDoServidor = await response.json();
                 
-                // MUDANÇA: Fazendo o parse do campo 'atribuidos' que vem como string JSON
                 demandasDoServidor.forEach(demandaServidor => {
                     if (demandaServidor.atribuidos && typeof demandaServidor.atribuidos === 'string') {
                         try {
@@ -2268,23 +2281,53 @@
         }
     }
 
-    // NOVO: Função para gerar notificações de demandas atribuídas ao logar
+    // MUDANÇA: Melhorada a mensagem e adicionado a TAG à notificação
     function gerarNotificacoesAoLogar() {
         if (!usuarioLogado || usuarioLogado.role !== 'funcionario') return;
 
         getDemandasParaUsuarioLogado().forEach(demanda => {
-            // Verifica se a demanda foi atribuída a mim e não está concluída
             const isAtribuidoAMim = demanda.atribuidos && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
             const isDono = demanda.funcionarioId === usuarioLogado.id;
             
+            // Notifica apenas sobre tarefas que foram atribuídas a mim por outra pessoa
             if (isAtribuidoAMim && !isDono && demanda.status !== 'aprovada') {
-                const notificacaoExistente = userNotifications.find(n => n.message.includes(demanda.tag) && n.title.includes('atribuída'));
+                const notificacaoExistente = userNotifications.find(n => n.tag === demanda.tag && n.title.includes('atribuiu'));
                 if (!notificacaoExistente) {
-                    addUserNotification('info', 'Nova Tarefa Atribuída', `Você tem uma tarefa pendente: "${demanda.nomeDemanda}".`);
+                    const nomeTarefa = demanda.nomeDemanda || demanda.descricao || 'uma tarefa';
+                    addUserNotification('info', 'Nova Tarefa Atribuída', `${demanda.nomeFuncionario} atribuiu uma tarefa a você: "${nomeTarefa}".`, { tag: demanda.tag });
                 }
             }
         });
     }
+
+    // MUDANÇA: Nova função para navegar até a demanda a partir da notificação
+    function goToDemandaFromNotification(tag) {
+        if (!tag) return;
+
+        // Fecha o dropdown de notificações
+        document.getElementById('notificationsDropdown').classList.remove('show');
+
+        // Vai para a aba de pendentes
+        switchTab('pendentes');
+
+        // Espera um pouco para a aba renderizar e depois encontra a demanda
+        setTimeout(() => {
+            const allDemandaItems = document.querySelectorAll('#pendentesContainer .demanda-item');
+            for (const item of allDemandaItems) {
+                if (item.innerHTML.includes(`TAG: ${tag}`)) {
+                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Efeito de destaque
+                    item.style.transition = 'background-color 0.5s';
+                    item.style.backgroundColor = 'rgba(255, 193, 7, 0.5)';
+                    setTimeout(() => {
+                        item.style.backgroundColor = '';
+                    }, 2500); // Duração do destaque
+                    break;
+                }
+            }
+        }, 300); // Delay para garantir que a aba foi renderizada
+    }
+
 
     function getDemandasParaUsuarioLogado() {
         if (usuarioLogado && usuarioLogado.role === 'gestor') {
@@ -2293,7 +2336,6 @@
         if (usuarioLogado && usuarioLogado.role === 'funcionario') {
             return todasDemandas.filter(demanda => {
                 const eCriador = demanda.funcionarioId === usuarioLogado.id;
-                // MUDANÇA: Garante que 'atribuidos' seja um array antes de usar 'some'
                 const eAtribuido = Array.isArray(demanda.atribuidos) && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
                 return eCriador || eAtribuido;
             });
@@ -2665,7 +2707,7 @@
                     comentarios: '',
                     comentarioGestor: '',
                     anexosCriacao,
-                    atribuidos: atribuidos // MUDANÇA: Enviando a lista de atribuídos corretamente
+                    atribuidos: atribuidos
                 };
                 
                 const sucesso = await salvarDemandaNoServidor(novaDemanda);
@@ -2674,11 +2716,8 @@
                     await carregarDadosDoServidor();
                     notificarPartesInteressadasNovaDemanda(novaDemanda);
                     
-                    if (atribuidos.length > 0) {
-                        atribuidos.forEach(atribuido => {
-                            addUserNotification('info', 'Nova Tarefa Atribuída', `A demanda "${nomeDemanda}" foi atribuída a você.`);
-                        });
-                    }
+                    // MUDANÇA: Removido o loop que criava notificações duplicadas aqui.
+                    // As notificações para os atribuídos são geradas apenas no login deles pela função `gerarNotificacoesAoLogar`.
                     
                     form.reset();
                     document.getElementById('anexosCriacaoList').innerHTML = '';
@@ -2868,7 +2907,7 @@
 
                 const gestor = usuarios.find(u => u.role === 'gestor');
                 if(gestor) {
-                    addUserNotification('info', 'Demanda para Aprovar', `A demanda "${demandaResolucaoAtual.nomeDemanda}" foi resolvida e espera sua aprovação.`);
+                    addUserNotification('info', 'Demanda para Aprovar', `A demanda "${demandaResolucaoAtual.nomeDemanda}" foi resolvida e espera sua aprovação.`, { tag: demandaResolucaoAtual.tag });
                 }
             }
 
@@ -3006,7 +3045,6 @@
             `<span class="demanda-priority priority-${demanda.prioridade.toLowerCase()}">${demanda.prioridade}</span>` : '';
         
         const podeAprovar = usuarioLogado && usuarioLogado.role === 'gestor';
-        // MUDANÇA: Verifica se é dono OU se está na lista de atribuídos
         const eDono = usuarioLogado && usuarioLogado.id === demanda.funcionarioId;
         const eAtribuido = usuarioLogado && Array.isArray(demanda.atribuidos) && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
         
@@ -3230,7 +3268,7 @@
                     const corpo = encodeURIComponent(`Prezado(a) ${nomeFuncionario},\n\nSua demanda foi analisada e aprovada.\n\n--- Detalhes ---\nNome: ${demanda.nomeDemanda || demanda.descricao}\nTAG: ${demanda.tag}\n\nParabéns pelo excelente trabalho!\n\nAtenciosamente,\nGestão`);
                     window.open(`mailto:${funcionario.email}?subject=${assunto}&body=${corpo}`, '_blank');
                     
-                    addUserNotification('success', 'Demanda Aprovada', `Sua demanda "${demanda.nomeDemanda}" foi aprovada!`);
+                    addUserNotification('success', 'Demanda Aprovada', `Sua demanda "${demanda.nomeDemanda}" foi aprovada!`, { tag: demanda.tag });
                 }
             }
         }
@@ -3260,7 +3298,7 @@
                     const corpo = encodeURIComponent(`Prezado(a) ${nomeFuncionario},\n\nSua demanda foi analisada e reprovada.\n\n--- Motivo ---\n${motivo}\n\nPor favor, revise e crie uma nova demanda se necessário.\n\nAtenciosamente,\nGestão`);
                     window.open(`mailto:${funcionario.email}?subject=${assunto}&body=${corpo}`, '_blank');
 
-                    addUserNotification('warning', 'Demanda Reprovada', `Sua demanda "${demanda.nomeDemanda}" foi reprovada.`);
+                    addUserNotification('warning', 'Demanda Reprovada', `Sua demanda "${demanda.nomeDemanda}" foi reprovada.`, { tag: demanda.tag });
                 }
             }
         }
@@ -3277,7 +3315,6 @@
         }
     }
 
-    // MUDANÇA: A função de ranking agora considera tanto criadores quanto atribuídos
     function atualizarRanking() {
         const ranking = {};
         
@@ -3291,7 +3328,6 @@
         });
         
         todasDemandas.forEach(demanda => {
-            // Conta para o criador
             if (ranking[demanda.funcionarioId]) {
                 if (demanda.status === 'aprovada') {
                     ranking[demanda.funcionarioId].concluidas++;
@@ -3306,7 +3342,6 @@
                 }
             }
 
-            // NOVO: Conta para os atribuídos
             if (Array.isArray(demanda.atribuidos)) {
                 demanda.atribuidos.forEach(atribuido => {
                     if (ranking[atribuido.id]) {
@@ -3470,7 +3505,6 @@
     }
 
     function inicializarImportacaoJSON() {
-        // Mantido para compatibilidade futura
     }
 
     function inicializarNotificacoesTempoReal() {
