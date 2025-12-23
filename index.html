@@ -29,6 +29,8 @@
             --gold: #ffd700;
             --silver: #c0c0c0;
             --bronze: #cd7f32;
+            /* MUDANÇA: Cor para notificação prioritária */
+            --priority-color: #ff9800;
         }
 
         * {
@@ -237,17 +239,23 @@
             align-items: center;
         }
 
-        /* MUDANÇA: Ajuste no item de notificação para acomodar o botão */
+        /* MUDANÇA: Ajuste no item de notificação para acomodar os botões e o estilo de prioridade */
         .notification-item {
             padding: 12px 15px;
             border-bottom: 1px solid #f0f0f0;
             cursor: pointer;
             transition: background-color 0.2s;
-            position: relative; /* Necessário para posicionar o botão */
+            position: relative;
         }
 
         .notification-item:hover {
             background-color: var(--light-color);
+        }
+        
+        /* MUDANÇA: Estilo para notificação prioritária */
+        .notification-item.priority {
+            background-color: rgba(255, 152, 0, 0.1);
+            border-left: 4px solid var(--priority-color);
         }
 
         .notification-item:last-child {
@@ -272,6 +280,31 @@
             font-size: 0.7rem;
             color: #aaa;
         }
+        
+        /* MUDANÇA: Container para os botões de ação da notificação */
+        .notification-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .notification-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+        .notification-actions button:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        .notification-actions button.priority { color: var(--warning-color); }
+        .notification-actions button.read { color: var(--success-color); }
+
 
         .clear-notifications-btn {
             background: none;
@@ -389,21 +422,9 @@
             gap: 5px;
         }
 
-        .trend-indicator {
-            font-size: 0.8rem;
-            padding: 2px 6px;
-            border-radius: 12px;
-            font-weight: normal;
-        }
-
-        .trend-up {
-            background: rgba(40, 167, 69, 0.2);
-            color: var(--success-color);
-        }
-
-        .trend-down {
-            background: rgba(220, 53, 69, 0.2);
-            color: var(--danger-color);
+        /* MUDANÇA: Escondendo os indicadores de tendência */
+        .stat-info .trend-indicator {
+            display: none; /* Esconde os números de porcentagem */
         }
 
         .stat-info p {
@@ -1401,6 +1422,7 @@
                     </div>
                     <div class="stat-info">
                         <h3 id="totalDemandas">0</h3>
+                        <!-- MUDANÇA: Indicadores de tendência escondidos -->
                         <span class="trend-indicator trend-up">+12%</span>
                         <p>Total de Demandas</p>
                     </div>
@@ -1448,9 +1470,9 @@
             </div>
 
             <div class="tabs">
+                <!-- MUDANÇA: Removido o badge da aba Dashboard -->
                 <div class="tab active" onclick="switchTab('dashboard')">
                     <i class="fas fa-chart-pie"></i> Dashboard
-                    <span class="badge" id="dashboardBadge" style="display: none;">0</span>
                 </div>
                 <div class="tab" onclick="switchTab('nova')">
                     <i class="fas fa-plus-circle"></i> Nova Demanda
@@ -1465,6 +1487,7 @@
                 </div>
                 <div class="tab" onclick="switchTab('aprovadas')">
                     <i class="fas fa-check-circle"></i> Concluídas
+                    <span class="badge" id="aprovadasBadge" style="display: none;">0</span>
                 </div>
                 <div class="tab" onclick="switchTab('ranking')">
                     <i class="fas fa-chart-bar"></i> Ranking
@@ -1894,29 +1917,61 @@
         dropdown.classList.toggle('show');
     }
 
-    // MUDANÇA: A função agora aceita dados extras, como a TAG da demanda
+    // MUDANÇA: Função para salvar notificações no localStorage
+    function saveNotificationsToStorage() {
+        if (!usuarioLogado) return;
+        const key = `notifications_${usuarioLogado.id}`;
+        localStorage.setItem(key, JSON.stringify(userNotifications));
+    }
+
+    // MUDANÇA: Função para carregar notificações do localStorage
+    function loadNotificationsFromStorage() {
+        if (!usuarioLogado) return;
+        const key = `notifications_${usuarioLogado.id}`;
+        const stored = localStorage.getItem(key);
+        if (stored) {
+            userNotifications = JSON.parse(stored);
+        } else {
+            userNotifications = [];
+        }
+    }
+
     function addUserNotification(type, title, message, data = {}) {
         const notification = {
-            id: Date.now() + Math.random(), // ID mais único para evitar conflitos
+            id: Date.now() + Math.random(),
             type: type,
             title: title,
             message: message,
             date: new Date(),
-            ...data // Adiciona dados extras como a tag
+            isPriority: false, // MUDANÇA: Adicionado flag de prioridade
+            ...data
         };
         userNotifications.unshift(notification);
         renderUserNotifications();
         updateNotificationCount();
+        // MUDANÇA: Salva no localStorage após adicionar
+        saveNotificationsToStorage();
     }
 
-    // MUDANÇA: Função para marcar uma notificação individual como lida
+    // MUDANÇA: Atualiza o contador e salva ao marcar como lida
     function markAsRead(id) {
         userNotifications = userNotifications.filter(n => n.id !== id);
         renderUserNotifications();
         updateNotificationCount();
+        // MUDANÇA: Salva no localStorage após remover
+        saveNotificationsToStorage();
     }
 
-    // MUDANÇA: Renderiza as notificações com o botão "Marcar como lida" e link para a demanda
+    // MUDANÇA: Nova função para marcar como prioridade
+    function markAsPriority(id) {
+        const notification = userNotifications.find(n => n.id === id);
+        if (notification) {
+            notification.isPriority = true;
+            renderUserNotifications();
+            saveNotificationsToStorage();
+        }
+    }
+
     function renderUserNotifications() {
         const listContainer = document.getElementById('notificationsList');
         if (!listContainer) return;
@@ -1927,13 +1982,18 @@
         }
 
         listContainer.innerHTML = userNotifications.map(not => `
-            <div class="notification-item" onclick="goToDemandaFromNotification('${not.tag || ''}')">
+            <div class="notification-item ${not.isPriority ? 'priority' : ''}" onclick="goToDemandaFromNotification('${not.tag || ''}')">
                 <h4>${not.title}</h4>
                 <p>${not.message}</p>
                 <small>${formatDate(not.date)}</small>
-                <button class="clear-notifications-btn" onclick="event.stopPropagation(); markAsRead(${not.id})" title="Marcar como lida">
-                    <i class="fas fa-check"></i>
-                </button>
+                <div class="notification-actions">
+                    <button class="priority" onclick="event.stopPropagation(); markAsPriority(${not.id})" title="Marcar como Prioridade">
+                        <i class="fas fa-star"></i>
+                    </button>
+                    <button class="read" onclick="event.stopPropagation(); markAsRead(${not.id})" title="Marcar como Lida">
+                        <i class="fas fa-check"></i>
+                    </button>
+                </div>
             </div>
         `).join('');
     }
@@ -1942,6 +2002,8 @@
         userNotifications = [];
         renderUserNotifications();
         updateNotificationCount();
+        // MUDANÇA: Salva no localStorage ao limpar tudo
+        saveNotificationsToStorage();
     }
 
     function updateNotificationCount() {
@@ -2045,6 +2107,8 @@
 
     async function inicializarSistemaPrincipal() {
         carregarFuncionariosNosSelect();
+        // MUDANÇA: Carrega notificações do storage antes de carregar dados do servidor
+        loadNotificationsFromStorage();
         await carregarDadosDoServidor();
         inicializarImportacaoJSON();
         atualizarDashboard();
@@ -2263,10 +2327,12 @@
             const hoje = new Date();
             return dataLimite < hoje;
         }).length;
+        const aprovadas = getDemandasParaUsuarioLogado().filter(d => d.status === 'aprovada').length;
         
         updateBadge('pendingBadge', pendentes);
         updateBadge('overdueBadge', atrasadas);
-        updateBadge('dashboardBadge', Math.floor(Math.random() * 10));
+        // MUDANÇA: Adicionado badge para a aba de aprovadas
+        updateBadge('aprovadasBadge', aprovadas);
     }
 
     function updateBadge(badgeId, count) {
@@ -2281,7 +2347,6 @@
         }
     }
 
-    // MUDANÇA: Melhorada a mensagem e adicionado a TAG à notificação
     function gerarNotificacoesAoLogar() {
         if (!usuarioLogado || usuarioLogado.role !== 'funcionario') return;
 
@@ -2289,7 +2354,6 @@
             const isAtribuidoAMim = demanda.atribuidos && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
             const isDono = demanda.funcionarioId === usuarioLogado.id;
             
-            // Notifica apenas sobre tarefas que foram atribuídas a mim por outra pessoa
             if (isAtribuidoAMim && !isDono && demanda.status !== 'aprovada') {
                 const notificacaoExistente = userNotifications.find(n => n.tag === demanda.tag && n.title.includes('atribuiu'));
                 if (!notificacaoExistente) {
@@ -2300,32 +2364,27 @@
         });
     }
 
-    // MUDANÇA: Nova função para navegar até a demanda a partir da notificação
     function goToDemandaFromNotification(tag) {
         if (!tag) return;
 
-        // Fecha o dropdown de notificações
         document.getElementById('notificationsDropdown').classList.remove('show');
 
-        // Vai para a aba de pendentes
         switchTab('pendentes');
 
-        // Espera um pouco para a aba renderizar e depois encontra a demanda
         setTimeout(() => {
             const allDemandaItems = document.querySelectorAll('#pendentesContainer .demanda-item');
             for (const item of allDemandaItems) {
                 if (item.innerHTML.includes(`TAG: ${tag}`)) {
                     item.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Efeito de destaque
                     item.style.transition = 'background-color 0.5s';
                     item.style.backgroundColor = 'rgba(255, 193, 7, 0.5)';
                     setTimeout(() => {
                         item.style.backgroundColor = '';
-                    }, 2500); // Duração do destaque
+                    }, 2500);
                     break;
                 }
             }
-        }, 300); // Delay para garantir que a aba foi renderizada
+        }, 300);
     }
 
 
@@ -2716,9 +2775,6 @@
                     await carregarDadosDoServidor();
                     notificarPartesInteressadasNovaDemanda(novaDemanda);
                     
-                    // MUDANÇA: Removido o loop que criava notificações duplicadas aqui.
-                    // As notificações para os atribuídos são geradas apenas no login deles pela função `gerarNotificacoesAoLogar`.
-                    
                     form.reset();
                     document.getElementById('anexosCriacaoList').innerHTML = '';
                     selectedUsers = [];
@@ -3038,7 +3094,7 @@
             tempoElement = `<div class="time-performance ${performanceClass}">${performanceText}</div>`;
         } else {
             const tempoRestante = calcularTempoRestante(demanda.dataLimite);
-            tempoElement = `<div class="time-remaining">${isAtrasada ? 'ATRASADA HÁ ' : 'TEMPO RESTANTE: '}${tempoRestante}</div>`;
+            tempoElement = `<div class="time-remaining">${isAtrasado ? 'ATRASADA HÁ ' : 'TEMPO RESTANTE: '}${tempoRestante}</div>`;
         }
         
         const priorityBadge = demanda.prioridade ? 
