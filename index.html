@@ -1,16 +1,3 @@
-
-
-Claro! Fiz todas as alterações necessárias no seu `index.html` de forma completa e integrada.
-
-As principais mudanças foram:
-1.  **Notificações Individuais:** Agora, as notificações são salvas no `localStorage` do navegador de forma individual para cada usuário. Se o Usuário A marcar uma notificação como lida, isso não afetará as notificações do Usuário B.
-2.  **Ações de Notificação:** Cada notificação no menu suspenso agora tem um botão para "Marcar como lida" (✓) e outro para "Marcar como Prioridade" (⭐). Notificações prioritárias ficam destacadas com uma borda dourada.
-3.  **Limpeza de Badges:** Removi os indicadores de tendência (ex: "+12%") dos cards do dashboard e o badge numérico da aba "Dashboard". Os badges numéricos foram mantidos apenas nas abas "Minhas Demandas", "Atrasadas" e "Concluídas".
-4.  **Persistência:** As alterações nas notificações (lidas, prioridade) são salvas automaticamente e persistem mesmo que o usuário saia e entre novamente no sistema.
-
-Aqui está o código completo e corrigido. Você pode substituir todo o conteúdo do seu arquivo `index.html` por este.
-
-```html
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -3402,5 +3389,600 @@ Aqui está o código completo e corrigido. Você pode substituir todo o conteúd
             if (ranking[demanda.funcionarioId]) {
                 if (demanda.status === 'aprovada') {
                     ranking[demanda.funcionarioId].concluidas++;
-                } else if (demanda.status === 'pendente' || dema
-```
+                } else if (demanda.status === 'pendente' || demanda.status === 'finalizado_pendente_aprovacao' || demanda.status === 'reprovada' || demanda.status === 'reprovada_pelo_atribuido') {
+                    ranking[demanda.funcionarioId].andamento++;
+                }
+                
+                const dataLimite = new Date(demanda.dataLimite);
+                const hoje = new Date();
+                if (dataLimite < hoje && demanda.status !== 'aprovada') {
+                    ranking[demanda.funcionarioId].atrasadas++;
+                }
+            }
+
+            if (Array.isArray(demanda.atribuidos)) {
+                demanda.atribuidos.forEach(atribuido => {
+                    if (ranking[atribuido.id]) {
+                        if (demanda.status === 'aprovada') {
+                            ranking[atribuido.id].concluidas++;
+                        } else if (demanda.status === 'pendente' || demanda.status === 'finalizado_pendente_aprovacao' || demanda.status === 'reprovada' || demanda.status === 'reprovada_pelo_atribuido') {
+                            ranking[atribuido.id].andamento++;
+                        }
+                        
+                        const dataLimite = new Date(demanda.dataLimite);
+                        const hoje = new Date();
+                        if (dataLimite < hoje && demanda.status !== 'aprovada') {
+                            ranking[atribuido.id].atrasadas++;
+                        }
+                    }
+                });
+            }
+        });
+        
+        const rankingArray = Object.values(ranking).sort((a, b) => b.concluidas - a.concluidas);
+        
+        const rankingList = document.getElementById('rankingList');
+        if (rankingList) {
+            rankingList.innerHTML = '';
+            
+            rankingArray.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'ranking-item';
+                
+                li.innerHTML = `
+                    <div class="ranking-position">${index + 1}</div>
+                    <div class="ranking-info">
+                        <strong>${item.nome}</strong>
+                        <div class="ranking-stats">
+                            <div class="ranking-stat">
+                                <span class="stat-badge concluidas">${item.concluidas} concluídas</span>
+                            </div>
+                            <div class="ranking-stat">
+                                <span class="stat-badge andamento">${item.andamento} em andamento</span>
+                            </div>
+                            <div class="ranking-stat">
+                                <span class="stat-badge atrasadas">${item.atrasadas} atrasadas</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                rankingList.appendChild(li);
+            });
+        }
+    }
+
+    function validateDeadline() {
+        const deadlineInput = document.getElementById('dataLimiteInput');
+        if (!deadlineInput) return;
+        
+        const deadline = new Date(deadlineInput.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (deadline < today) {
+            showNotification('warning', 'Data Inválida', 'A data limite não pode ser anterior a hoje');
+            deadlineInput.value = '';
+        }
+    }
+
+    function toggleRoutineFields() {
+        const rotinaCheckbox = document.getElementById('rotinaCheckbox');
+        const diasSemanaGroup = document.getElementById('diasSemanaGroup');
+        
+        if (diasSemanaGroup) {
+            diasSemanaGroup.style.display = rotinaCheckbox.checked ? 'block' : 'none';
+        }
+    }
+
+    function showNotification(type, title, message) {
+        const notification = document.getElementById('notification');
+        const titleElement = document.getElementById('notificationTitle');
+        const messageElement = document.getElementById('notificationMessage');
+        
+        if (!notification || !titleElement || !messageElement) {
+            console.error('Elementos de notificação não encontrados!');
+            return;
+        }
+        
+        notification.className = `notification ${type} show`;
+        titleElement.textContent = title;
+        messageElement.textContent = message;
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 5000);
+    }
+
+    function resetFilters() {
+        document.getElementById('filtroFuncionario').value = 'todos';
+        document.getElementById('filtroPeriodo').value = '7';
+        document.getElementById('filtroCategoria').value = 'todas';
+        document.getElementById('filtroPrioridade').value = 'todas';
+        
+        filtrarDashboard();
+        showNotification('info', 'Filtros Resetados', 'Todos os filtros foram resetados');
+    }
+
+    function drillDown(type) {
+        showNotification('info', 'Análise Detalhada', `Analisando detalhes de ${type}...`);
+        
+        setTimeout(() => {
+            switchTab('pendentes');
+        }, 1000);
+    }
+
+    function bulkApprove() {
+        showNotification('info', 'Aprovação em Lote', 'Funcionalidade em desenvolvimento');
+    }
+
+    function bulkReject() {
+        showNotification('info', 'Reprovação em Lote', 'Funcionalidade em desenvolvimento');
+    }
+
+    function reassignOverdue() {
+        showNotification('info', 'Reatribuir Atrasadas', 'Funcionalidade em desenvolvimento');
+    }
+
+    function extendDeadlines() {
+        showNotification('info', 'Estender Prazos', 'Funcionalidade em desenvolvimento');
+    }
+
+    function exportCompleted() {
+        showNotification('info', 'Exportar Concluídas', 'Exportando demandas concluídas...');
+    }
+
+    function archiveCompleted() {
+        showNotification('info', 'Arquivar Concluídas', 'Arquivando demandas concluídas...');
+    }
+
+    function changeRankingPeriod() {
+        showNotification('info', 'Alterar Período', 'Selecionando período do ranking...');
+    }
+
+    function exportRanking() {
+        showNotification('info', 'Exportar Ranking', 'Exportando dados do ranking...');
+    }
+
+    function refreshChart(chartType) {
+        showNotification('info', 'Atualizando Gráfico', `Atualizando gráfico ${chartType}...`);
+        atualizarGraficos();
+    }
+
+    function downloadChart(chartType) {
+        const chart = charts[chartType];
+        if (chart) {
+            const url = chart.toBase64Image();
+            const link = document.createElement('a');
+            link.download = `chart_${chartType}_${Date.now()}.png`;
+            link.href = url;
+            link.click();
+            
+            showNotification('success', 'Gráfico Baixado', `Gráfico ${chartType} baixado com sucesso!`);
+        }
+    }
+
+    function inicializarImportacaoJSON() {
+    }
+
+    function inicializarNotificacoesTempoReal() {
+        setInterval(() => {
+            if (Math.random() > 0.9) {
+                const tipos = ['success', 'warning', 'info'];
+                const mensagens = [
+                    'Nova demanda concluída',
+                    'Demanda está próxima do prazo',
+                    'Funcionário disponível para nova tarefa',
+                    'Meta semanal alcançada'
+                ];
+                
+                const tipo = tipos[Math.floor(Math.random() * tipos.length)];
+                const mensagem = mensagens[Math.floor(Math.random() * mensagens.length)];
+                
+                showNotification(tipo, 'Notificação do Sistema', mensagem);
+            }
+        }, 45000);
+    }
+
+    function renderizarCobranca() {
+        const cobrancaContainer = document.getElementById('cobrancaContainer');
+        if (!cobrancaContainer) return;
+        
+        const funcionarioFilter = document.getElementById('cobrancaFuncionario').value;
+        const prioridadeFilter = document.getElementById('cobrancaPrioridade').value;
+        
+        let atrasadas = getDemandasParaUsuarioLogado().filter(d => {
+            if (d.status === 'aprovada') return false;
+            const dataLimite = new Date(d.dataLimite);
+            const hoje = new Date();
+            return dataLimite < hoje;
+        });
+        
+        if (funcionarioFilter !== 'todos') {
+            atrasadas = atrasadas.filter(d => d.funcionarioId == funcionarioFilter);
+        }
+        
+        if (prioridadeFilter !== 'todas') {
+            atrasadas = atrasadas.filter(d => d.prioridade === prioridadeFilter);
+        }
+        
+        cobrancaContainer.innerHTML = '';
+        
+        if (atrasadas.length === 0) {
+            cobrancaContainer.innerHTML = '<p>Nenhuma demanda atrasada encontrada com os filtros selecionados.</p>';
+            return;
+        }
+        
+        const demandasPorFuncionario = {};
+        atrasadas.forEach(demanda => {
+            if (!demandasPorFuncionario[demanda.funcionarioId]) {
+                demandasPorFuncionario[demanda.funcionarioId] = {
+                    nome: demanda.nomeFuncionario,
+                    email: demanda.emailFuncionario,
+                    demandas: []
+                };
+            }
+            demandasPorFuncionario[demanda.funcionarioId].demandas.push(demanda);
+        });
+        
+        Object.values(demandasPorFuncionario).forEach(funcionario => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            const checkboxId = `func_${funcionario.nome.replace(/\s+/g, '_')}`;
+            
+            card.innerHTML = `
+                <div class="card-header">
+                    <h3><i class="fas fa-user"></i> ${funcionario.nome}</h3>
+                    <div class="card-actions">
+                        <input type="checkbox" id="${checkboxId}" class="func-checkbox" onchange="toggleFuncionarioSelection('${funcionario.nome.replace(/'/g, "\\'")}')">
+                        <label for="${checkboxId}">Selecionar</label>
+                    </div>
+                </div>
+                <div class="demandas-list">
+                    ${funcionario.demandas.map(demanda => {
+                        const dataLimite = new Date(demanda.dataLimite);
+                        const hoje = new Date();
+                        const diasAtraso = Math.floor((hoje - dataLimite) / (1000 * 60 * 60 * 24));
+                        const tempoAtraso = calcularTempoRestante(demanda.dataLimite);
+                        
+                        return `
+                            <div class="demanda-item atrasado">
+                                <div class="demanda-info">
+                                    <strong>${demanda.nomeDemanda || demanda.descricao}</strong>
+                                    <small>Categoria: ${demanda.categoria} | Prioridade: ${demanda.prioridade} | Data Limite: ${dataLimite.toLocaleDateString('pt-BR')}</small>
+                                    <small><strong>TAG:</strong> ${demanda.tag}</small>
+                                    <div class="time-remaining">ATRASADA HÁ ${tempoAtraso}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div class="card-actions">
+                    <button class="success" onclick="enviarEmailCobranca('${funcionario.nome}', '${funcionario.email}')">
+                        <i class="fas fa-envelope"></i> Enviar Email de Cobrança
+                    </button>
+                </div>
+            `;
+            
+            cobrancaContainer.appendChild(card);
+        });
+        
+        atualizarPreviaEmail();
+    }
+
+    function filtrarCobranca() {
+        renderizarCobranca();
+    }
+
+    function resetFiltrosCobranca() {
+        document.getElementById('cobrancaFuncionario').value = 'todos';
+        document.getElementById('cobrancaPrioridade').value = 'todas';
+        renderizarCobranca();
+    }
+
+    function selectAllOverdue() {
+        document.querySelectorAll('.func-checkbox').forEach(checkbox => {
+            checkbox.checked = true;
+        });
+    }
+
+    function deselectAllOverdue() {
+        document.querySelectorAll('.func-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+    }
+
+    function toggleFuncionarioSelection(nomeFuncionario) {
+        console.log(`Seleção alterada para: ${nomeFuncionario}`);
+    }
+
+    function enviarEmailCobranca(nomeFuncionario, emailFuncionario) {
+        const demandasAtrasadas = getDemandasParaUsuarioLogado().filter(d => {
+            if (d.status === 'aprovada') return false;
+            if (d.nomeFuncionario !== nomeFuncionario) return false;
+            const dataLimite = new Date(d.dataLimite);
+            const hoje = new Date();
+            return dataLimite < hoje;
+        });
+        
+        if (demandasAtrasadas.length === 0) {
+            showNotification('warning', 'Nenhuma Demanda Atrasada', `${nomeFuncionario} não possui demandas atrasadas.`);
+            return;
+        }
+        
+        let corpoEmail = `Prezado(a) ${nomeFuncionario},\n\n`;
+        corpoEmail += `Identificamos que você possui ${demandasAtrasadas.length} demanda(s) em atraso. Por favor, verifique e regularize a situação o mais breve possível.\n\n`;
+        corpoEmail += `--- Demandas em Atraso ---\n\n`;
+        
+        demandasAtrasadas.forEach(demanda => {
+            const dataLimite = new Date(demanda.dataLimite);
+            const hoje = new Date();
+            const diasAtraso = Math.floor((hoje - dataLimite) / (1000 * 60 * 60 * 24));
+            const tempoAtraso = calcularTempoRestante(demanda.dataLimite);
+            
+            corpoEmail += `• ${demanda.nomeDemanda || demanda.descricao}\n`;
+            corpoEmail += `  Categoria: ${demanda.categoria}\n`;
+            corpoEmail += `  Prioridade: ${demanda.prioridade}\n`;
+            corpoEmail += `  Data Limite: ${dataLimite.toLocaleDateString('pt-BR')}\n`;
+            corpoEmail += `  Dias de Atraso: ${diasAtraso}\n`;
+            corpoEmail += `  TAG: ${demanda.tag}\n\n`;
+        });
+        
+        corpoEmail += `Por favor, acesse o sistema para atualizar o status das demandas ou entrar em contato caso necessite de suporte.\n\n`;
+        corpoEmail += `Atenciosamente,\nGestão`;
+        
+        const assunto = encodeURIComponent(`Cobrança de Demandas em Atraso - ${demandasAtrasadas.length} pendente(s)`);
+        const corpo = encodeURIComponent(corpoEmail);
+        
+        window.open(`mailto:${emailFuncionario}?subject=${assunto}&body=${corpo}`, '_blank');
+        
+        showNotification('success', 'Email de Cobrança', `Email de cobrança para ${nomeFuncionario} foi aberto para envio.`);
+    }
+
+    function sendBulkEmail() {
+        const checkboxes = document.querySelectorAll('.func-checkbox:checked');
+        
+        if (checkboxes.length === 0) {
+            showNotification('warning', 'Nenhum Funcionário Selecionado', 'Por favor, selecione pelo menos um funcionário para enviar emails em lote.');
+            return;
+        }
+        
+        if (!confirm(`Tem certeza que deseja enviar emails de cobrança para ${checkboxes.length} funcionário(s)?`)) {
+            return;
+        }
+        
+        const emails = [];
+        checkboxes.forEach(checkbox => {
+            const card = checkbox.closest('.card');
+            const nome = card.querySelector('h3').textContent.trim();
+            const funcionario = usuarios.find(u => u.nome === nome);
+            if (funcionario) {
+                emails.push({
+                    nome: funcionario.nome,
+                    email: funcionario.email
+                });
+            }
+        });
+        
+        emails.forEach((item, index) => {
+            setTimeout(() => {
+                enviarEmailCobranca(item.nome, item.email);
+            }, index * 1000);
+        });
+    }
+
+    function atualizarPreviaEmail() {
+        const emailPreview = document.getElementById('emailPreview');
+        if (!emailPreview) return;
+        
+        const funcionarioFilter = document.getElementById('cobrancaFuncionario').value;
+        const prioridadeFilter = document.getElementById('cobrancaPrioridade').value;
+        
+        let atrasadas = getDemandasParaUsuarioLogado().filter(d => {
+            if (d.status === 'aprovada') return false;
+            const dataLimite = new Date(d.dataLimite);
+            const hoje = new Date();
+            return dataLimite < hoje;
+        });
+        
+        if (funcionarioFilter !== 'todos') {
+            atrasadas = atrasadas.filter(d => d.funcionarioId == funcionarioFilter);
+        }
+        
+        if (prioridadeFilter !== 'todas') {
+            atrasadas = atrasadas.filter(d => d.prioridade === prioridadeFilter);
+        }
+        
+        if (atrasadas.length === 0) {
+            emailPreview.textContent = 'Nenhuma demanda em atraso encontrada com os filtros atuais.';
+            return;
+        }
+        
+        let corpoEmail = `Prezado(a) [Nome do Funcionário],\n\n`;
+        corpoEmail += `Identificamos que você possui ${atrasadas.length} demanda(s) em atraso. Por favor, verifique e regularize a situação o mais breve possível.\n\n`;
+        corpoEmail += `--- Demandas em Atraso ---\n\n`;
+        
+        atrasadas.slice(0, 3).forEach(demanda => {
+            const dataLimite = new Date(demanda.dataLimite);
+            const hoje = new Date();
+            const diasAtraso = Math.floor((hoje - dataLimite) / (1000 * 60 * 60 * 24));
+            const tempoAtraso = calcularTempoRestante(demanda.dataLimite);
+            
+            corpoEmail += `• ${demanda.nomeDemanda || demanda.descricao}\n`;
+            corpoEmail += `  Categoria: ${demanda.categoria}\n`;
+            corpoEmail += `  Prioridade: ${demanda.prioridade}\n`;
+            corpoEmail += `  Data Limite: ${dataLimite.toLocaleDateString('pt-BR')}\n`;
+            corpoEmail += `  Dias de Atraso: ${diasAtraso}\n`;
+            corpoEmail += `  TAG: ${demanda.tag}\n\n`;
+        });
+        
+        if (atrasadas.length > 3) {
+            corpoEmail += `... e mais ${atrasadas.length - 3} demanda(s).\n\n`;
+        }
+        
+        corpoEmail += `Por favor, acesse o sistema para atualizar o status das demandas ou entrar em contato caso necessite de suporte.\n\n`;
+        corpoEmail += `Atenciosamente,\nGestão`;
+        
+        emailPreview.textContent = corpoEmail;
+    }
+
+    document.getElementById('passwordConfirm').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            confirmPassword();
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePasswordModal();
+            closeModal('resolucaoModal');
+            closeModal('atribuicaoReprovacaoModal');
+        }
+    });
+
+    function exportarDemandas() {
+        const format = document.getElementById('exportFormat').value;
+        const dadosParaExportar = todasDemandas;
+
+        if (dadosParaExportar.length === 0) {
+            showNotification('warning', 'Sem Dados', 'Não há demandas para exportar.');
+            return;
+        }
+
+        if (format === 'json') {
+            exportarJSON(dadosParaExportar);
+        } else if (format === 'csv') {
+            exportarCSV(dadosParaExportar);
+        } else {
+            showNotification('error', 'Formato Inválido', 'Selecione um formato de exportação válido (CSV ou JSON).');
+        }
+    }
+
+    function exportarJSON(dados) {
+        try {
+            const jsonString = JSON.stringify(dados, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `demandas_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('success', 'Exportação Concluída', 'Os dados foram exportados em formato JSON.');
+        } catch (error) {
+            console.error('Erro ao exportar JSON:', error);
+            showNotification('error', 'Erro na Exportação', 'Ocorreu um erro ao gerar o arquivo JSON.');
+        }
+    }
+
+    function exportarCSV(dados) {
+        if (dados.length === 0) {
+            showNotification('warning', 'Sem Dados', 'Não há dados para exportar.');
+            return;
+        }
+        
+        const headers = Object.keys(dados[0]);
+        let csvContent = headers.join(',') + '\n';
+        
+        dados.forEach(item => {
+            const values = headers.map(header => {
+                let value = item[header] || '';
+                if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+                    value = `"${value.replace(/"/g, '""')}"`;
+                }
+                return value;
+            });
+            csvContent += values.join(',') + '\n';
+        });
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `demandas_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showNotification('success', 'Exportação Concluída', 'Os dados foram exportados em formato CSV.');
+    }
+
+    function importarDemandas() {
+        const fileInput = document.getElementById('importFile');
+        if (!fileInput.files.length) {
+            showNotification('warning', 'Nenhum Arquivo Selecionado', 'Por favor, selecione um arquivo JSON para importar.');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onload = async function(event) {
+            try {
+                const importedData = JSON.parse(event.target.result);
+
+                if (!Array.isArray(importedData)) {
+                    throw new Error("O arquivo JSON deve conter uma lista de demandas.");
+                }
+
+                let updatedCount = 0;
+                let addedCount = 0;
+
+                for (const demandaImportada of importedData) {
+                    const demandaExistente = todasDemandas.find(d => 
+                        d.nomeDemanda === demandaImportada.nomeDemanda && d.tag === demandaImportada.tag
+                    );
+                    
+                    if (demandaExistente) {
+                        const index = todasDemandas.findIndex(d => d.id === demandaExistente.id);
+                        if (index !== -1) {
+                            todasDemandas[index] = { ...demandaImportada, id: demandaExistente.id };
+                            await atualizarDemandaNoServidor(demandaExistente.id, todasDemandas[index]);
+                            updatedCount++;
+                        }
+                    } else {
+                        if (!demandaImportada.id) {
+                           demandaImportada.id = Date.now() + Math.random();
+                        }
+                        
+                        todasDemandas.push(demandaImportada);
+                        await salvarDemandaNoServidor(demandaImportada);
+                        addedCount++;
+                    }
+                }
+
+                if (updatedCount > 0 || addedCount > 0) {
+                    await carregarDadosDoServidor();
+                    renderizarDemandas();
+                    atualizarDashboard();
+                    let message = `Importação concluída. `;
+                    if (updatedCount > 0) message += `${updatedCount} demanda(s) atualizada(s). `;
+                    if (addedCount > 0) message += `${addedCount} nova(s) demanda(s) adicionada(s).`;
+                    showNotification('success', 'Importação Concluída', message);
+                } else {
+                    showNotification('info', 'Nenhuma Alteração', 'Nenhuma demanda nova foi adicionada ou atualizada.');
+                }
+
+                fileInput.value = '';
+
+            } catch (error) {
+                console.error('Erro ao importar o arquivo JSON:', error);
+                showNotification('error', 'Erro na Importação', `Falha ao ler o arquivo: ${error.message}. Verifique se o formato está correto.`);
+            }
+        };
+
+        reader.onerror = function() {
+            showNotification('error', 'Erro de Leitura', 'Ocorreu um erro ao ler o arquivo selecionado.');
+        };
+
+        reader.readAsText(file);
+    }
+</script>
+
+</body>
+</html>
