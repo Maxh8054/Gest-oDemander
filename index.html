@@ -1864,7 +1864,6 @@
                         <div class="form-group">
                             <label for="exportFormat">Formato:</label>
                             <select id="exportFormat">
-                                <!-- CORREÇÃO: Limitado para CSV e JSON -->
                                 <option value="csv">CSV</option>
                                 <option value="json">JSON</option>
                             </select>
@@ -1877,7 +1876,7 @@
 
                 <div class="card">
                     <h2><i class="fas fa-upload"></i> Importar Dados</h2>
-                    <p>Importe demandas a partir de um arquivo JSON. As demandas serão adicionadas às existentes.</p>
+                    <p>Importe demandas a partir de um arquivo JSON. As demandas com o mesmo nome e TAG serão substituídas.</p>
                     <div class="form-group">
                         <label for="importFile">Selecione o arquivo JSON:</label>
                         <input type="file" id="importFile" accept=".json">
@@ -2008,16 +2007,6 @@
             role: 'funcionario'
         },
         { 
-            id: 4, 
-            nome: 'Alvino Alberto Junior', 
-            email: 'alvino-j@zaminebrasil.com', 
-            nivel: 'Pleno', 
-            pontos: 320, 
-            conquistas: ['star'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
             id: 5, 
             nome: 'Marcos Antônio Lino Rosa', 
             email: 'marcos-a@zaminebrasil.com', 
@@ -2108,16 +2097,6 @@
             role: 'funcionario'
         },
         { 
-            id: 14, 
-            nome: 'Demetrius Rufino', 
-            email: 'demetrius-r@zaminebrasil.com', 
-            nivel: 'Senior', 
-            pontos: 460, 
-            conquistas: ['star', 'fire', 'gold'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
             id: 99, 
             nome: 'Gestor do Sistema', 
             email: 'gestor@zaminebrasil.com', 
@@ -2135,7 +2114,6 @@
     let timerInterval;
     let charts = {};
     let filtroFuncionarioAtual = 'todos';
-    // NOVO: Array para armazenar notificações persistentes do usuário
     let userNotifications = []; 
     let pendingAction = null;
     let selectedOverdueItems = [];
@@ -2169,13 +2147,13 @@
         console.log('Sistema inicializado com sucesso!');
     });
 
-    // NOVO: Função para alternar o dropdown de notificações
+    // Função para alternar o dropdown de notificações
     function toggleNotificationsDropdown() {
         const dropdown = document.getElementById('notificationsDropdown');
         dropdown.classList.toggle('show');
     }
 
-    // NOVO: Função para adicionar notificação à caixa do usuário
+    // Função para adicionar notificação à caixa do usuário
     function addUserNotification(type, title, message) {
         const notification = {
             id: Date.now(),
@@ -2184,12 +2162,12 @@
             message: message,
             date: new Date()
         };
-        userNotifications.unshift(notification); // Adiciona no início
+        userNotifications.unshift(notification);
         renderUserNotifications();
         updateNotificationCount();
     }
 
-    // NOVO: Função para renderizar as notificações na UI
+    // Função para renderizar as notificações na UI
     function renderUserNotifications() {
         const listContainer = document.getElementById('notificationsList');
         if (!listContainer) return;
@@ -2208,14 +2186,14 @@
         `).join('');
     }
     
-    // NOVO: Função para limpar todas as notificações
+    // Função para limpar todas as notificações
     function clearAllNotifications() {
         userNotifications = [];
         renderUserNotifications();
         updateNotificationCount();
     }
 
-    // NOVO: Função para atualizar o contador de notificações
+    // Função para atualizar o contador de notificações
     function updateNotificationCount() {
         const countElement = document.getElementById('notificationCount');
         if (countElement) {
@@ -3016,12 +2994,13 @@
                 if (sucesso) {
                     await carregarDadosDoServidor();
                     
-                    // CORREÇÃO: Chamando a função de notificação corrigida
                     notificarPartesInteressadasNovaDemanda(novaDemanda);
                     
-                    // NOVO: Adiciona notificação para o usuário se a demanda for atribuída a ele
-                    if (atribuidos.some(a => a.id === usuarioLogado.id)) {
-                        addUserNotification('info', 'Nova Tarefa Atribuída', `A demanda "${nomeDemanda}" foi atribuída a você.`);
+                    // CORREÇÃO: Adiciona notificação para TODOS os usuários atribuídos
+                    if (atribuidos.length > 0) {
+                        atribuidos.forEach(atribuido => {
+                            addUserNotification('info', 'Nova Tarefa Atribuída', `A demanda "${nomeDemanda}" foi atribuída a você.`);
+                        });
                     }
                     
                     form.reset();
@@ -3107,7 +3086,7 @@
         }
     }
 
-    // CORREÇÃO: Função de notificação reescrita para seguir as regras
+    // Função de notificação reescrita para seguir as regras
     function notificarPartesInteressadasNovaDemanda(demanda) {
         const gestor = usuarios.find(u => u.role === 'gestor');
 
@@ -3230,7 +3209,6 @@
                 await carregarDadosDoServidor();
                 switchTab('pendentes');
 
-                // NOVO: Notifica o gestor sobre a nova resolução
                 const gestor = usuarios.find(u => u.role === 'gestor');
                 if(gestor) {
                     addUserNotification('info', 'Demanda para Aprovar', `A demanda "${demandaResolucaoAtual.nomeDemanda}" foi resolvida e espera sua aprovação.`);
@@ -3370,6 +3348,7 @@
         
         const podeAprovar = usuarioLogado && usuarioLogado.role === 'gestor';
         const eDono = usuarioLogado && usuarioLogado.id === demanda.funcionarioId;
+        // CORREÇÃO: Verifica se o usuário logado está na lista de atribuídos
         const eAtribuido = usuarioLogado && demanda.atribuidos && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
         
         let atribuidosInfo = '';
@@ -3391,7 +3370,7 @@
                 ${tempoElement}
             </div>
             <div class="acoes-demandas">
-                ${eDono && (demanda.status === 'pendente' || demanda.status === 'reprovada') ? `
+                ${ (eDono || eAtribuido) && (demanda.status === 'pendente' || demanda.status === 'reprovada') ? `
                     <button class="success" onclick="abrirModalResolucao(${demanda.id})" title="Resolver Demanda">
                         <i class="fas fa-tools"></i>
                     </button>
@@ -3592,7 +3571,6 @@
                     const corpo = encodeURIComponent(`Prezado(a) ${nomeFuncionario},\n\nSua demanda foi analisada e aprovada.\n\n--- Detalhes ---\nNome: ${demanda.nomeDemanda || demanda.descricao}\nTAG: ${demanda.tag}\n\nParabéns pelo excelente trabalho!\n\nAtenciosamente,\nGestão`);
                     window.open(`mailto:${funcionario.email}?subject=${assunto}&body=${corpo}`, '_blank');
                     
-                    // NOVO: Notifica o funcionário
                     addUserNotification('success', 'Demanda Aprovada', `Sua demanda "${demanda.nomeDemanda}" foi aprovada!`);
                 }
             }
@@ -3623,7 +3601,6 @@
                     const corpo = encodeURIComponent(`Prezado(a) ${nomeFuncionario},\n\nSua demanda foi analisada e reprovada.\n\n--- Motivo ---\n${motivo}\n\nPor favor, revise e crie uma nova demanda se necessário.\n\nAtenciosamente,\nGestão`);
                     window.open(`mailto:${funcionario.email}?subject=${assunto}&body=${corpo}`, '_blank');
 
-                    // NOVO: Notifica o funcionário
                     addUserNotification('warning', 'Demanda Reprovada', `Sua demanda "${demanda.nomeDemanda}" foi reprovada.`);
                 }
             }
@@ -4092,11 +4069,9 @@
         }
     });
 
-    // CORREÇÃO: Função de exportação reescrita para ser simples e funcional
     function exportarDemandas() {
         const format = document.getElementById('exportFormat').value;
         
-        // Exporta TODAS as demandas, sem filtros
         const dadosParaExportar = todasDemandas;
 
         if (dadosParaExportar.length === 0) {
@@ -4166,7 +4141,6 @@
         showNotification('success', 'Exportação Concluída', 'Os dados foram exportados em formato CSV.');
     }
 
-    // CORREÇÃO: Função de importação implementada
     function importarDemandas() {
         const fileInput = document.getElementById('importFile');
         if (!fileInput.files.length) {
@@ -4185,33 +4159,48 @@
                     throw new Error("O arquivo JSON deve conter uma lista de demandas.");
                 }
 
-                let importCount = 0;
+                let updatedCount = 0;
+                let addedCount = 0;
+
                 for (const demandaImportada of importedData) {
-                    // Verifica se a demanda já existe pelo ID ou TAG para evitar duplicatas
-                    const jaExiste = todasDemandas.find(d => d.id === demandaImportada.id || d.tag === demandaImportada.tag);
+                    // CORREÇÃO: Busca por nome e TAG para substituir
+                    const demandaExistente = todasDemandas.find(d => 
+                        d.nomeDemanda === demandaImportada.nomeDemanda && d.tag === demandaImportada.tag
+                    );
                     
-                    if (!jaExiste) {
-                        // Garante que a demanda importada tenha um ID único se não tiver
+                    if (demandaExistente) {
+                        // Se encontrar, substitui a demanda existente
+                        const index = todasDemandas.findIndex(d => d.id === demandaExistente.id);
+                        if (index !== -1) {
+                            todasDemandas[index] = { ...demandaImportada, id: demandaExistente.id };
+                            await atualizarDemandaNoServidor(demandaExistente.id, todasDemandas[index]);
+                            updatedCount++;
+                        }
+                    } else {
+                        // Se não encontrar, adiciona como nova
                         if (!demandaImportada.id) {
                            demandaImportada.id = Date.now() + Math.random();
                         }
                         
                         todasDemandas.push(demandaImportada);
-                        await salvarDemandaNoServidor(demandaImportada); // Salva cada uma no servidor
-                        importCount++;
+                        await salvarDemandaNoServidor(demandaImportada);
+                        addedCount++;
                     }
                 }
 
-                if (importCount > 0) {
-                    await carregarDadosDoServidor(); // Recarrega do servidor para sincronizar
+                if (updatedCount > 0 || addedCount > 0) {
+                    await carregarDadosDoServidor();
                     renderizarDemandas();
                     atualizarDashboard();
-                    showNotification('success', 'Importação Concluída', `${importCount} nova(s) demanda(s) foi(ram) importada(s) com sucesso.`);
+                    let message = `Importação concluída. `;
+                    if (updatedCount > 0) message += `${updatedCount} demanda(s) atualizada(s). `;
+                    if (addedCount > 0) message += `${addedCount} nova(s) demanda(s) adicionada(s).`;
+                    showNotification('success', 'Importação Concluída', message);
                 } else {
-                    showNotification('info', 'Nenhuma Novidade', 'Todas as demandas do arquivo já existem no sistema.');
+                    showNotification('info', 'Nenhuma Alteração', 'Nenhuma demanda nova foi adicionada ou atualizada.');
                 }
 
-                fileInput.value = ''; // Limpa o input de arquivo
+                fileInput.value = '';
 
             } catch (error) {
                 console.error('Erro ao importar o arquivo JSON:', error);
@@ -4225,7 +4214,6 @@
 
         reader.readAsText(file);
     }
-
 </script>
 
 </body>
