@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <!-- Adicionando a biblioteca JSZip para criar arquivos ZIP no navegador -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         :root {
             --primary-color: #0056b3;
@@ -656,6 +658,24 @@
             display: inline-block;
             color: var(--success-color);
         }
+        
+        .time-performance {
+            font-weight: bold;
+            margin-top: 5px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .time-performance.early {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+        }
+
+        .time-performance.late {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+        }
 
         .acoes-demandas {
             display: flex;
@@ -1189,6 +1209,37 @@
             font-size: 0.9rem;
             color: var(--gray-color);
         }
+
+        .file-list {
+            margin-top: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item button {
+            padding: 2px 6px;
+            font-size: 12px;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -1324,7 +1375,7 @@
                     <i class="fas fa-plus-circle"></i> Nova Demanda
                 </div>
                 <div class="tab" onclick="switchTab('pendentes')">
-                    <i class="fas fa-clock"></i> Em Análise
+                    <i class="fas fa-clock"></i> Pendentes
                     <span class="badge" id="pendingBadge" style="display: none;">0</span>
                 </div>
                 <div class="tab" onclick="switchTab('atrasadas')">
@@ -1438,6 +1489,10 @@
                 <div class="card">
                     <h2><i class="fas fa-plus-circle"></i> Registrar Nova Demanda</h2>
                     <form id="demandaForm">
+                        <div class="form-group">
+                            <label for="nomeDemandaInput">Nome da Demanda:</label>
+                            <input type="text" id="nomeDemandaInput" required placeholder="Dê um nome claro para a demanda">
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="categoriaSelect">Categoria:</label>
@@ -1518,15 +1573,7 @@
             <div id="pendentes" class="tab-content">
                 <div class="card">
                     <div class="card-header">
-                        <h2><i class="fas fa-clock"></i> Demandas em Análise</h2>
-                        <div class="card-actions" id="gestorActions" style="display: none;">
-                            <button onclick="bulkApprove()">
-                                <i class="fas fa-check-double"></i> Aprovar em Lote
-                            </button>
-                            <button onclick="bulkReject()">
-                                <i class="fas fa-times-double"></i> Reprovar em Lote
-                            </button>
-                        </div>
+                        <h2><i class="fas fa-clock"></i> Demandas Pendentes</h2>
                     </div>
                     <div id="pendentesContainer"></div>
                 </div>
@@ -1705,6 +1752,33 @@
                 <i class="fas fa-times"></i> Cancelar
             </button>
         </div>
+    </div>
+</div>
+
+<!-- Modal de Resolução de Demanda -->
+<div id="resolucaoModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('resolucaoModal')">&times;</span>
+        <h2 id="resolucaoModalTitle">Resolver Demanda</h2>
+        <form id="resolucaoForm">
+            <div class="form-group">
+                <label for="resolucaoComentarios">Comentários sobre a resolução:</label>
+                <textarea id="resolucaoComentarios" rows="4" required placeholder="Descreva como a demanda foi resolvida, quais foram os desafios, etc."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="resolucaoAnexos">Anexar Documentos/Imagens:</label>
+                <input type="file" id="resolucaoAnexos" multiple>
+                <div id="anexosList" class="file-list"></div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="success">
+                    <i class="fas fa-save"></i> Salvar Resolução e Baixar Anexos
+                </button>
+                <button type="button" class="secondary" onclick="closeModal('resolucaoModal')">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -1890,6 +1964,7 @@
     let notifications = [];
     let pendingAction = null;
     let selectedOverdueItems = [];
+    let demandaResolucaoAtual = null; // Para armazenar a demanda sendo resolvida
 
     // URL do servidor (altere para o IP do servidor)
    const SERVER_URL = window.location.origin;
@@ -2008,7 +2083,6 @@
                 // Mostra abas e ações do gestor
                 document.getElementById('gestorTab').style.display = 'block';
                 document.getElementById('gestorTab2').style.display = 'block';
-                document.getElementById('gestorActions').style.display = 'flex';
                 document.getElementById('gestorActions2').style.display = 'flex';
                 document.getElementById('gestorActions3').style.display = 'flex';
                 document.getElementById('exportRankingBtn').style.display = 'inline-block';
@@ -2112,12 +2186,22 @@
     async function atualizarDemandaNoServidor(id, dadosAtualizados) {
         console.log('Atualizando demanda no servidor...');
         try {
+            // CORREÇÃO: Busca a demanda existente primeiro para não apagar dados
+            const demandaExistente = todasDemandas.find(d => d.id === id);
+            if (!demandaExistente) {
+                showNotification('error', 'Erro ao Atualizar', 'Demanda não encontrada.');
+                return false;
+            }
+
+            // Mescla os dados existentes com os novos
+            const dadosCompletos = { ...demandaExistente, ...dadosAtualizados };
+
             const response = await fetch(`${SERVER_URL}/api/demandas/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(dadosAtualizados)
+                body: JSON.stringify(dadosCompletos)
             });
             
             if (response.ok) {
@@ -2152,7 +2236,7 @@
             }
         } catch (error) {
             console.error('Erro ao deletar demanda do servidor:', error);
-            showNotification('error', 'Erro ao Deletar', 'Não foi possível deletar a demanda do servidor.');
+            showNotification('error', 'Erro ao Deletar', 'Não foi possível deletar a demanda no servidor.');
         }
         
         return false;
@@ -2455,8 +2539,6 @@
         document.querySelectorAll('.tab').forEach(tab => {
             if (tab.onclick && tab.onclick.toString().includes(tabName)) {
                 targetTab = tab;
-            } else if (tab.textContent.toLowerCase().includes('análise') && tabName === 'pendentes') {
-                targetTab = tab;
             } else if (tab.textContent.toLowerCase().includes('nova') && tabName === 'nova') {
                 targetTab = tab;
             }
@@ -2481,22 +2563,22 @@
         if (contentElement) {
             contentElement.classList.add('active');
             console.log('Conteúdo ativado:', tabName);
-            
-            // Se for a aba de pendentes, renderiza novamente
-            if (tabName === 'pendentes') {
-                setTimeout(() => {
-                    renderizarDemandas();
-                }, 100);
-            }
-            
-            // Se for a aba de cobrança, renderiza novamente
-            if (tabName === 'cobranca') {
-                setTimeout(() => {
-                    renderizarCobranca();
-                }, 100);
-            }
         } else {
             console.error('Conteúdo não encontrado:', tabName);
+        }
+
+        // Se for a aba de pendentes, renderiza novamente
+        if (tabName === 'pendentes') {
+            setTimeout(() => {
+                renderizarDemandas();
+            }, 100);
+        }
+        
+        // Se for a aba de cobrança, renderiza novamente
+        if (tabName === 'cobranca') {
+            setTimeout(() => {
+                renderizarCobranca();
+            }, 100);
         }
 
         // Se for a aba de dashboard, atualiza os gráficos
@@ -2509,13 +2591,23 @@
 
     function showModal(modalId, title, content) {
         const modal = document.getElementById(modalId);
-        const modalTitle = document.getElementById('modalTitle');
-        const modalBody = document.getElementById('modalBody');
+        const modalTitle = document.getElementById('resolucaoModalTitle'); // Usando o ID específico
+        const modalBody = document.getElementById('modalBody'); // Este não existe no resolucaoModal, vamos ajustar
         
-        if (modal && modalTitle && modalBody) {
-            modalTitle.textContent = title;
-            modalBody.innerHTML = content;
-            modal.style.display = 'block';
+        // O modal de resolução tem uma estrutura diferente
+        if (modalId === 'resolucaoModal') {
+            if (modal && modalTitle) {
+                modalTitle.textContent = title;
+                modal.style.display = 'block';
+            }
+        } else {
+             const modalTitleGeneric = document.getElementById('modalTitle');
+             const modalBodyGeneric = document.getElementById('modalBody');
+             if (modal && modalTitleGeneric && modalBodyGeneric) {
+                modalTitleGeneric.textContent = title;
+                modalBodyGeneric.innerHTML = content;
+                modal.style.display = 'block';
+            }
         }
     }
 
@@ -2523,6 +2615,11 @@
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.style.display = 'none';
+            if (modalId === 'resolucaoModal') {
+                document.getElementById('resolucaoForm').reset();
+                document.getElementById('anexosList').innerHTML = '';
+                demandaResolucaoAtual = null;
+            }
         }
     }
 
@@ -2544,6 +2641,7 @@
                 console.log('Formulário submetido!');
                 
                 // Coleta os dados do formulário
+                const nomeDemanda = document.getElementById('nomeDemandaInput').value;
                 const categoria = document.getElementById('categoriaSelect').value;
                 const prioridade = document.getElementById('prioridadeSelect').value;
                 const complexidade = document.getElementById('complexidadeSelect').value;
@@ -2553,11 +2651,11 @@
                 const isRotina = document.getElementById('rotinaCheckbox').checked;
                 
                 console.log('Dados coletados:', {
-                    categoria, prioridade, complexidade, descricao, local, dataLimite, isRotina
+                    nomeDemanda, categoria, prioridade, complexidade, descricao, local, dataLimite, isRotina
                 });
                 
                 // Validação básica
-                if (!categoria || !prioridade || !complexidade || !descricao || !local || !dataLimite) {
+                if (!nomeDemanda || !categoria || !prioridade || !complexidade || !descricao || !local || !dataLimite) {
                     showNotification('error', 'Erro', 'Por favor, preencha todos os campos obrigatórios');
                     return;
                 }
@@ -2571,6 +2669,7 @@
                 
                 // Cria o objeto da demanda
                 const novaDemanda = {
+                    nomeDemanda, // NOVO CAMPO
                     funcionarioId: usuarioLogado.id,
                     nomeFuncionario: usuarioLogado.nome,
                     emailFuncionario: usuarioLogado.email,
@@ -2598,14 +2697,11 @@
                     // Recarrega dados do servidor
                     await carregarDadosDoServidor();
                     
-                    // Envia notificação para o gestor
-                    notificarGestorNovaDemanda(novaDemanda);
-                    
                     // Limpa o formulário
                     form.reset();
                     
                     // Mostra notificação de sucesso
-                    showNotification('success', 'Demanda Registrada', `Sua demanda "${descricao}" foi registrada com sucesso! Aguarde a análise do gestor.`);
+                    showNotification('success', 'Demanda Registrada', `Sua demanda "${nomeDemanda}" foi registrada com sucesso!`);
                     
                     // Muda para a aba de pendentes automaticamente
                     setTimeout(() => {
@@ -2617,6 +2713,21 @@
             });
         } else {
             console.error('Formulário não encontrado!');
+        }
+
+        // Formulário de resolução
+        const resolucaoForm = document.getElementById('resolucaoForm');
+        if (resolucaoForm) {
+            resolucaoForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await salvarResolucao();
+            });
+        }
+
+        // Listener para o input de arquivos
+        const anexosInput = document.getElementById('resolucaoAnexos');
+        if (anexosInput) {
+            anexosInput.addEventListener('change', atualizarListaAnexos);
         }
         
         // Busca global
@@ -2636,16 +2747,97 @@
         console.log('Event listeners inicializados!');
     }
 
-    // Notificar gestor sobre nova demanda
-    function notificarGestorNovaDemanda(demanda) {
-        // Envia email para o gestor
-        const gestor = usuarios.find(u => u.role === 'gestor');
-        if (gestor) {
-            const assunto = encodeURIComponent(`Nova Demanda Registrada: ${demanda.descricao}`);
-            const corpo = encodeURIComponent(`Prezado Gestor,\n\nUma nova demanda foi registrada por ${demanda.nomeFuncionario}:\n\n--- Detalhes da Demanda ---\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nPrioridade: ${demanda.prioridade}\nComplexidade: ${demanda.complexidade}\nLocal: ${demanda.local}\nData Limite: ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n\nPor favor, acesse o sistema para analisar e aprovar ou reprovar esta demanda.\n\nAtenciosamente,\nSistema Automático`);
-            
-            // Abre o cliente de email padrão
-            window.open(`mailto:${gestor.email}?subject=${assunto}&body=${corpo}`, '_blank');
+    // Função para abrir o modal de resolução
+    function abrirModalResolucao(demandaId) {
+        demandaResolucaoAtual = todasDemandas.find(d => d.id === demandaId);
+        if (!demandaResolucaoAtual) return;
+
+        document.getElementById('resolucaoComentarios').value = demandaResolucaoAtual.comentarios || '';
+        showModal('resolucaoModal', `Resolver Demanda: ${demandaResolucaoAtual.nomeDemanda}`);
+    }
+
+    // Função para atualizar a lista de anexos na tela
+    function atualizarListaAnexos() {
+        const anexosInput = document.getElementById('resolucaoAnexos');
+        const anexosList = document.getElementById('anexosList');
+        anexosList.innerHTML = '';
+
+        if (anexosInput.files.length === 0) {
+            anexosList.innerHTML = '<p>Nenhum arquivo selecionado.</p>';
+            return;
+        }
+
+        for (const file of anexosInput.files) {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+            `;
+            anexosList.appendChild(fileItem);
+        }
+    }
+
+    // Função para salvar a resolução
+    async function salvarResolucao() {
+        if (!demandaResolucaoAtual) return;
+
+        const comentarios = document.getElementById('resolucaoComentarios').value;
+        const anexosInput = document.getElementById('resolucaoAnexos');
+        const files = anexosInput.files;
+
+        if (!comentarios && files.length === 0) {
+            showNotification('warning', 'Ação Incompleta', 'Por favor, adicione comentários ou anexe pelo menos um arquivo.');
+            return;
+        }
+
+        try {
+            // 1. Criar o arquivo ZIP
+            const zip = new JSZip();
+            const dataConclusao = new Date();
+            const zipFileName = `${demandaResolucaoAtual.tag}_${dataConclusao.toISOString().split('T')[0]}.zip`;
+
+            // Adicionar comentários como um arquivo de texto
+            if (comentarios) {
+                zip.file("comentarios.txt", comentarios);
+            }
+
+            // Adicionar os arquivos anexados
+            for (const file of files) {
+                zip.file(file.name, file);
+            }
+
+            // Gerar o arquivo ZIP
+            const zipBlob = await zip.generateAsync({ type: "blob" });
+
+            // 2. Fazer o download do ZIP
+            const url = URL.createObjectURL(zipBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = zipFileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            // 3. Atualizar a demanda no servidor
+            const dadosAtualizados = {
+                comentarios: comentarios,
+                status: 'finalizado_pendente_aprovacao'
+            };
+
+            const sucesso = await atualizarDemandaNoServidor(demandaResolucaoAtual.id, dadosAtualizados);
+
+            if (sucesso) {
+                showNotification('success', 'Resolução Salva', `A resolução foi salva e o arquivo ${zipFileName} foi baixado. A demanda agora está em análise.`);
+                closeModal('resolucaoModal');
+                await carregarDadosDoServidor();
+                // Mudar para a aba de pendentes (que agora mostrará "Em Análise")
+                switchTab('pendentes');
+            }
+
+        } catch (error) {
+            console.error('Erro ao salvar resolução:', error);
+            showNotification('error', 'Erro ao Salvar', 'Ocorreu um erro ao processar a resolução.');
         }
     }
 
@@ -2669,13 +2861,10 @@
         if (aprovadasContainer) aprovadasContainer.innerHTML = '';
         if (atrasadasContainer) atrasadasContainer.innerHTML = '';
 
-        // Filtra as demandas pendentes (incluindo reprovadas que precisam ser reavaliadas)
+        // Filtra as demandas pendentes (incluindo reprovadas e as que esperam aprovação)
         const pendentes = todasDemandas.filter(d => {
-            console.log(`Demanda ID ${d.id}: status = ${d.status}`);
             return d.status === 'pendente' || d.status === 'reprovada' || d.status === 'finalizado_pendente_aprovacao';
         });
-        
-        console.log('Demandas pendentes encontradas:', pendentes.length);
         
         // Filtra as demandas concluídas
         const concluidas = todasDemandas.filter(d => d.status === 'aprovada');
@@ -2693,10 +2882,10 @@
         // Renderiza as demandas pendentes
         if (pendentesContainer) {
             if (pendentes.length === 0) {
-                pendentesContainer.innerHTML = '<p>Nenhuma demanda em análise no momento.</p>';
+                pendentesContainer.innerHTML = '<p>Nenhuma demanda pendente no momento.</p>';
             } else {
                 pendentes.forEach((demanda, index) => {
-                    console.log(`Adicionando demanda pendente ${index + 1}: ${demanda.descricao}`);
+                    console.log(`Adicionando demanda pendente ${index + 1}: ${demanda.nomeDemanda || demanda.descricao}`);
                     const elemento = criarElementoDemanda(demanda);
                     pendentesContainer.appendChild(elemento);
                 });
@@ -2745,7 +2934,7 @@
 
         let infoAdicional = '';
         if (demanda.status === 'finalizado_pendente_aprovacao') {
-            infoAdicional = `<br><small><strong>Comentários:</strong> ${demanda.comentarios}</small>`;
+            infoAdicional = `<br><small><strong>Comentários do Funcionário:</strong> ${demanda.comentarios}</small>`;
         }
         
         let diasFormatados = '';
@@ -2753,12 +2942,12 @@
             diasFormatados = demanda.diasSemana.map(dia => ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][dia]).join(', ');
         }
         
-        // Adiciona o contador de tempo restante ou tempo total se concluída
+        // Adiciona o contador de tempo restante ou performance
         let tempoElement = '';
         if (demanda.status === 'aprovada' && demanda.dataConclusao) {
-            const tempoTotal = calcularTempoTotal(demanda.dataCriacao, demanda.dataConclusao);
-            const tempoEstimado = estimarTempoPorComplexidade(demanda.complexidade);
-            tempoElement = `<div class="time-completed">TEMPO TOTAL: ${tempoTotal} (Estimado: ${tempoEstimado})</div>`;
+            const performanceText = calcularDesempenhoTempo(demanda.dataCriacao, demanda.dataConclusao, demanda.dataLimite);
+            const performanceClass = performanceText.includes('antes') ? 'early' : 'late';
+            tempoElement = `<div class="time-performance ${performanceClass}">${performanceText}</div>`;
         } else {
             const tempoRestante = calcularTempoRestante(demanda.dataLimite);
             tempoElement = `<div class="time-remaining">${isAtrasada ? 'ATRASADA HÁ ' : 'TEMPO RESTANTE: '}${tempoRestante}</div>`;
@@ -2768,13 +2957,14 @@
         const priorityBadge = demanda.prioridade ? 
             `<span class="demanda-priority priority-${demanda.prioridade.toLowerCase()}">${demanda.prioridade}</span>` : '';
         
-        // Verifica se o usuário logado pode aprovar
+        // Verifica se o usuário logado pode aprovar ou é o dono da demanda
         const podeAprovar = usuarioLogado && usuarioLogado.role === 'gestor';
+        const eDono = usuarioLogado && usuarioLogado.id === demanda.funcionarioId;
         
         div.innerHTML = `
             ${priorityBadge}
             <div class="demanda-info">
-                <strong>${demanda.nomeFuncionario} - ${demanda.descricao}</strong>
+                <strong>${demanda.nomeFuncionario} - ${demanda.nomeDemanda || demanda.descricao}</strong>
                 <small>Categoria: ${demanda.categoria} | ${statusIcon} ${demanda.status.replace(/_/g, ' ')} | Local: ${demanda.local || 'N/A'} | Data Limite: ${dataLimiteFormatada}</small>
                 <small><strong>TAG:</strong> ${demanda.tag}</small>
                 ${demanda.comentarioGestor ? `<br><small><strong>Comentário do Gestor:</strong> ${demanda.comentarioGestor}</small>` : ''}
@@ -2784,7 +2974,12 @@
                 ${tempoElement}
             </div>
             <div class="acoes-demandas">
-                ${podeAprovar && (demanda.status === 'pendente' || demanda.status === 'finalizado_pendente_aprovacao' || demanda.status === 'reprovada') ? `
+                ${eDono && (demanda.status === 'pendente' || demanda.status === 'reprovada') ? `
+                    <button class="success" onclick="abrirModalResolucao(${demanda.id})" title="Resolver Demanda">
+                        <i class="fas fa-tools"></i>
+                    </button>
+                ` : ''}
+                ${podeAprovar && (demanda.status === 'finalizado_pendente_aprovacao') ? `
                     <button class="success" onclick="solicitarSenhaParaAprovar(${demanda.id}, '${demanda.nomeFuncionario}')" title="Aprovar">
                         <i class="fas fa-check"></i>
                     </button>
@@ -2805,27 +3000,27 @@
         return div;
     }
 
-    // Função para calcular o tempo total de uma demanda
-    function calcularTempoTotal(dataCriacao, dataConclusao) {
-        const criacao = new Date(dataCriacao);
+    // Função para calcular o desempenho de tempo
+    function calcularDesempenhoTempo(dataCriacao, dataConclusao, dataLimite) {
         const conclusao = new Date(dataConclusao);
-        const diferenca = conclusao - criacao;
+        const limite = new Date(dataLimite);
         
-        const dias = Math.floor(diferenca / (1000 * 60 * 60 * 24));
-        const horas = Math.floor((diferenca % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutos = Math.floor((diferenca % (1000 * 60 * 60)) / (1000 * 60));
-        
-        return `${dias}d ${horas}h ${minutos}m`;
-    }
+        const diffMs = conclusao - limite; // Positivo se atrasou, negativo se adiantou
+        const diffHoras = Math.abs(diffMs) / (1000 * 60 * 60);
+        const diffDias = Math.floor(diffHoras / 24);
+        const diffHorasRestantes = Math.floor(diffHoras % 24);
 
-    // Função para estimar o tempo com base na complexidade
-    function estimarTempoPorComplexidade(complexidade) {
-        switch (complexidade) {
-            case 'Baixa': return '1-2 dias';
-            case 'Média': return '3-5 dias';
-            case 'Alta': return '6-10 dias';
-            case 'Crítica': return '10+ dias';
-            default: return 'Não definido';
+        let tempoTexto = '';
+        if (diffDias > 0) {
+            tempoTexto = `${diffDias} dia(s) e ${diffHorasRestantes} hora(s)`;
+        } else {
+            tempoTexto = `${diffHorasRestantes} hora(s)`;
+        }
+
+        if (diffMs > 0) {
+            return `Concluído ${tempoTexto} após o prazo`;
+        } else {
+            return `Concluído ${tempoTexto} antes do prazo`;
         }
     }
 
@@ -2882,14 +3077,12 @@
         
         let tempoInfo = '';
         if (demanda.status === 'aprovada' && demanda.dataConclusao) {
-            const tempoTotal = calcularTempoTotal(demanda.dataCriacao, demanda.dataConclusao);
-            const tempoEstimado = estimarTempoPorComplexidade(demanda.complexidade);
-            tempoInfo = `<p><strong>Tempo Total:</strong> ${tempoTotal}</p><p><strong>Tempo Estimado:</strong> ${tempoEstimado}</p>`;
+            tempoInfo = `<p><strong>Desempenho de Tempo:</strong> ${calcularDesempenhoTempo(demanda.dataCriacao, demanda.dataConclusao, demanda.dataLimite)}</p>`;
         }
         
         const content = `
             <div class="demanda-details">
-                <h3>${demanda.descricao}</h3>
+                <h3>${demanda.nomeDemanda || demanda.descricao}</h3>
                 <p><strong>Funcionário:</strong> ${demanda.nomeFuncionario}</p>
                 <p><strong>Categoria:</strong> ${demanda.categoria}</p>
                 <p><strong>Status:</strong> ${demanda.status}</p>
@@ -2897,7 +3090,8 @@
                 <p><strong>Data Criação:</strong> ${new Date(demanda.dataCriacao).toLocaleDateString('pt-BR')}</p>
                 ${demanda.dataConclusao ? `<p><strong>Data Conclusão:</strong> ${new Date(demanda.dataConclusao).toLocaleDateString('pt-BR')}</p>` : ''}
                 ${tempoInfo}
-                ${demanda.comentarios ? `<p><strong>Comentários:</strong> ${demanda.comentarios}</p>` : ''}
+                ${demanda.comentarios ? `<p><strong>Comentários do Funcionário:</strong> ${demanda.comentarios}</p>` : ''}
+                ${demanda.comentarioGestor ? `<p><strong>Comentário do Gestor:</strong> ${demanda.comentarioGestor}</p>` : ''}
                 ${demanda.isRotina ? `<p><strong>Tipo:</strong> Tarefa de Rotina</p>` : ''}
             </div>
         `;
@@ -2940,7 +3134,10 @@
                 // Procura pelo botão que tem o ID da demanda no onclick
                 botoes.forEach(botao => {
                     const onclick = botao.getAttribute('onclick');
-                    if (onclick && onclick.includes('solicitarSenhaParaAprovar')) {
+                    if (onclick && onclick.includes('abrirModalResolucao')) {
+                        const match = onclick.match(/abrirModalResolucao\((\d+)/);
+                        if (match) demandaId = parseInt(match[1]);
+                    } else if (onclick && onclick.includes('solicitarSenhaParaAprovar')) {
                         const match = onclick.match(/solicitarSenhaParaAprovar\((\d+)/);
                         if (match) demandaId = parseInt(match[1]);
                     } else if (onclick && onclick.includes('solicitarSenhaParaReprovar')) {
@@ -2983,8 +3180,14 @@
                 // Envia email para o funcionário
                 const funcionario = usuarios.find(u => u.id === demanda.funcionarioId);
                 if (funcionario) {
-                    const assunto = encodeURIComponent(`Sua Demanda Foi Aprovada: ${demanda.descricao}`);
-                    const corpo = encodeURIComponent(`Prezado(a) ${nomeFuncionario},\n\nGostaríamos de informar que sua demanda foi analisada e **aprovada**.\n\n--- Detalhes da Demanda ---\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nLocal: ${demanda.local || 'N/A'}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n\nParabéns pelo excelente trabalho!\n\nAtenciosamente,\nGestão`);
+                    const assunto = encodeURIComponent(`Sua Demanda Foi Aprovada: ${demanda.nomeDemanda || demanda.descricao}`);
+                    let corpo = `Prezado(a) ${nomeFuncionario},\n\nGostaríamos de informar que sua demanda foi analisada e **aprovada**.\n\n--- Detalhes da Demanda ---\nNome: ${demanda.nomeDemanda || demanda.descricao}\nCategoria: ${demanda.categoria}\nLocal: ${demanda.local || 'N/A'}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n\nParabéns pelo excelente trabalho!\n\nAtenciosamente,\nGestão`;
+                    
+                    // Adiciona a nota sobre o anexo se houver comentários (indicando que passou pela resolução)
+                    if (demanda.comentarios) {
+                        corpo += encodeURIComponent('\n\n--- Importante ---\nPor favor, não se esqueça de anexar o arquivo ZIP com a resolução que você baixou no email de resposta, se aplicável.');
+                    }
+
                     window.open(`mailto:${funcionario.email}?subject=${assunto}&body=${corpo}`, '_blank');
                 }
             }
@@ -3012,8 +3215,8 @@
                 // Envia email para o funcionário
                 const funcionario = usuarios.find(u => u.id === demanda.funcionarioId);
                 if (funcionario) {
-                    const assunto = encodeURIComponent(`Sua Demanda Foi Reprovada: ${demanda.descricao}`);
-                    const corpo = encodeURIComponent(`Prezado(a) ${nomeFuncionario},\n\nGostaríamos de informar que sua demanda foi analisada e, infelizmente, **reprovada** neste momento.\n\n--- Detalhes da Demanda ---\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nLocal: ${demanda.local || 'N/A'}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n\n--- Motivo da Reprovação ---\n${motivo}\n\nSugerimos que revise os pontos acima e, se necessário, entre em contato para maiores esclarecimentos.\n\nAtenciosamente,\nGestão`);
+                    const assunto = encodeURIComponent(`Sua Demanda Foi Reprovada: ${demanda.nomeDemanda || demanda.descricao}`);
+                    const corpo = encodeURIComponent(`Prezado(a) ${nomeFuncionario},\n\nGostaríamos de informar que sua demanda foi analisada e, infelizmente, **reprovada** neste momento.\n\n--- Detalhes da Demanda ---\nNome: ${demanda.nomeDemanda || demanda.descricao}\nCategoria: ${demanda.categoria}\nLocal: ${demanda.local || 'N/A'}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n\n--- Motivo da Reprovação ---\n${motivo}\n\nSugerimos que revise os pontos acima e, se necessário, entre em contato para maiores esclarecimentos.\n\nAtenciosamente,\nGestão`);
                     window.open(`mailto:${funcionario.email}?subject=${assunto}&body=${corpo}`, '_blank');
                 }
             }
@@ -3324,7 +3527,7 @@
                         return `
                             <div class="demanda-item atrasado">
                                 <div class="demanda-info">
-                                    <strong>${demanda.descricao}</strong>
+                                    <strong>${demanda.nomeDemanda || demanda.descricao}</strong>
                                     <small>Categoria: ${demanda.categoria} | Prioridade: ${demanda.prioridade} | Data Limite: ${dataLimite.toLocaleDateString('pt-BR')}</small>
                                     <small><strong>TAG:</strong> ${demanda.tag}</small>
                                     <div class="time-remaining">ATRASADA HÁ ${tempoAtraso}</div>
@@ -3399,7 +3602,7 @@
             const hoje = new Date();
             const diasAtraso = Math.floor((hoje - dataLimite) / (1000 * 60 * 60 * 24));
             
-            corpoEmail += `• ${demanda.descricao}\n`;
+            corpoEmail += `• ${demanda.nomeDemanda || demanda.descricao}\n`;
             corpoEmail += `  Categoria: ${demanda.categoria}\n`;
             corpoEmail += `  Prioridade: ${demanda.prioridade}\n`;
             corpoEmail += `  Data Limite: ${dataLimite.toLocaleDateString('pt-BR')}\n`;
@@ -3492,7 +3695,7 @@
             const hoje = new Date();
             const diasAtraso = Math.floor((hoje - dataLimite) / (1000 * 60 * 60 * 24));
             
-            corpoEmail += `• ${demanda.descricao}\n`;
+            corpoEmail += `• ${demanda.nomeDemanda || demanda.descricao}\n`;
             corpoEmail += `  Categoria: ${demanda.categoria}\n`;
             corpoEmail += `  Prioridade: ${demanda.prioridade}\n`;
             corpoEmail += `  Data Limite: ${dataLimite.toLocaleDateString('pt-BR')}\n`;
@@ -3521,6 +3724,7 @@
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closePasswordModal();
+            closeModal('resolucaoModal');
         }
     });
 </script>
