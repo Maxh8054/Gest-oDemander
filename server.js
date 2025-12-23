@@ -19,7 +19,6 @@ const db = new sqlite3.Database(DB_FILE, (err) => {
     console.log('✅ Banco de dados SQLite pronto!');
 });
 
-// MUDANÇA: A tabela agora tem uma coluna 'atribuidos' para separar dos 'diasSemana'.
 // Criar tabela de demandas se não existir
 db.run(`
     CREATE TABLE IF NOT EXISTS demandas (
@@ -36,12 +35,12 @@ db.run(`
         dataLimite TEXT,
         status TEXT,
         isRotina INTEGER,
-        diasSemana TEXT,
+        diasSemana TEXT, -- Armazenado como string JSON
         tag TEXT,
         comentarios TEXT,
         comentarioGestor TEXT,
         dataConclusao TEXT,
-        atribuidos TEXT -- NOVO: Coluna dedicada para armazenar os atribuídos em JSON
+        atribuidos TEXT -- Armazenado como string JSON
     )
 `);
 
@@ -56,14 +55,45 @@ app.get('/', (req, res) => {
 app.get('/api/demandas', (req, res) => {
     db.all('SELECT * FROM demandas', [], (err, rows) => {
         if (err) return res.status(500).json({ success: false, error: err.message });
-        res.json(rows);
+
+        // MUDANÇA CRÍTICA: Processa cada linha para converter strings JSON de volta para objetos/arrays
+        const processedRows = rows.map(row => {
+            // Converter diasSemana de string para array, se existir
+            if (row.diasSemana) {
+                try {
+                    row.diasSemana = JSON.parse(row.diasSemana);
+                } catch (e) {
+                    // Se falhar o parse, garante que seja um array vazio para não quebrar o frontend
+                    row.diasSemana = [];
+                }
+            } else {
+                row.diasSemana = [];
+            }
+
+            // Converter atribuidos de string para array, se existir
+            if (row.atribuidos) {
+                try {
+                    row.atribuidos = JSON.parse(row.atribuidos);
+                } catch (e) {
+                    row.atribuidos = [];
+                }
+            } else {
+                row.atribuidos = [];
+            }
+
+            // Converte isRotina de número (0/1) para booleano (true/false)
+            row.isRotina = Boolean(row.isRotina);
+
+            return row;
+        });
+
+        res.json(processedRows);
     });
 });
 
 // POST /api/demandas
 app.post('/api/demandas', (req, res) => {
     const d = req.body;
-    // MUDANÇA: Incluindo o campo 'atribuidos' no INSERT.
     const sql = `
         INSERT INTO demandas 
         (funcionarioId, nomeFuncionario, emailFuncionario, categoria, prioridade, complexidade, descricao, local, dataCriacao, dataLimite, status, isRotina, diasSemana, tag, comentarios, comentarioGestor, atribuidos)
@@ -86,7 +116,7 @@ app.post('/api/demandas', (req, res) => {
         d.tag,
         d.comentarios || '',
         d.comentarioGestor || '',
-        d.atribuidos ? JSON.stringify(d.atribuidos) : null // MUDANÇA: Salvando a lista de atribuídos.
+        d.atribuidos ? JSON.stringify(d.atribuidos) : null
     ];
     db.run(sql, params, function(err) {
         if (err) return res.status(500).json({ success: false, error: err.message });
@@ -98,7 +128,6 @@ app.post('/api/demandas', (req, res) => {
 app.put('/api/demandas/:id', (req, res) => {
     const d = req.body;
     const id = req.params.id;
-    // MUDANÇA: Incluindo o campo 'atribuidos' no UPDATE.
     const sql = `
         UPDATE demandas SET
         funcionarioId = ?, nomeFuncionario = ?, emailFuncionario = ?, categoria = ?, prioridade = ?, complexidade = ?, descricao = ?, local = ?, dataLimite = ?, status = ?, isRotina = ?, diasSemana = ?, tag = ?, comentarios = ?, comentarioGestor = ?, dataConclusao = ?, atribuidos = ?
@@ -121,7 +150,7 @@ app.put('/api/demandas/:id', (req, res) => {
         d.comentarios || '',
         d.comentarioGestor || '',
         d.dataConclusao || null,
-        d.atribuidos ? JSON.stringify(d.atribuidos) : null, // MUDANÇA: Atualizando a lista de atribuídos.
+        d.atribuidos ? JSON.stringify(d.atribuidos) : null,
         id
     ];
     db.run(sql, params, function(err) {
