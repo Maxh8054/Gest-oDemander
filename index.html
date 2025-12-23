@@ -647,6 +647,16 @@
             display: inline-block;
         }
 
+        .time-completed {
+            font-weight: bold;
+            margin-top: 5px;
+            padding: 5px 10px;
+            background: rgba(40, 167, 69, 0.1);
+            border-radius: 4px;
+            display: inline-block;
+            color: var(--success-color);
+        }
+
         .acoes-demandas {
             display: flex;
             gap: 5px;
@@ -744,24 +754,6 @@
             font-size: 1.1rem;
         }
 
-        .ranking-position.gold {
-            background: linear-gradient(135deg, var(--gold), #ffed4e);
-            color: #333;
-            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
-        }
-
-        .ranking-position.silver {
-            background: linear-gradient(135deg, var(--silver), #e8e8e8);
-            color: #333;
-            box-shadow: 0 4px 8px rgba(192, 192, 192, 0.3);
-        }
-
-        .ranking-position.bronze {
-            background: linear-gradient(135deg, var(--bronze), #e6a157);
-            color: white;
-            box-shadow: 0 4px 8px rgba(205, 127, 50, 0.3);
-        }
-
         .ranking-info {
             flex-grow: 1;
         }
@@ -775,38 +767,38 @@
             color: var(--gray-color);
         }
 
-        .ranking-score {
-            font-weight: bold;
-            color: var(--primary-color);
-            font-size: 1.2rem;
-        }
-
-        .ranking-badges {
+        .ranking-stats {
             display: flex;
-            gap: 5px;
+            gap: 15px;
             margin-top: 5px;
         }
 
-        .badge {
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-size: 0.7rem;
+        .ranking-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
             font-weight: bold;
         }
 
-        .badge-gold {
-            background: var(--gold);
-            color: #333;
+        .stat-badge.concluidas {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: var(--success-color);
         }
 
-        .badge-fire {
-            background: var(--danger-color);
-            color: white;
+        .stat-badge.andamento {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: var(--warning-color);
         }
 
-        .badge-star {
-            background: var(--info-color);
-            color: white;
+        .stat-badge.atrasadas {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--danger-color);
         }
 
         .tabs {
@@ -1164,6 +1156,39 @@
         .server-status.disconnected {
             background: rgba(220, 53, 69, 0.8);
         }
+
+        .email-template {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .email-template h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .email-template .email-subject {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        .email-template .email-body {
+            white-space: pre-line;
+            line-height: 1.5;
+            color: var(--dark-color);
+        }
+
+        .email-template .email-footer {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-size: 0.9rem;
+            color: var(--gray-color);
+        }
     </style>
 </head>
 <body>
@@ -1310,9 +1335,12 @@
                     <i class="fas fa-check-circle"></i> Concluídas
                 </div>
                 <div class="tab" onclick="switchTab('ranking')">
-                    <i class="fas fa-trophy"></i> Ranking
+                    <i class="fas fa-chart-bar"></i> Ranking
                 </div>
-                <div class="tab" id="gestorTab" style="display: none;" onclick="switchTab('exportar')">
+                <div class="tab" id="gestorTab" style="display: none;" onclick="switchTab('cobranca')">
+                    <i class="fas fa-envelope"></i> Cobrança
+                </div>
+                <div class="tab" id="gestorTab2" style="display: none;" onclick="switchTab('exportar')">
                     <i class="fas fa-download"></i> Exportar
                 </div>
             </div>
@@ -1544,7 +1572,7 @@
             <div id="ranking" class="tab-content">
                 <div class="ranking-container">
                     <div class="card-header">
-                        <h2><i class="fas fa-trophy"></i> Ranking de Produtividade</h2>
+                        <h2><i class="fas fa-chart-bar"></i> Estatísticas por Funcionário</h2>
                         <div class="card-actions">
                             <button onclick="changeRankingPeriod()">
                                 <i class="fas fa-calendar"></i> Período
@@ -1555,6 +1583,65 @@
                         </div>
                     </div>
                     <ul class="ranking-list" id="rankingList"></ul>
+                </div>
+            </div>
+
+            <!-- Aba Cobrança -->
+            <div id="cobranca" class="tab-content">
+                <div class="card">
+                    <h2><i class="fas fa-envelope"></i> Sistema de Cobrança</h2>
+                    <p>Envie emails de cobrança para as demandas que estão em atraso.</p>
+                    
+                    <div class="filter-container">
+                        <label for="cobrancaFuncionario">Filtrar por Funcionário:</label>
+                        <select id="cobrancaFuncionario">
+                            <option value="todos">Todos os Funcionários com Demandas Atrasadas</option>
+                        </select>
+                        
+                        <label for="cobrancaPrioridade">Filtrar por Prioridade:</label>
+                        <select id="cobrancaPrioridade">
+                            <option value="todas">Todas as Prioridades</option>
+                            <option value="Importante">Importante</option>
+                            <option value="Média">Média</option>
+                            <option value="Relevante">Relevante</option>
+                        </select>
+                        
+                        <button onclick="filtrarCobranca()">
+                            <i class="fas fa-filter"></i> Filtrar
+                        </button>
+                        <button onclick="resetFiltrosCobranca()">
+                            <i class="fas fa-undo"></i> Resetar
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-list"></i> Demandas em Atraso</h3>
+                            <div class="card-actions">
+                                <button onclick="selectAllOverdue()">
+                                    <i class="fas fa-check-square"></i> Selecionar Todas
+                                </button>
+                                <button onclick="deselectAllOverdue()">
+                                    <i class="fas fa-square"></i> Desmarcar Todas
+                                </button>
+                                <button onclick="sendBulkEmail()" class="success">
+                                    <i class="fas fa-paper-plane"></i> Enviar Emails em Lote
+                                </button>
+                            </div>
+                        </div>
+                        <div id="cobrancaContainer"></div>
+                    </div>
+                    
+                    <div class="email-template">
+                        <h3>Modelo de Email de Cobrança</h3>
+                        <div class="email-subject">Assunto: [ASSUNTO]</div>
+                        <div class="email-body" id="emailPreview">
+[CORPO DO EMAIL]
+                        </div>
+                        <div class="email-footer">
+                            Este email será enviado automaticamente pelo sistema de gestão de demandas.
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1802,6 +1889,7 @@
     let darkMode = false;
     let notifications = [];
     let pendingAction = null;
+    let selectedOverdueItems = [];
 
     // URL do servidor (altere para o IP do servidor)
    const SERVER_URL = window.location.origin;
@@ -1919,6 +2007,7 @@
                 
                 // Mostra abas e ações do gestor
                 document.getElementById('gestorTab').style.display = 'block';
+                document.getElementById('gestorTab2').style.display = 'block';
                 document.getElementById('gestorActions').style.display = 'flex';
                 document.getElementById('gestorActions2').style.display = 'flex';
                 document.getElementById('gestorActions3').style.display = 'flex';
@@ -1956,7 +2045,7 @@
     // Carregar funcionários nos selects (exceto login)
     function carregarFuncionariosNosSelect() {
         console.log('Carregando funcionários nos selects...');
-        const selects = ['filtroFuncionario'];
+        const selects = ['filtroFuncionario', 'cobrancaFuncionario'];
         
         selects.forEach(selectId => {
             const select = document.getElementById(selectId);
@@ -1988,6 +2077,7 @@
         }
         
         renderizarDemandas();
+        renderizarCobranca();
         atualizarBadges();
     }
 
@@ -2374,7 +2464,7 @@
         
         // Se não encontrar, tenta pelo índice
         if (!targetTab) {
-            const tabNames = ['dashboard', 'nova', 'pendentes', 'atrasadas', 'aprovadas', 'ranking', 'exportar'];
+            const tabNames = ['dashboard', 'nova', 'pendentes', 'atrasadas', 'aprovadas', 'ranking', 'cobranca', 'exportar'];
             const index = tabNames.indexOf(tabName);
             if (index !== -1) {
                 targetTab = document.querySelectorAll('.tab')[index];
@@ -2396,6 +2486,13 @@
             if (tabName === 'pendentes') {
                 setTimeout(() => {
                     renderizarDemandas();
+                }, 100);
+            }
+            
+            // Se for a aba de cobrança, renderiza novamente
+            if (tabName === 'cobranca') {
+                setTimeout(() => {
+                    renderizarCobranca();
                 }, 100);
             }
         } else {
@@ -2656,8 +2753,16 @@
             diasFormatados = demanda.diasSemana.map(dia => ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][dia]).join(', ');
         }
         
-        // Adiciona o contador de tempo restante
-        const tempoRestante = calcularTempoRestante(demanda.dataLimite);
+        // Adiciona o contador de tempo restante ou tempo total se concluída
+        let tempoElement = '';
+        if (demanda.status === 'aprovada' && demanda.dataConclusao) {
+            const tempoTotal = calcularTempoTotal(demanda.dataCriacao, demanda.dataConclusao);
+            const tempoEstimado = estimarTempoPorComplexidade(demanda.complexidade);
+            tempoElement = `<div class="time-completed">TEMPO TOTAL: ${tempoTotal} (Estimado: ${tempoEstimado})</div>`;
+        } else {
+            const tempoRestante = calcularTempoRestante(demanda.dataLimite);
+            tempoElement = `<div class="time-remaining">${isAtrasada ? 'ATRASADA HÁ ' : 'TEMPO RESTANTE: '}${tempoRestante}</div>`;
+        }
         
         // Badge de prioridade
         const priorityBadge = demanda.prioridade ? 
@@ -2676,7 +2781,7 @@
                 ${infoAdicional}
                 ${rotinaInfo}
                 ${diasFormatados ? `<small><strong>Dias da semana:</strong> ${diasFormatados}</small>` : ''}
-                <div class="time-remaining">${isAtrasada ? 'ATRASADA HÁ ' : 'TEMPO RESTANTE: '}${tempoRestante}</div>
+                ${tempoElement}
             </div>
             <div class="acoes-demandas">
                 ${podeAprovar && (demanda.status === 'pendente' || demanda.status === 'finalizado_pendente_aprovacao' || demanda.status === 'reprovada') ? `
@@ -2698,6 +2803,30 @@
             </div>
         `;
         return div;
+    }
+
+    // Função para calcular o tempo total de uma demanda
+    function calcularTempoTotal(dataCriacao, dataConclusao) {
+        const criacao = new Date(dataCriacao);
+        const conclusao = new Date(dataConclusao);
+        const diferenca = conclusao - criacao;
+        
+        const dias = Math.floor(diferenca / (1000 * 60 * 60 * 24));
+        const horas = Math.floor((diferenca % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutos = Math.floor((diferenca % (1000 * 60 * 60)) / (1000 * 60));
+        
+        return `${dias}d ${horas}h ${minutos}m`;
+    }
+
+    // Função para estimar o tempo com base na complexidade
+    function estimarTempoPorComplexidade(complexidade) {
+        switch (complexidade) {
+            case 'Baixa': return '1-2 dias';
+            case 'Média': return '3-5 dias';
+            case 'Alta': return '6-10 dias';
+            case 'Crítica': return '10+ dias';
+            default: return 'Não definido';
+        }
     }
 
     // Sistema de senha para aprovação
@@ -2751,6 +2880,13 @@
         const demanda = todasDemandas.find(d => d.id === id);
         if (!demanda) return;
         
+        let tempoInfo = '';
+        if (demanda.status === 'aprovada' && demanda.dataConclusao) {
+            const tempoTotal = calcularTempoTotal(demanda.dataCriacao, demanda.dataConclusao);
+            const tempoEstimado = estimarTempoPorComplexidade(demanda.complexidade);
+            tempoInfo = `<p><strong>Tempo Total:</strong> ${tempoTotal}</p><p><strong>Tempo Estimado:</strong> ${tempoEstimado}</p>`;
+        }
+        
         const content = `
             <div class="demanda-details">
                 <h3>${demanda.descricao}</h3>
@@ -2760,6 +2896,7 @@
                 <p><strong>Data Limite:</strong> ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}</p>
                 <p><strong>Data Criação:</strong> ${new Date(demanda.dataCriacao).toLocaleDateString('pt-BR')}</p>
                 ${demanda.dataConclusao ? `<p><strong>Data Conclusão:</strong> ${new Date(demanda.dataConclusao).toLocaleDateString('pt-BR')}</p>` : ''}
+                ${tempoInfo}
                 ${demanda.comentarios ? `<p><strong>Comentários:</strong> ${demanda.comentarios}</p>` : ''}
                 ${demanda.isRotina ? `<p><strong>Tipo:</strong> Tarefa de Rotina</p>` : ''}
             </div>
@@ -2895,7 +3032,7 @@
     }
 
     function atualizarRanking() {
-        // Conta as demandas concluídas por funcionário
+        // Conta as demandas por status para cada funcionário
         const ranking = {};
         
         usuarios.filter(u => u.role === 'funcionario').forEach(func => {
@@ -2903,9 +3040,8 @@
                 nome: func.nome,
                 nivel: func.nivel,
                 concluidas: 0,
-                atrasadas: 0,
-                pontos: func.pontos || 0,
-                conquistas: func.conquistas || []
+                andamento: 0,
+                atrasadas: 0
             };
         });
         
@@ -2913,20 +3049,20 @@
             if (ranking[demanda.funcionarioId]) {
                 if (demanda.status === 'aprovada') {
                     ranking[demanda.funcionarioId].concluidas++;
-                    ranking[demanda.funcionarioId].pontos += 10;
+                } else if (demanda.status === 'pendente' || demanda.status === 'finalizado_pendente_aprovacao' || demanda.status === 'reprovada') {
+                    ranking[demanda.funcionarioId].andamento++;
                 }
                 
                 const dataLimite = new Date(demanda.dataLimite);
                 const hoje = new Date();
                 if (dataLimite < hoje && demanda.status !== 'aprovada') {
                     ranking[demanda.funcionarioId].atrasadas++;
-                    ranking[demanda.funcionarioId].pontos -= 5;
                 }
             }
         });
         
-        // Converte o objeto em array e ordena por pontos
-        const rankingArray = Object.values(ranking).sort((a, b) => b.pontos - a.pontos);
+        // Converte o objeto em array e ordena por número de demandas concluídas
+        const rankingArray = Object.values(ranking).sort((a, b) => b.concluidas - a.concluidas);
         
         // Renderiza o ranking
         const rankingList = document.getElementById('rankingList');
@@ -2937,23 +3073,22 @@
                 const li = document.createElement('li');
                 li.className = 'ranking-item';
                 
-                let positionClass = '';
-                if (index === 0) positionClass = 'gold';
-                else if (index === 1) positionClass = 'silver';
-                else if (index === 2) positionClass = 'bronze';
-                
-                const badges = item.conquistas.map(c => 
-                    `<span class="badge badge-${c}">${c}</span>`
-                ).join(' ');
-                
                 li.innerHTML = `
-                    <div class="ranking-position ${positionClass}">${index + 1}</div>
+                    <div class="ranking-position">${index + 1}</div>
                     <div class="ranking-info">
                         <strong>${item.nome} - ${item.nivel}</strong>
-                        <small>${item.concluidas} concluídas, ${item.atrasadas} atrasadas</small>
-                        <div class="ranking-badges">${badges}</div>
+                        <div class="ranking-stats">
+                            <div class="ranking-stat">
+                                <span class="stat-badge concluidas">${item.concluidas} concluídas</span>
+                            </div>
+                            <div class="ranking-stat">
+                                <span class="stat-badge andamento">${item.andamento} em andamento</span>
+                            </div>
+                            <div class="ranking-stat">
+                                <span class="stat-badge atrasadas">${item.atrasadas} atrasadas</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="ranking-score">${item.pontos} pts</div>
                 `;
                 
                 rankingList.appendChild(li);
@@ -3116,6 +3251,263 @@
                 showNotification(tipo, 'Notificação do Sistema', mensagem);
             }
         }, 45000); // A cada 45 segundos
+    }
+
+    // Funções para a aba de Cobrança
+    function renderizarCobranca() {
+        const cobrancaContainer = document.getElementById('cobrancaContainer');
+        if (!cobrancaContainer) return;
+        
+        // Filtra as demandas atrasadas
+        const funcionarioFilter = document.getElementById('cobrancaFuncionario').value;
+        const prioridadeFilter = document.getElementById('cobrancaPrioridade').value;
+        
+        let atrasadas = todasDemandas.filter(d => {
+            if (d.status === 'aprovada') return false;
+            const dataLimite = new Date(d.dataLimite);
+            const hoje = new Date();
+            return dataLimite < hoje;
+        });
+        
+        // Aplica filtros adicionais
+        if (funcionarioFilter !== 'todos') {
+            atrasadas = atrasadas.filter(d => d.funcionarioId == funcionarioFilter);
+        }
+        
+        if (prioridadeFilter !== 'todas') {
+            atrasadas = atrasadas.filter(d => d.prioridade === prioridadeFilter);
+        }
+        
+        // Limpa o container
+        cobrancaContainer.innerHTML = '';
+        
+        if (atrasadas.length === 0) {
+            cobrancaContainer.innerHTML = '<p>Nenhuma demanda atrasada encontrada com os filtros selecionados.</p>';
+            return;
+        }
+        
+        // Agrupa por funcionário
+        const demandasPorFuncionario = {};
+        atrasadas.forEach(demanda => {
+            if (!demandasPorFuncionario[demanda.funcionarioId]) {
+                demandasPorFuncionario[demanda.funcionarioId] = {
+                    nome: demanda.nomeFuncionario,
+                    email: demanda.emailFuncionario,
+                    demandas: []
+                };
+            }
+            demandasPorFuncionario[demanda.funcionarioId].demandas.push(demanda);
+        });
+        
+        // Renderiza os cards de cobrança
+        Object.values(demandasPorFuncionario).forEach(funcionario => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            const checkboxId = `func_${funcionario.nome.replace(/\s+/g, '_')}`;
+            
+            card.innerHTML = `
+                <div class="card-header">
+                    <h3><i class="fas fa-user"></i> ${funcionario.nome}</h3>
+                    <div class="card-actions">
+                        <input type="checkbox" id="${checkboxId}" class="func-checkbox" onchange="toggleFuncionarioSelection(${funcionario.nome.replace(/'/g, "\\'")})">
+                        <label for="${checkboxId}">Selecionar</label>
+                    </div>
+                </div>
+                <div class="demandas-list">
+                    ${funcionario.demandas.map(demanda => {
+                        const dataLimite = new Date(demanda.dataLimite);
+                        const hoje = new Date();
+                        const diasAtraso = Math.floor((hoje - dataLimite) / (1000 * 60 * 60 * 24));
+                        const tempoAtraso = calcularTempoRestante(demanda.dataLimite);
+                        
+                        return `
+                            <div class="demanda-item atrasado">
+                                <div class="demanda-info">
+                                    <strong>${demanda.descricao}</strong>
+                                    <small>Categoria: ${demanda.categoria} | Prioridade: ${demanda.prioridade} | Data Limite: ${dataLimite.toLocaleDateString('pt-BR')}</small>
+                                    <small><strong>TAG:</strong> ${demanda.tag}</small>
+                                    <div class="time-remaining">ATRASADA HÁ ${tempoAtraso}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div class="card-actions">
+                    <button class="success" onclick="enviarEmailCobranca('${funcionario.nome}', '${funcionario.email}')">
+                        <i class="fas fa-envelope"></i> Enviar Email de Cobrança
+                    </button>
+                </div>
+            `;
+            
+            cobrancaContainer.appendChild(card);
+        });
+        
+        // Atualiza a prévia do email
+        atualizarPreviaEmail();
+    }
+
+    function filtrarCobranca() {
+        renderizarCobranca();
+    }
+
+    function resetFiltrosCobranca() {
+        document.getElementById('cobrancaFuncionario').value = 'todos';
+        document.getElementById('cobrancaPrioridade').value = 'todas';
+        renderizarCobranca();
+    }
+
+    function selectAllOverdue() {
+        document.querySelectorAll('.func-checkbox').forEach(checkbox => {
+            checkbox.checked = true;
+        });
+    }
+
+    function deselectAllOverdue() {
+        document.querySelectorAll('.func-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+    }
+
+    function toggleFuncionarioSelection(nomeFuncionario) {
+        // Esta função pode ser usada para lógica adicional quando um funcionário é selecionado/deselecionado
+        console.log(`Seleção alterada para: ${nomeFuncionario}`);
+    }
+
+    function enviarEmailCobranca(nomeFuncionario, emailFuncionario) {
+        // Obtém as demandas atrasadas do funcionário
+        const demandasAtrasadas = todasDemandas.filter(d => {
+            if (d.status === 'aprovada') return false;
+            if (d.nomeFuncionario !== nomeFuncionario) return false;
+            const dataLimite = new Date(d.dataLimite);
+            const hoje = new Date();
+            return dataLimite < hoje;
+        });
+        
+        if (demandasAtrasadas.length === 0) {
+            showNotification('warning', 'Nenhuma Demanda Atrasada', `${nomeFuncionario} não possui demandas atrasadas.`);
+            return;
+        }
+        
+        // Prepara o conteúdo do email
+        let corpoEmail = `Prezado(a) ${nomeFuncionario},\n\n`;
+        corpoEmail += `Identificamos que você possui ${demandasAtrasadas.length} demanda(s) em atraso. Por favor, verifique e regularize a situação o mais breve possível.\n\n`;
+        corpoEmail += `--- Demandas em Atraso ---\n\n`;
+        
+        demandasAtrasadas.forEach(demanda => {
+            const dataLimite = new Date(demanda.dataLimite);
+            const hoje = new Date();
+            const diasAtraso = Math.floor((hoje - dataLimite) / (1000 * 60 * 60 * 24));
+            
+            corpoEmail += `• ${demanda.descricao}\n`;
+            corpoEmail += `  Categoria: ${demanda.categoria}\n`;
+            corpoEmail += `  Prioridade: ${demanda.prioridade}\n`;
+            corpoEmail += `  Data Limite: ${dataLimite.toLocaleDateString('pt-BR')}\n`;
+            corpoEmail += `  Dias de Atraso: ${diasAtraso}\n`;
+            corpoEmail += `  TAG: ${demanda.tag}\n\n`;
+        });
+        
+        corpoEmail += `Por favor, acesse o sistema para atualizar o status das demandas ou entrar em contato caso necessite de suporte.\n\n`;
+        corpoEmail += `Atenciosamente,\nGestão`;
+        
+        const assunto = encodeURIComponent(`Cobrança de Demandas em Atraso - ${demandasAtrasadas.length} pendente(s)`);
+        const corpo = encodeURIComponent(corpoEmail);
+        
+        // Abre o cliente de email padrão
+        window.open(`mailto:${emailFuncionario}?subject=${assunto}&body=${corpo}`, '_blank');
+        
+        showNotification('success', 'Email de Cobrança', `Email de cobrança para ${nomeFuncionario} foi aberto para envio.`);
+    }
+
+    function sendBulkEmail() {
+        const checkboxes = document.querySelectorAll('.func-checkbox:checked');
+        
+        if (checkboxes.length === 0) {
+            showNotification('warning', 'Nenhum Funcionário Selecionado', 'Por favor, selecione pelo menos um funcionário para enviar emails em lote.');
+            return;
+        }
+        
+        if (!confirm(`Tem certeza que deseja enviar emails de cobrança para ${checkboxes.length} funcionário(s)?`)) {
+            return;
+        }
+        
+        // Coleta os emails dos funcionários selecionados
+        const emails = [];
+        checkboxes.forEach(checkbox => {
+            const card = checkbox.closest('.card');
+            const nome = card.querySelector('h3').textContent.trim();
+            const funcionario = usuarios.find(u => u.nome === nome);
+            if (funcionario) {
+                emails.push({
+                    nome: funcionario.nome,
+                    email: funcionario.email
+                });
+            }
+        });
+        
+        // Envia emails um por um
+        emails.forEach((item, index) => {
+            setTimeout(() => {
+                enviarEmailCobranca(item.nome, item.email);
+            }, index * 1000); // Aguarda 1 segundo entre cada email para evitar problemas
+        });
+    }
+
+    function atualizarPreviaEmail() {
+        const emailPreview = document.getElementById('emailPreview');
+        if (!emailPreview) return;
+        
+        const funcionarioFilter = document.getElementById('cobrancaFuncionario').value;
+        const prioridadeFilter = document.getElementById('cobrancaPrioridade').value;
+        
+        let atrasadas = todasDemandas.filter(d => {
+            if (d.status === 'aprovada') return false;
+            const dataLimite = new Date(d.dataLimite);
+            const hoje = new Date();
+            return dataLimite < hoje;
+        });
+        
+        // Aplica filtros adicionais
+        if (funcionarioFilter !== 'todos') {
+            atrasadas = atrasadas.filter(d => d.funcionarioId == funcionarioFilter);
+        }
+        
+        if (prioridadeFilter !== 'todas') {
+            atrasadas = atrasadas.filter(d => d.prioridade === prioridadeFilter);
+        }
+        
+        if (atrasadas.length === 0) {
+            emailPreview.textContent = 'Nenhuma demanda em atraso encontrada com os filtros atuais.';
+            return;
+        }
+        
+        // Prepara uma prévia do email
+        let corpoEmail = `Prezado(a) [Nome do Funcionário],\n\n`;
+        corpoEmail += `Identificamos que você possui ${atrasadas.length} demanda(s) em atraso. Por favor, verifique e regularize a situação o mais breve possível.\n\n`;
+        corpoEmail += `--- Demandas em Atraso ---\n\n`;
+        
+        // Adiciona apenas as 3 primeiras demandas como exemplo
+        atrasadas.slice(0, 3).forEach(demanda => {
+            const dataLimite = new Date(demanda.dataLimite);
+            const hoje = new Date();
+            const diasAtraso = Math.floor((hoje - dataLimite) / (1000 * 60 * 60 * 24));
+            
+            corpoEmail += `• ${demanda.descricao}\n`;
+            corpoEmail += `  Categoria: ${demanda.categoria}\n`;
+            corpoEmail += `  Prioridade: ${demanda.prioridade}\n`;
+            corpoEmail += `  Data Limite: ${dataLimite.toLocaleDateString('pt-BR')}\n`;
+            corpoEmail += `  Dias de Atraso: ${diasAtraso}\n`;
+            corpoEmail += `  TAG: ${demanda.tag}\n\n`;
+        });
+        
+        if (atrasadas.length > 3) {
+            corpoEmail += `... e mais ${atrasadas.length - 3} demanda(s).\n\n`;
+        }
+        
+        corpoEmail += `Por favor, acesse o sistema para atualizar o status das demandas ou entrar em contato caso necessite de suporte.\n\n`;
+        corpoEmail += `Atenciosamente,\nGestão`;
+        
+        emailPreview.textContent = corpoEmail;
     }
 
     // Tecla Enter no modal de senha
