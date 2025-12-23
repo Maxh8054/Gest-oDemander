@@ -7,9 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <!-- Adicionando a biblioteca JSZip para criar arquivos ZIP no navegador -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <!-- Adicionando bibliotecas para exportação em diferentes formatos -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
@@ -47,7 +45,6 @@
             line-height: 1.6;
         }
 
-        /* Tela de Login */
         .login-container {
             display: flex;
             justify-content: center;
@@ -68,14 +65,8 @@
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .login-card h1 {
@@ -143,7 +134,6 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Sistema Principal */
         .main-container {
             display: none;
             background-color: #f5f7fa;
@@ -212,14 +202,12 @@
             border-radius: 4px;
             cursor: pointer;
             transition: background 0.3s ease;
-            position: relative;
         }
 
         .header-controls button:hover {
             background: rgba(255,255,255,0.3);
         }
         
-        /* Estilo para o dropdown de notificações */
         .notifications-dropdown {
             position: absolute;
             top: 100%;
@@ -231,7 +219,7 @@
             max-height: 400px;
             overflow-y: auto;
             z-index: 1000;
-            display: none; /* Controlado por JavaScript */
+            display: none;
             color: var(--dark-color);
             margin-top: 5px;
         }
@@ -385,30 +373,11 @@
             100% { transform: scale(1); opacity: 0.1; }
         }
 
-        .stat-icon.primary {
-            background-color: rgba(0, 86, 179, 0.1);
-            color: var(--primary-color);
-        }
-
-        .stat-icon.success {
-            background-color: rgba(40, 167, 69, 0.1);
-            color: var(--success-color);
-        }
-
-        .stat-icon.warning {
-            background-color: rgba(255, 193, 7, 0.1);
-            color: var(--warning-color);
-        }
-
-        .stat-icon.danger {
-            background-color: rgba(220, 53, 69, 0.1);
-            color: var(--danger-color);
-        }
-
-        .stat-icon.info {
-            background-color: rgba(23, 162, 184, 0.1);
-            color: var(--info-color);
-        }
+        .stat-icon.primary { background-color: rgba(0, 86, 179, 0.1); color: var(--primary-color); }
+        .stat-icon.success { background-color: rgba(40, 167, 69, 0.1); color: var(--success-color); }
+        .stat-icon.warning { background-color: rgba(255, 193, 7, 0.1); color: var(--warning-color); }
+        .stat-icon.danger { background-color: rgba(220, 53, 69, 0.1); color: var(--danger-color); }
+        .stat-icon.info { background-color: rgba(23, 162, 184, 0.1); color: var(--info-color); }
 
         .stat-info h3 {
             font-size: 1.8rem;
@@ -1119,41 +1088,14 @@
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-            
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .filter-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .filter-container select {
-                max-width: 100%;
-            }
-            
-            .header-controls {
-                position: static;
-                margin-top: 15px;
-                justify-content: center;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 5% auto;
-            }
+            .container { padding: 10px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .dashboard { grid-template-columns: 1fr; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .filter-container { flex-direction: column; align-items: stretch; }
+            .filter-container select { max-width: 100%; }
+            .header-controls { position: static; margin-top: 15px; justify-content: center; }
+            .modal-content { width: 95%; margin: 5% auto; }
         }
 
         .loading-spinner {
@@ -1303,7 +1245,6 @@
             cursor: pointer;
         }
 
-        /* Estilo para o campo de seleção múltipla */
         .multi-select-container {
             position: relative;
         }
@@ -1380,12 +1321,10 @@
 </head>
 <body>
 
-<!-- Indicador de Status do Servidor -->
 <div class="server-status" id="serverStatus">
     <i class="fas fa-circle"></i> <span id="serverStatusText">Verificando servidor...</span>
 </div>
 
-<!-- Tela de Login -->
 <div class="login-container" id="loginContainer">
     <div class="login-card">
         <h1><i class="fas fa-chart-line"></i> Portal do Gestor</h1>
@@ -1416,7 +1355,6 @@
     </div>
 </div>
 
-<!-- Sistema Principal -->
 <div class="main-container" id="mainContainer">
     <div class="container">
         <header>
@@ -1427,7 +1365,6 @@
                     <i class="fas fa-user"></i>
                     <span id="userName">Carregando...</span>
                 </div>
-                <!-- Botão de Notificações com Dropdown -->
                 <div style="position: relative;">
                     <button onclick="toggleNotificationsDropdown()" title="Notificações">
                         <i class="fas fa-bell"></i>
@@ -1449,14 +1386,12 @@
             </div>
         </header>
 
-        <!-- Barra de Pesquisa Rápida -->
         <div class="search-bar">
             <input type="text" placeholder="Pesquisar demandas, funcionários, categorias..." id="globalSearch">
             <i class="fas fa-search"></i>
         </div>
 
         <main>
-            <!-- Dashboard com estatísticas -->
             <div class="dashboard">
                 <div class="stat-card" onclick="drillDown('total')">
                     <div class="stat-icon primary">
@@ -1510,7 +1445,6 @@
                 </div>
             </div>
 
-            <!-- Abas para diferentes funcionalidades -->
             <div class="tabs">
                 <div class="tab active" onclick="switchTab('dashboard')">
                     <i class="fas fa-chart-pie"></i> Dashboard
@@ -1520,7 +1454,7 @@
                     <i class="fas fa-plus-circle"></i> Nova Demanda
                 </div>
                 <div class="tab" onclick="switchTab('pendentes')">
-                    <i class="fas fa-clock"></i> Pendentes
+                    <i class="fas fa-clock"></i> Minhas Demandas
                     <span class="badge" id="pendingBadge" style="display: none;">0</span>
                 </div>
                 <div class="tab" onclick="switchTab('atrasadas')">
@@ -1541,9 +1475,7 @@
                 </div>
             </div>
 
-            <!-- Conteúdo das abas -->
             <div id="dashboard" class="tab-content active">
-                <!-- Filtros Avançados -->
                 <div class="filter-container">
                     <label for="filtroFuncionario">Filtrar por Funcionário:</label>
                     <select id="filtroFuncionario" onchange="filtrarDashboard()">
@@ -1582,18 +1514,13 @@
                     </button>
                 </div>
 
-                <!-- Gráficos Interativos -->
                 <div class="charts-grid">
                     <div class="chart-container">
                         <h3>
                             <span><i class="fas fa-chart-pie"></i> Distribuição de Status</span>
                             <div class="chart-actions">
-                                <button onclick="refreshChart('status')">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                                <button onclick="downloadChart('status')">
-                                    <i class="fas fa-download"></i>
-                                </button>
+                                <button onclick="refreshChart('status')"><i class="fas fa-sync-alt"></i></button>
+                                <button onclick="downloadChart('status')"><i class="fas fa-download"></i></button>
                             </div>
                         </h3>
                         <canvas id="statusChart"></canvas>
@@ -1602,12 +1529,8 @@
                         <h3>
                             <span><i class="fas fa-chart-bar"></i> Demandas por Categoria</span>
                             <div class="chart-actions">
-                                <button onclick="refreshChart('categoria')">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                                <button onclick="downloadChart('categoria')">
-                                    <i class="fas fa-download"></i>
-                                </button>
+                                <button onclick="refreshChart('categoria')"><i class="fas fa-sync-alt"></i></button>
+                                <button onclick="downloadChart('categoria')"><i class="fas fa-download"></i></button>
                             </div>
                         </h3>
                         <canvas id="categoriaChart"></canvas>
@@ -1616,12 +1539,8 @@
                         <h3>
                             <span><i class="fas fa-chart-bar"></i> Produtividade por Funcionário</span>
                             <div class="chart-actions">
-                                <button onclick="refreshChart('productivity')">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                                <button onclick="downloadChart('productivity')">
-                                    <i class="fas fa-download"></i>
-                                </button>
+                                <button onclick="refreshChart('productivity')"><i class="fas fa-sync-alt"></i></button>
+                                <button onclick="downloadChart('productivity')"><i class="fas fa-download"></i></button>
                             </div>
                         </h3>
                         <canvas id="productivityChart"></canvas>
@@ -1629,7 +1548,6 @@
                 </div>
             </div>
 
-            <!-- Aba Nova Demanda -->
             <div id="nova" class="tab-content">
                 <div class="card">
                     <h2><i class="fas fa-plus-circle"></i> Registrar Nova Demanda</h2>
@@ -1699,14 +1617,12 @@
                             <input type="date" id="dataLimiteInput" required onchange="validateDeadline()">
                         </div>
                         
-                        <!-- Anexos na Criação -->
                         <div class="form-group">
                             <label for="anexosCriacaoInput">Anexar Documentos/Imagens (Opcional):</label>
                             <input type="file" id="anexosCriacaoInput" multiple>
                             <div id="anexosCriacaoList" class="file-list"></div>
                         </div>
                         
-                        <!-- Tarefa de Rotina -->
                         <div class="checkbox-group">
                             <input type="checkbox" id="rotinaCheckbox" onchange="toggleRoutineFields()">
                             <label for="rotinaCheckbox">Esta é uma tarefa de rotina</label>
@@ -1732,71 +1648,54 @@
                 </div>
             </div>
 
-            <!-- Aba Pendentes -->
             <div id="pendentes" class="tab-content">
                 <div class="card">
                     <div class="card-header">
-                        <h2><i class="fas fa-clock"></i> Demandas Pendentes</h2>
+                        <h2><i class="fas fa-clock"></i> Minhas Demandas Pendentes</h2>
                     </div>
                     <div id="pendentesContainer"></div>
                 </div>
             </div>
 
-            <!-- Aba Atrasadas -->
             <div id="atrasadas" class="tab-content">
                 <div class="card">
                     <div class="card-header">
                         <h2><i class="fas fa-exclamation-triangle"></i> Demandas Atrasadas</h2>
                         <div class="card-actions" id="gestorActions2" style="display: none;">
-                            <button onclick="reassignOverdue()">
-                                <i class="fas fa-user-plus"></i> Reatribuir
-                            </button>
-                            <button onclick="extendDeadlines()">
-                                <i class="fas fa-calendar-plus"></i> Estender Prazos
-                            </button>
+                            <button onclick="reassignOverdue()"><i class="fas fa-user-plus"></i> Reatribuir</button>
+                            <button onclick="extendDeadlines()"><i class="fas fa-calendar-plus"></i> Estender Prazos</button>
                         </div>
                     </div>
                     <div id="atrasadasContainer"></div>
                 </div>
             </div>
 
-            <!-- Aba Concluídas -->
             <div id="aprovadas" class="tab-content">
                 <div class="card">
                     <div class="card-header">
-                        <h2><i class="fas fa-check-circle"></i> Demandas Concluídas</h2>
+                        <h2><i class="fas fa-check-circle"></i> Minhas Demandas Concluídas</h2>
                         <div class="card-actions" id="gestorActions3" style="display: none;">
-                            <button onclick="exportCompleted()">
-                                <i class="fas fa-download"></i> Exportar Concluídas
-                            </button>
-                            <button onclick="archiveCompleted()">
-                                <i class="fas fa-archive"></i> Arquivar
-                            </button>
+                            <button onclick="exportCompleted()"><i class="fas fa-download"></i> Exportar Concluídas</button>
+                            <button onclick="archiveCompleted()"><i class="fas fa-archive"></i> Arquivar</button>
                         </div>
                     </div>
                     <div id="aprovadasContainer"></div>
                 </div>
             </div>
 
-            <!-- Aba Ranking -->
             <div id="ranking" class="tab-content">
                 <div class="ranking-container">
                     <div class="card-header">
                         <h2><i class="fas fa-chart-bar"></i> Estatísticas por Funcionário</h2>
                         <div class="card-actions">
-                            <button onclick="changeRankingPeriod()">
-                                <i class="fas fa-calendar"></i> Período
-                            </button>
-                            <button onclick="exportRanking()" id="exportRankingBtn" style="display: none;">
-                                <i class="fas fa-download"></i> Exportar
-                            </button>
+                            <button onclick="changeRankingPeriod()"><i class="fas fa-calendar"></i> Período</button>
+                            <button onclick="exportRanking()" id="exportRankingBtn" style="display: none;"><i class="fas fa-download"></i> Exportar</button>
                         </div>
                     </div>
                     <ul class="ranking-list" id="rankingList"></ul>
                 </div>
             </div>
 
-            <!-- Aba Cobrança -->
             <div id="cobranca" class="tab-content">
                 <div class="card">
                     <h2><i class="fas fa-envelope"></i> Sistema de Cobrança</h2>
@@ -1816,27 +1715,17 @@
                             <option value="Relevante">Relevante</option>
                         </select>
                         
-                        <button onclick="filtrarCobranca()">
-                            <i class="fas fa-filter"></i> Filtrar
-                        </button>
-                        <button onclick="resetFiltrosCobranca()">
-                            <i class="fas fa-undo"></i> Resetar
-                        </button>
+                        <button onclick="filtrarCobranca()"><i class="fas fa-filter"></i> Filtrar</button>
+                        <button onclick="resetFiltrosCobranca()"><i class="fas fa-undo"></i> Resetar</button>
                     </div>
                     
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="fas fa-list"></i> Demandas em Atraso</h3>
                             <div class="card-actions">
-                                <button onclick="selectAllOverdue()">
-                                    <i class="fas fa-check-square"></i> Selecionar Todas
-                                </button>
-                                <button onclick="deselectAllOverdue()">
-                                    <i class="fas fa-square"></i> Desmarcar Todas
-                                </button>
-                                <button onclick="sendBulkEmail()" class="success">
-                                    <i class="fas fa-paper-plane"></i> Enviar Emails em Lote
-                                </button>
+                                <button onclick="selectAllOverdue()"><i class="fas fa-check-square"></i> Selecionar Todas</button>
+                                <button onclick="deselectAllOverdue()"><i class="fas fa-square"></i> Desmarcar Todas</button>
+                                <button onclick="sendBulkEmail()" class="success"><i class="fas fa-paper-plane"></i> Enviar Emails em Lote</button>
                             </div>
                         </div>
                         <div id="cobrancaContainer"></div>
@@ -1855,7 +1744,6 @@
                 </div>
             </div>
 
-            <!-- Aba Exportar/Importar (apenas gestor) -->
             <div id="exportar" class="tab-content">
                 <div class="card">
                     <h2><i class="fas fa-download"></i> Exportar Dados</h2>
@@ -1869,9 +1757,7 @@
                             </select>
                         </div>
                     </div>
-                    <button onclick="exportarDemandas()">
-                        <i class="fas fa-download"></i> Exportar Todas as Demandas
-                    </button>
+                    <button onclick="exportarDemandas()"><i class="fas fa-download"></i> Exportar Todas as Demandas</button>
                 </div>
 
                 <div class="card">
@@ -1881,33 +1767,25 @@
                         <label for="importFile">Selecione o arquivo JSON:</label>
                         <input type="file" id="importFile" accept=".json">
                     </div>
-                    <button onclick="importarDemandas()">
-                        <i class="fas fa-file-import"></i> Importar Demandas
-                    </button>
+                    <button onclick="importarDemandas()"><i class="fas fa-file-import"></i> Importar Demandas</button>
                 </div>
             </div>
         </main>
     </div>
 </div>
 
-<!-- Modal de Senha para Aprovação -->
 <div id="passwordModal" class="password-modal">
     <div class="password-modal-content">
         <h3><i class="fas fa-lock"></i> Autenticação Requerida</h3>
         <p>Apenas o gestor pode aprovar ou reprovar demandas.</p>
         <input type="password" id="passwordConfirm" class="password-input" placeholder="Digite a senha do gestor">
         <div class="password-buttons">
-            <button onclick="confirmPassword()" class="success">
-                <i class="fas fa-check"></i> Confirmar
-            </button>
-            <button onclick="closePasswordModal()" class="danger">
-                <i class="fas fa-times"></i> Cancelar
-            </button>
+            <button onclick="confirmPassword()" class="success"><i class="fas fa-check"></i> Confirmar</button>
+            <button onclick="closePasswordModal()" class="danger"><i class="fas fa-times"></i> Cancelar</button>
         </div>
     </div>
 </div>
 
-<!-- Modal de Resolução de Demanda -->
 <div id="resolucaoModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeModal('resolucaoModal')">&times;</span>
@@ -1923,18 +1801,13 @@
                 <div id="anexosList" class="file-list"></div>
             </div>
             <div class="form-group">
-                <button type="submit" class="success">
-                    <i class="fas fa-save"></i> Salvar Resolução e Baixar Anexos
-                </button>
-                <button type="button" class="secondary" onclick="closeModal('resolucaoModal')">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
+                <button type="submit" class="success"><i class="fas fa-save"></i> Salvar Resolução e Baixar Anexos</button>
+                <button type="button" class="secondary" onclick="closeModal('resolucaoModal')"><i class="fas fa-times"></i> Cancelar</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal de Reprovação por Atribuição -->
 <div id="atribuicaoReprovacaoModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeModal('atribuicaoReprovacaoModal')">&times;</span>
@@ -1945,24 +1818,18 @@
                 <textarea id="motivoReprovacaoAtribuicao" rows="4" required placeholder="Por favor, justifique o motivo da reprovação desta demanda para que o solicitante possa entender e ajustar."></textarea>
             </div>
             <div class="form-group">
-                <button type="submit" class="danger">
-                    <i class="fas fa-times"></i> Reprovar Demanda
-                </button>
-                <button type="button" class="secondary" onclick="closeModal('atribuicaoReprovacaoModal')">
-                    <i class="fas fa-arrow-left"></i> Voltar
-                </button>
+                <button type="submit" class="danger"><i class="fas fa-times"></i> Reprovar Demanda</button>
+                <button type="button" class="secondary" onclick="closeModal('atribuicaoReprovacaoModal')"><i class="fas fa-arrow-left"></i> Voltar</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Sistema de Notificações Toast -->
 <div id="notification" class="notification">
     <h4><i class="fas fa-bell"></i> <span id="notificationTitle">Notificação</span></h4>
     <p id="notificationMessage">Mensagem da notificação</p>
 </div>
 
-<!-- Modal para Detalhes -->
 <div id="detailModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeModal('detailModal')">&times;</span>
@@ -1974,141 +1841,22 @@
 </div>
 
 <script>
-    // Sistema de Usuários
     const usuarios = [
-        { 
-            id: 1, 
-            nome: 'Ranielly Miranda De Souza', 
-            email: 'ranielly-s@zaminebrasil.com', 
-            nivel: 'Senior', 
-            pontos: 450, 
-            conquistas: ['star', 'fire', 'gold'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
-            id: 2, 
-            nome: 'Girlene da Silva Nogueira', 
-            email: 'girlene-n@zaminebrasil.com', 
-            nivel: 'Pleno', 
-            pontos: 380, 
-            conquistas: ['star', 'silver'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
-            id: 3, 
-            nome: 'Rafaela Cristine da Silva Martins', 
-            email: 'rafaela-m@zaminebrasil.com', 
-            nivel: 'Senior', 
-            pontos: 520, 
-            conquistas: ['star', 'fire', 'gold'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
-            id: 5, 
-            nome: 'Marcos Antônio Lino Rosa', 
-            email: 'marcos-a@zaminebrasil.com', 
-            nivel: 'Junior', 
-            pontos: 280, 
-            conquistas: ['star'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
-            id: 6, 
-            nome: 'Marcos Paulo Moraes Borges', 
-            email: 'marcos-b@zaminebrasil.com', 
-            nivel: 'Pleno', 
-            pontos: 410, 
-            conquistas: ['star', 'silver'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
-            id: 7, 
-            nome: 'Marcelo Goncalves de Paula', 
-            email: 'marcelo-p@zaminebrasil.com', 
-            nivel: 'Senior', 
-            pontos: 480, 
-            conquistas: ['star', 'fire', 'gold'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
-            id: 8, 
-            nome: 'Higor Ataides Macedo', 
-            email: 'higor-a@zaminebrasil.com', 
-            nivel: 'Junior', 
-            pontos: 250, 
-            conquistas: ['star'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
-            id: 9, 
-            nome: 'Weslley Ferreira de Siqueira', 
-            email: 'weslley-f@zaminebrasil.com', 
-            nivel: 'Pleno', 
-            pontos: 360, 
-            conquistas: ['star', 'silver'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
-            id: 10, 
-            nome: 'Jadson Joao Romano', 
-            email: 'jadson-r@zaminebrasil.com', 
-            nivel: 'Senior', 
-            pontos: 440, 
-            conquistas: ['star', 'fire', 'gold'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
-            id: 11, 
-            nome: 'Charles de Andrade', 
-            email: 'charles-a@zaminebrasil.com', 
-            nivel: 'Pleno', 
-            pontos: 390, 
-            conquistas: ['star', 'silver'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
-            id: 12, 
-            nome: 'Jose Carlos Rodrigues de Santana', 
-            email: 'jose-s@zaminebrasil.com', 
-            nivel: 'Junior', 
-            pontos: 220, 
-            conquistas: ['star'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
-            id: 13, 
-            nome: 'Max Henrique Araujo', 
-            email: 'max-r@zaminebrasil.com', 
-            nivel: 'Pleno', 
-            pontos: 340, 
-            conquistas: ['star', 'silver'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
-            id: 99, 
-            nome: 'Gestor do Sistema', 
-            email: 'gestor@zaminebrasil.com', 
-            nivel: 'Administrador', 
-            pontos: 999, 
-            conquistas: ['star', 'fire', 'gold', 'crown'],
-            senha: 'admin123',
-            role: 'gestor'
-        }
+        { id: 1, nome: 'Ranielly Miranda De Souza', email: 'ranielly-s@zaminebrasil.com', nivel: 'Senior', pontos: 450, conquistas: ['star', 'fire', 'gold'], senha: '123456', role: 'funcionario' },
+        { id: 2, nome: 'Girlene da Silva Nogueira', email: 'girlene-n@zaminebrasil.com', nivel: 'Pleno', pontos: 380, conquistas: ['star', 'silver'], senha: '123456', role: 'funcionario' },
+        { id: 3, nome: 'Rafaela Cristine da Silva Martins', email: 'rafaela-m@zaminebrasil.com', nivel: 'Senior', pontos: 520, conquistas: ['star', 'fire', 'gold'], senha: '123456', role: 'funcionario' },
+        { id: 5, nome: 'Marcos Antônio Lino Rosa', email: 'marcos-a@zaminebrasil.com', nivel: 'Junior', pontos: 280, conquistas: ['star'], senha: '123456', role: 'funcionario' },
+        { id: 6, nome: 'Marcos Paulo Moraes Borges', email: 'marcos-b@zaminebrasil.com', nivel: 'Pleno', pontos: 410, conquistas: ['star', 'silver'], senha: '123456', role: 'funcionario' },
+        { id: 7, nome: 'Marcelo Goncalves de Paula', email: 'marcelo-p@zaminebrasil.com', nivel: 'Senior', pontos: 480, conquistas: ['star', 'fire', 'gold'], senha: '123456', role: 'funcionario' },
+        { id: 8, nome: 'Higor Ataides Macedo', email: 'higor-a@zaminebrasil.com', nivel: 'Junior', pontos: 250, conquistas: ['star'], senha: '123456', role: 'funcionario' },
+        { id: 9, nome: 'Weslley Ferreira de Siqueira', email: 'weslley-f@zaminebrasil.com', nivel: 'Pleno', pontos: 360, conquistas: ['star', 'silver'], senha: '123456', role: 'funcionario' },
+        { id: 10, nome: 'Jadson Joao Romano', email: 'jadson-r@zaminebrasil.com', nivel: 'Senior', pontos: 440, conquistas: ['star', 'fire', 'gold'], senha: '123456', role: 'funcionario' },
+        { id: 11, nome: 'Charles de Andrade', email: 'charles-a@zaminebrasil.com', nivel: 'Pleno', pontos: 390, conquistas: ['star', 'silver'], senha: '123456', role: 'funcionario' },
+        { id: 12, nome: 'Jose Carlos Rodrigues de Santana', email: 'jose-s@zaminebrasil.com', nivel: 'Junior', pontos: 220, conquistas: ['star'], senha: '123456', role: 'funcionario' },
+        { id: 13, nome: 'Max Henrique Araujo', email: 'max-r@zaminebrasil.com', nivel: 'Pleno', pontos: 340, conquistas: ['star', 'silver'], senha: '123456', role: 'funcionario' },
+        { id: 99, nome: 'Gestor do Sistema', email: 'gestor@zaminebrasil.com', nivel: 'Administrador', pontos: 999, conquistas: ['star', 'fire', 'gold', 'crown'], senha: 'admin123', role: 'gestor' }
     ];
 
-    // Variáveis globais
     let usuarioLogado = null;
     let todasDemandas = [];
     let timerInterval;
@@ -2121,20 +1869,14 @@
     let demandaAtribuicaoAtual = null;
     let selectedUsers = [];
 
-    // URL do servidor (altere para o IP do servidor)
-   const SERVER_URL = window.location.origin;
-
-    // Status do servidor
+    const SERVER_URL = window.location.origin;
     let serverConnected = false;
 
-    // Inicialização
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('Inicializando sistema...');
         carregarUsuariosNoSelect();
         inicializarEventListeners();
         verificarStatusServidor();
         
-        // Verifica se há sessão salva
         const sessao = sessionStorage.getItem('usuarioLogado');
         if (sessao) {
             usuarioLogado = JSON.parse(sessao);
@@ -2143,17 +1885,13 @@
             configurarInterfaceUsuario();
             inicializarSistemaPrincipal();
         }
-        
-        console.log('Sistema inicializado com sucesso!');
     });
 
-    // Função para alternar o dropdown de notificações
     function toggleNotificationsDropdown() {
         const dropdown = document.getElementById('notificationsDropdown');
         dropdown.classList.toggle('show');
     }
 
-    // Função para adicionar notificação à caixa do usuário
     function addUserNotification(type, title, message) {
         const notification = {
             id: Date.now(),
@@ -2167,7 +1905,6 @@
         updateNotificationCount();
     }
 
-    // Função para renderizar as notificações na UI
     function renderUserNotifications() {
         const listContainer = document.getElementById('notificationsList');
         if (!listContainer) return;
@@ -2186,14 +1923,12 @@
         `).join('');
     }
     
-    // Função para limpar todas as notificações
     function clearAllNotifications() {
         userNotifications = [];
         renderUserNotifications();
         updateNotificationCount();
     }
 
-    // Função para atualizar o contador de notificações
     function updateNotificationCount() {
         const countElement = document.getElementById('notificationCount');
         if (countElement) {
@@ -2202,7 +1937,6 @@
         }
     }
     
-    // Fecha o dropdown se clicar fora
     document.addEventListener('click', function(event) {
         const dropdown = document.getElementById('notificationsDropdown');
         const button = event.target.closest('button[onclick="toggleNotificationsDropdown()"]');
@@ -2211,7 +1945,6 @@
         }
     });
 
-    // Verificar status do servidor
     async function verificarStatusServidor() {
         const statusElement = document.getElementById('serverStatus');
         const statusText = document.getElementById('serverStatusText');
@@ -2231,24 +1964,19 @@
             statusText.textContent = 'Servidor desconectado';
         }
         
-        // Tenta reconectar a cada 30 segundos
         setTimeout(verificarStatusServidor, 30000);
     }
 
-    // Carregar usuários no select de login
     function carregarUsuariosNoSelect() {
-        console.log('Carregando usuários no select...');
         const userSelect = document.getElementById('userSelect');
         if (userSelect) {
             usuarios.forEach(usuario => {
                 const option = new Option(usuario.nome, usuario.id);
                 userSelect.add(option);
             });
-            console.log('Usuários carregados no select de login');
         }
     }
 
-    // Sistema de Login
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -2267,27 +1995,18 @@
             return;
         }
         
-        // Login bem sucedido
         usuarioLogado = usuario;
-        console.log('Login bem sucedido:', usuarioLogado.nome);
-        
-        // Salva sessão
         sessionStorage.setItem('usuarioLogado', JSON.stringify(usuario));
         
-        // Mostra sistema principal
         document.getElementById('loginContainer').style.display = 'none';
         document.getElementById('mainContainer').style.display = 'block';
         
-        // Configura interface baseado no papel do usuário
         configurarInterfaceUsuario();
-        
-        // Inicializa sistema
         inicializarSistemaPrincipal();
         
         showNotification('success', 'Bem-vindo!', `Olá, ${usuario.nome}! Você está logado como ${usuario.role === 'gestor' ? 'Gestor' : 'Funcionário'}`);
     });
 
-    // Configurar interface baseado no papel do usuário
     function configurarInterfaceUsuario() {
         const userBadge = document.getElementById('userBadge');
         const userName = document.getElementById('userName');
@@ -2298,8 +2017,6 @@
             if (usuarioLogado.role === 'gestor') {
                 userBadge.classList.add('gestor');
                 userBadge.innerHTML = '<i class="fas fa-user-shield"></i> <span>' + usuarioLogado.nome + ' (Gestor)</span>';
-                
-                // Mostra abas e ações do gestor
                 document.getElementById('gestorTab').style.display = 'block';
                 document.getElementById('gestorTab2').style.display = 'block';
                 document.getElementById('gestorActions2').style.display = 'flex';
@@ -2311,7 +2028,6 @@
         }
     }
 
-    // Inicializar sistema principal após login
     async function inicializarSistemaPrincipal() {
         carregarFuncionariosNosSelect();
         await carregarDadosDoServidor();
@@ -2320,14 +2036,13 @@
         atualizarRanking();
         inicializarGraficos();
         
-        // Inicia o contador de tempo
         timerInterval = setInterval(atualizarTemposRestantes, 1000);
-        
-        // Inicializa notificações em tempo real
         inicializarNotificacoesTempoReal();
+        
+        // NOVO: Gera notificações ao logar
+        gerarNotificacoesAoLogar();
     }
 
-    // Logout
     function logout() {
         if (confirm('Tem certeza que deseja sair do sistema?')) {
             sessionStorage.removeItem('usuarioLogado');
@@ -2335,9 +2050,7 @@
         }
     }
 
-    // Carregar funcionários nos selects (exceto login)
     function carregarFuncionariosNosSelect() {
-        console.log('Carregando funcionários nos selects...');
         const selects = ['filtroFuncionario', 'cobrancaFuncionario'];
         
         selects.forEach(selectId => {
@@ -2357,15 +2070,12 @@
                     const option = new Option(func.nome, func.id);
                     select.add(option);
                 });
-                console.log(`Funcionários carregados no select: ${selectId}`);
             }
         });
         
-        // Inicializa o campo de seleção múltipla
         inicializarCampoMultiSelect();
     }
 
-    // Inicializa o campo de seleção múltipla para atribuição de demandas
     function inicializarCampoMultiSelect() {
         const dropdown = document.getElementById('atribuidoADropdown');
         if (!dropdown) return;
@@ -2392,7 +2102,6 @@
         });
     }
 
-    // Alterna a exibição do dropdown de seleção múltipla
     function toggleMultiSelect(id) {
         const dropdown = document.getElementById(id + 'Dropdown');
         if (dropdown.style.display === 'block') {
@@ -2405,7 +2114,6 @@
         }
     }
 
-    // Atualiza a lista de usuários selecionados
     function updateSelectedUsers() {
         selectedUsers = [];
         const checkboxes = document.querySelectorAll('#atribuidoADropdown input[type="checkbox"]:checked');
@@ -2428,7 +2136,6 @@
         }
     }
 
-    // Remove um usuário da seleção
     function removeUser(userId) {
         const checkbox = document.getElementById(`user_${userId}`);
         if (checkbox) {
@@ -2437,28 +2144,32 @@
         }
     }
 
-    // Carregar dados do servidor
     async function carregarDadosDoServidor() {
-        console.log('Carregando dados do servidor...');
         try {
             const response = await fetch(`${SERVER_URL}/api/demandas`);
             if (response.ok) {
                 const demandasDoServidor = await response.json();
                 
+                // MUDANÇA: Fazendo o parse do campo 'atribuidos' que vem como string JSON
                 demandasDoServidor.forEach(demandaServidor => {
+                    if (demandaServidor.atribuidos && typeof demandaServidor.atribuidos === 'string') {
+                        try {
+                            demandaServidor.atribuidos = JSON.parse(demandaServidor.atribuidos);
+                        } catch (e) {
+                            demandaServidor.atribuidos = [];
+                        }
+                    }
                     if (!todasDemandas.find(d => d.id === demandaServidor.id)) {
                         todasDemandas.push(demandaServidor);
                     }
                 });
                 
-                console.log(`Carregadas ${demandasDoServidor.length} demandas do servidor. Total: ${todasDemandas.length}`);
             } else {
-                console.error('Erro ao carregar demandas do servidor');
-                showNotification('error', 'Erro de Conexão', 'Não foi possível conectar ao servidor. Verifique se o servidor está rodando.');
+                showNotification('error', 'Erro de Conexão', 'Não foi possível conectar ao servidor.');
             }
         } catch (error) {
             console.error('Erro de conexão com o servidor:', error);
-            showNotification('error', 'Erro de Conexão', 'Não foi possível conectar ao servidor. Verifique se o servidor está rodando.');
+            showNotification('error', 'Erro de Conexão', 'Não foi possível conectar ao servidor.');
         }
         
         renderizarDemandas();
@@ -2466,22 +2177,17 @@
         atualizarBadges();
     }
 
-    // Salvar dados no servidor
     async function salvarDemandaNoServidor(demanda) {
-        console.log('Salvando demanda no servidor...');
         try {
             const response = await fetch(`${SERVER_URL}/api/demandas`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(demanda)
             });
             
             if (response.ok) {
                 const result = await response.json();
                 if (result.success) {
-                    console.log('Demanda salva com sucesso no servidor');
                     return true;
                 }
             }
@@ -2489,34 +2195,24 @@
             console.error('Erro ao salvar demanda no servidor:', error);
             showNotification('error', 'Erro ao Salvar', 'Não foi possível salvar a demanda no servidor.');
         }
-        
         return false;
     }
 
-    // Atualizar demanda no servidor
     async function atualizarDemandaNoServidor(id, dadosAtualizados) {
-        console.log('Atualizando demanda no servidor...');
         try {
             const demandaExistente = todasDemandas.find(d => d.id === id);
-            if (!demandaExistente) {
-                showNotification('error', 'Erro ao Atualizar', 'Demanda não encontrada.');
-                return false;
-            }
-
+            if (!demandaExistente) return false;
             const dadosCompletos = { ...demandaExistente, ...dadosAtualizados };
 
             const response = await fetch(`${SERVER_URL}/api/demandas/${id}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosCompletos)
             });
             
             if (response.ok) {
                 const result = await response.json();
                 if (result.success) {
-                    console.log('Demanda atualizada com sucesso no servidor');
                     return true;
                 }
             }
@@ -2524,13 +2220,10 @@
             console.error('Erro ao atualizar demanda no servidor:', error);
             showNotification('error', 'Erro ao Atualizar', 'Não foi possível atualizar a demanda no servidor.');
         }
-        
         return false;
     }
 
-    // Deletar demanda do servidor
     async function deletarDemandaDoServidor(id) {
-        console.log('Deletando demanda do servidor...');
         try {
             const response = await fetch(`${SERVER_URL}/api/demandas/${id}`, {
                 method: 'DELETE'
@@ -2539,7 +2232,6 @@
             if (response.ok) {
                 const result = await response.json();
                 if (result.success) {
-                    console.log('Demanda deletada com sucesso do servidor');
                     return true;
                 }
             }
@@ -2547,14 +2239,12 @@
             console.error('Erro ao deletar demanda do servidor:', error);
             showNotification('error', 'Erro ao Deletar', 'Não foi possível deletar a demanda no servidor.');
         }
-        
         return false;
     }
 
-    // Atualizar badges nas abas
     function atualizarBadges() {
-        const pendentes = todasDemandas.filter(d => d.status === 'pendente' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'atribuida_pendente_aceitacao').length;
-        const atrasadas = todasDemandas.filter(d => {
+        const pendentes = getDemandasParaUsuarioLogado().filter(d => d.status === 'pendente' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'atribuida_pendente_aceitacao').length;
+        const atrasadas = getDemandasParaUsuarioLogado().filter(d => {
             if (d.status === 'aprovada') return false;
             const dataLimite = new Date(d.dataLimite);
             const hoje = new Date();
@@ -2578,23 +2268,65 @@
         }
     }
 
-    // Mostrar notificações
-    function showNotifications() {
-        showNotification('info', 'Notificações', 'Você não possui notificações no momento.');
+    // NOVO: Função para gerar notificações de demandas atribuídas ao logar
+    function gerarNotificacoesAoLogar() {
+        if (!usuarioLogado || usuarioLogado.role !== 'funcionario') return;
+
+        getDemandasParaUsuarioLogado().forEach(demanda => {
+            // Verifica se a demanda foi atribuída a mim e não está concluída
+            const isAtribuidoAMim = demanda.atribuidos && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
+            const isDono = demanda.funcionarioId === usuarioLogado.id;
+            
+            if (isAtribuidoAMim && !isDono && demanda.status !== 'aprovada') {
+                const notificacaoExistente = userNotifications.find(n => n.message.includes(demanda.tag) && n.title.includes('atribuída'));
+                if (!notificacaoExistente) {
+                    addUserNotification('info', 'Nova Tarefa Atribuída', `Você tem uma tarefa pendente: "${demanda.nomeDemanda}".`);
+                }
+            }
+        });
     }
 
-    // Funções de Dashboard
-    function filtrarDashboard() {
-        filtroFuncionarioAtual = document.getElementById('filtroFuncionario').value;
-        atualizarDashboard();
-        atualizarGraficos();
+    function getDemandasParaUsuarioLogado() {
+        if (usuarioLogado && usuarioLogado.role === 'gestor') {
+            return todasDemandas;
+        }
+        if (usuarioLogado && usuarioLogado.role === 'funcionario') {
+            return todasDemandas.filter(demanda => {
+                const eCriador = demanda.funcionarioId === usuarioLogado.id;
+                // MUDANÇA: Garante que 'atribuidos' seja um array antes de usar 'some'
+                const eAtribuido = Array.isArray(demanda.atribuidos) && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
+                return eCriador || eAtribuido;
+            });
+        }
+        return [];
     }
 
     function getDemandasFiltradas() {
-        if (filtroFuncionarioAtual === 'todos') {
-            return todasDemandas;
+        let demandasBase = getDemandasParaUsuarioLogado();
+
+        if (filtroFuncionarioAtual !== 'todos') {
+            demandasBase = demandasBase.filter(d => d.funcionarioId == filtroFuncionarioAtual);
         }
-        return todasDemandas.filter(d => d.funcionarioId == filtroFuncionarioAtual);
+        
+        const periodo = document.getElementById('filtroPeriodo')?.value;
+        if (periodo && periodo !== 'all') {
+            const diasAtras = parseInt(periodo);
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - diasAtras);
+            demandasBase = demandasBase.filter(d => new Date(d.dataCriacao) >= cutoffDate);
+        }
+        
+        const categoria = document.getElementById('filtroCategoria')?.value;
+        if (categoria && categoria !== 'todas') {
+            demandasBase = demandasBase.filter(d => d.categoria === categoria);
+        }
+        
+        const prioridade = document.getElementById('filtroPrioridade')?.value;
+        if (prioridade && prioridade !== 'todas') {
+            demandasBase = demandasBase.filter(d => d.prioridade === prioridade);
+        }
+        
+        return demandasBase;
     }
 
     function atualizarDashboard() {
@@ -2642,7 +2374,6 @@
         }, stepDuration);
     }
 
-    // Inicializar gráficos
     function inicializarGraficos() {
         if (typeof Chart === 'undefined') {
             console.log('Chart.js não carregado, pulando inicialização dos gráficos');
@@ -2659,12 +2390,7 @@
                     labels: ['Em Andamento', 'Aprovadas', 'Reprovadas', 'Em Análise'],
                     datasets: [{
                         data: [0, 0, 0, 0],
-                        backgroundColor: [
-                            'rgba(255,193, 7, 0.8)',
-                            'rgba(40, 167, 69, 0.8)',
-                            'rgba(220, 53, 69, 0.8)',
-                            'rgba(0, 86, 179, 0.8)'
-                        ],
+                        backgroundColor: ['rgba(255,193, 7, 0.8)', 'rgba(40, 167, 69, 0.8)', 'rgba(220, 53, 69, 0.8)', 'rgba(0, 86, 179, 0.8)'],
                         borderWidth: 2,
                         borderColor: '#fff'
                     }]
@@ -2673,15 +2399,10 @@
                     responsive: true,
                     maintainAspectRatio: true,
                     plugins: {
-                        legend: {
-                            position: 'bottom'
-                        },
+                        legend: { position: 'bottom' },
                         datalabels: {
                             color: '#fff',
-                            font: {
-                                weight: 'bold',
-                                size: 14
-                            },
+                            font: { weight: 'bold', size: 14 },
                             formatter: (value, ctx) => {
                                 const sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
                                 const percentage = sum > 0 ? ((value / sum) * 100).toFixed(1) + '%' : '0%';
@@ -2711,21 +2432,14 @@
                     responsive: true,
                     maintainAspectRatio: true,
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
-                        }
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
                     },
                     plugins: {
                         datalabels: {
                             anchor: 'end',
                             align: 'top',
                             color: '#333',
-                            font: {
-                                weight: 'bold'
-                            }
+                            font: { weight: 'bold' }
                         }
                     }
                 }
@@ -2750,21 +2464,14 @@
                     responsive: true,
                     maintainAspectRatio: true,
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
-                        }
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
                     },
                     plugins: {
                         datalabels: {
                             anchor: 'end',
                             align: 'top',
                             color: '#333',
-                            font: {
-                                weight: 'bold'
-                            }
+                            font: { weight: 'bold' }
                         }
                     }
                 }
@@ -2801,7 +2508,6 @@
         charts.productivity.update();
     }
 
-    // Funções utilitárias
     function formatDate(date) {
         return new Date(date).toLocaleDateString('pt-BR', {
             day: '2-digit',
@@ -2812,15 +2518,8 @@
     }
 
     function switchTab(tabName) {
-        console.log(`Mudando para aba: ${tabName}`);
-        
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
+        document.querySelectorAll('.tab').forEach(tab => { tab.classList.remove('active'); });
+        document.querySelectorAll('.tab-content').forEach(content => { content.classList.remove('active'); });
         
         let targetTab = null;
         document.querySelectorAll('.tab').forEach(tab => {
@@ -2846,26 +2545,18 @@
         const contentElement = document.getElementById(tabName);
         if (contentElement) {
             contentElement.classList.add('active');
-        } else {
-            console.error('Conteúdo não encontrado:', tabName);
         }
 
         if (tabName === 'pendentes') {
-            setTimeout(() => {
-                renderizarDemandas();
-            }, 100);
+            setTimeout(() => { renderizarDemandas(); }, 100);
         }
         
         if (tabName === 'cobranca') {
-            setTimeout(() => {
-                renderizarCobranca();
-            }, 100);
+            setTimeout(() => { renderizarCobranca(); }, 100);
         }
 
         if (tabName === 'dashboard') {
-            setTimeout(() => {
-                atualizarGraficos();
-            }, 100);
+            setTimeout(() => { atualizarGraficos(); }, 100);
         }
     }
 
@@ -2910,17 +2601,11 @@
         switchTab('nova');
     }
 
-    // Inicializar event listeners
     function inicializarEventListeners() {
-        console.log('Inicializando event listeners...');
-        
         const form = document.getElementById('demandaForm');
         if (form) {
-            console.log('Formulário encontrado, adicionando listener...');
-            
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                console.log('Formulário submetido!');
                 
                 const nomeDemanda = document.getElementById('nomeDemandaInput').value;
                 const categoria = document.getElementById('categoriaSelect').value;
@@ -2940,11 +2625,7 @@
                 let anexosCriacao = [];
                 if (anexosInput.files.length > 0) {
                     for (const file of anexosInput.files) {
-                        anexosCriacao.push({
-                            nome: file.name,
-                            tamanho: file.size,
-                            tipo: file.type
-                        });
+                        anexosCriacao.push({ nome: file.name, tamanho: file.size, tipo: file.type });
                     }
                 }
                 
@@ -2984,19 +2665,15 @@
                     comentarios: '',
                     comentarioGestor: '',
                     anexosCriacao,
-                    atribuidos: atribuidos
+                    atribuidos: atribuidos // MUDANÇA: Enviando a lista de atribuídos corretamente
                 };
-                
-                console.log('Nova demanda criada:', novaDemanda);
                 
                 const sucesso = await salvarDemandaNoServidor(novaDemanda);
                 
                 if (sucesso) {
                     await carregarDadosDoServidor();
-                    
                     notificarPartesInteressadasNovaDemanda(novaDemanda);
                     
-                    // CORREÇÃO: Adiciona notificação para TODOS os usuários atribuídos
                     if (atribuidos.length > 0) {
                         atribuidos.forEach(atribuido => {
                             addUserNotification('info', 'Nova Tarefa Atribuída', `A demanda "${nomeDemanda}" foi atribuída a você.`);
@@ -3010,15 +2687,9 @@
                     
                     showNotification('success', 'Demanda Registrada', `Sua demanda "${nomeDemanda}" foi registrada com sucesso!`);
                     
-                    setTimeout(() => {
-                        switchTab('pendentes');
-                    }, 1000);
-                    
-                    console.log('Processo de registro concluído com sucesso!');
+                    setTimeout(() => { switchTab('pendentes'); }, 1000);
                 }
             });
-        } else {
-            console.error('Formulário não encontrado!');
         }
 
         const resolucaoForm = document.getElementById('resolucaoForm');
@@ -3051,7 +2722,6 @@
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase();
-                console.log('Buscando por:', term);
             });
         }
         
@@ -3062,8 +2732,6 @@
                 });
             }
         });
-        
-        console.log('Event listeners inicializados!');
     }
 
     function atualizarListaAnexosCriacao() {
@@ -3079,18 +2747,14 @@
         for (const file of anexosInput.files) {
             const fileItem = document.createElement('div');
             fileItem.className = 'file-item';
-            fileItem.innerHTML = `
-                <span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
-            `;
+            fileItem.innerHTML = `<span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>`;
             anexosList.appendChild(fileItem);
         }
     }
 
-    // Função de notificação reescrita para seguir as regras
     function notificarPartesInteressadasNovaDemanda(demanda) {
         const gestor = usuarios.find(u => u.role === 'gestor');
 
-        // Regra 1: Gestor cria a demanda
         if (usuarioLogado.role === 'gestor') {
             if (demanda.atribuidos && demanda.atribuidos.length > 0) {
                 const emailsPara = demanda.atribuidos.map(a => a.email).join(',');
@@ -3098,14 +2762,9 @@
                 const corpo = encodeURIComponent(`Prezado(a),\n\nUma nova tarefa foi atribuída a você pelo Gestor:\n\n--- Detalhes da Tarefa ---\nNome: ${demanda.nomeDemanda}\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nPrioridade: ${demanda.prioridade}\nLocal: ${demanda.local}\nData Limite: ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}\nTAG: ${demanda.tag}\n\nPor favor, acesse o sistema para começar a trabalhar.\n\nAtenciosamente,\nGestor do Sistema`);
                 window.open(`mailto:${emailsPara}?subject=${assunto}&body=${corpo}`, '_blank');
             }
-        } 
-        // Regra 2: Funcionário cria a demanda
-        else {
+        } else {
             if (gestor) {
-                const emailsCc = demanda.atribuidos && demanda.atribuidos.length > 0 
-                    ? demanda.atribuidos.map(a => a.email).join(',') 
-                    : '';
-                    
+                const emailsCc = demanda.atribuidos && demanda.atribuidos.length > 0 ? demanda.atribuidos.map(a => a.email).join(',') : '';
                 const assunto = encodeURIComponent(`Nova Demanda Registrada: ${demanda.nomeDemanda}`);
                 let corpo = `Prezado Gestor,\n\nUma nova demanda foi registrada por ${demanda.nomeFuncionario}:\n\n--- Detalhes da Demanda ---\nNome: ${demanda.nomeDemanda}\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nPrioridade: ${demanda.prioridade}\nLocal: ${demanda.local}\nData Limite: ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}\nTAG: ${demanda.tag}\n`;
                 
@@ -3153,9 +2812,7 @@
         for (const file of anexosInput.files) {
             const fileItem = document.createElement('div');
             fileItem.className = 'file-item';
-            fileItem.innerHTML = `
-                <span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
-            `;
+            fileItem.innerHTML = `<span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>`;
             anexosList.appendChild(fileItem);
         }
     }
@@ -3253,6 +2910,8 @@
     }
 
     function renderizarDemandas() {
+        const demandasDoUsuario = getDemandasParaUsuarioLogado();
+
         const pendentesContainer = document.getElementById('pendentesContainer');
         const aprovadasContainer = document.getElementById('aprovadasContainer');
         const atrasadasContainer = document.getElementById('atrasadasContainer');
@@ -3261,13 +2920,13 @@
         if (aprovadasContainer) aprovadasContainer.innerHTML = '';
         if (atrasadasContainer) atrasadasContainer.innerHTML = '';
 
-        const pendentes = todasDemandas.filter(d => {
+        const pendentes = demandasDoUsuario.filter(d => {
             return d.status === 'pendente' || d.status === 'reprovada' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'reprovada_pelo_atribuido';
         });
         
-        const concluidas = todasDemandas.filter(d => d.status === 'aprovada');
+        const concluidas = demandasDoUsuario.filter(d => d.status === 'aprovada');
         
-        const atrasadas = todasDemandas.filter(d => {
+        const atrasadas = demandasDoUsuario.filter(d => {
             if (d.status === 'aprovada') return false;
             const dataLimite = new Date(d.dataLimite);
             const hoje = new Date();
@@ -3347,9 +3006,9 @@
             `<span class="demanda-priority priority-${demanda.prioridade.toLowerCase()}">${demanda.prioridade}</span>` : '';
         
         const podeAprovar = usuarioLogado && usuarioLogado.role === 'gestor';
+        // MUDANÇA: Verifica se é dono OU se está na lista de atribuídos
         const eDono = usuarioLogado && usuarioLogado.id === demanda.funcionarioId;
-        // CORREÇÃO: Verifica se o usuário logado está na lista de atribuídos
-        const eAtribuido = usuarioLogado && demanda.atribuidos && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
+        const eAtribuido = usuarioLogado && Array.isArray(demanda.atribuidos) && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
         
         let atribuidosInfo = '';
         if (demanda.atribuidos && demanda.atribuidos.length > 0) {
@@ -3618,6 +3277,7 @@
         }
     }
 
+    // MUDANÇA: A função de ranking agora considera tanto criadores quanto atribuídos
     function atualizarRanking() {
         const ranking = {};
         
@@ -3631,6 +3291,7 @@
         });
         
         todasDemandas.forEach(demanda => {
+            // Conta para o criador
             if (ranking[demanda.funcionarioId]) {
                 if (demanda.status === 'aprovada') {
                     ranking[demanda.funcionarioId].concluidas++;
@@ -3643,6 +3304,25 @@
                 if (dataLimite < hoje && demanda.status !== 'aprovada') {
                     ranking[demanda.funcionarioId].atrasadas++;
                 }
+            }
+
+            // NOVO: Conta para os atribuídos
+            if (Array.isArray(demanda.atribuidos)) {
+                demanda.atribuidos.forEach(atribuido => {
+                    if (ranking[atribuido.id]) {
+                        if (demanda.status === 'aprovada') {
+                            ranking[atribuido.id].concluidas++;
+                        } else if (demanda.status === 'pendente' || demanda.status === 'finalizado_pendente_aprovacao' || demanda.status === 'reprovada' || demanda.status === 'reprovada_pelo_atribuido') {
+                            ranking[atribuido.id].andamento++;
+                        }
+                        
+                        const dataLimite = new Date(demanda.dataLimite);
+                        const hoje = new Date();
+                        if (dataLimite < hoje && demanda.status !== 'aprovada') {
+                            ranking[atribuido.id].atrasadas++;
+                        }
+                    }
+                });
             }
         });
         
@@ -3819,7 +3499,7 @@
         const funcionarioFilter = document.getElementById('cobrancaFuncionario').value;
         const prioridadeFilter = document.getElementById('cobrancaPrioridade').value;
         
-        let atrasadas = todasDemandas.filter(d => {
+        let atrasadas = getDemandasParaUsuarioLogado().filter(d => {
             if (d.status === 'aprovada') return false;
             const dataLimite = new Date(d.dataLimite);
             const hoje = new Date();
@@ -3863,7 +3543,7 @@
                 <div class="card-header">
                     <h3><i class="fas fa-user"></i> ${funcionario.nome}</h3>
                     <div class="card-actions">
-                        <input type="checkbox" id="${checkboxId}" class="func-checkbox" onchange="toggleFuncionarioSelection(${funcionario.nome.replace(/'/g, "\\'")})">
+                        <input type="checkbox" id="${checkboxId}" class="func-checkbox" onchange="toggleFuncionarioSelection('${funcionario.nome.replace(/'/g, "\\'")}')">
                         <label for="${checkboxId}">Selecionar</label>
                     </div>
                 </div>
@@ -3926,7 +3606,7 @@
     }
 
     function enviarEmailCobranca(nomeFuncionario, emailFuncionario) {
-        const demandasAtrasadas = todasDemandas.filter(d => {
+        const demandasAtrasadas = getDemandasParaUsuarioLogado().filter(d => {
             if (d.status === 'aprovada') return false;
             if (d.nomeFuncionario !== nomeFuncionario) return false;
             const dataLimite = new Date(d.dataLimite);
@@ -4007,7 +3687,7 @@
         const funcionarioFilter = document.getElementById('cobrancaFuncionario').value;
         const prioridadeFilter = document.getElementById('cobrancaPrioridade').value;
         
-        let atrasadas = todasDemandas.filter(d => {
+        let atrasadas = getDemandasParaUsuarioLogado().filter(d => {
             if (d.status === 'aprovada') return false;
             const dataLimite = new Date(d.dataLimite);
             const hoje = new Date();
@@ -4071,7 +3751,6 @@
 
     function exportarDemandas() {
         const format = document.getElementById('exportFormat').value;
-        
         const dadosParaExportar = todasDemandas;
 
         if (dadosParaExportar.length === 0) {
@@ -4163,13 +3842,11 @@
                 let addedCount = 0;
 
                 for (const demandaImportada of importedData) {
-                    // CORREÇÃO: Busca por nome e TAG para substituir
                     const demandaExistente = todasDemandas.find(d => 
                         d.nomeDemanda === demandaImportada.nomeDemanda && d.tag === demandaImportada.tag
                     );
                     
                     if (demandaExistente) {
-                        // Se encontrar, substitui a demanda existente
                         const index = todasDemandas.findIndex(d => d.id === demandaExistente.id);
                         if (index !== -1) {
                             todasDemandas[index] = { ...demandaImportada, id: demandaExistente.id };
@@ -4177,7 +3854,6 @@
                             updatedCount++;
                         }
                     } else {
-                        // Se não encontrar, adiciona como nova
                         if (!demandaImportada.id) {
                            demandaImportada.id = Date.now() + Math.random();
                         }
