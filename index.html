@@ -3605,48 +3605,48 @@
         return div;
     }
 
-    function criarElementoDemandaEmAnalise(demanda) {
-        const div = document.createElement('div');
-        div.className = `demanda-item ${demanda.status} ${demanda.isRotina ? 'rotina' : ''}`;
-        
-        const dataLimiteFormatada = new Date(demanda.dataLimite).toLocaleDateString('pt-BR');
-        
-        let atribuidosInfo = '';
-        if (demanda.atribuidos && demanda.atribuidos.length > 0) {
-            atribuidosInfo = `<small><strong>Resolvido por:</strong> ${demanda.atribuidos.map(a => a.nome).join(', ')}</small>`;
-        }
-        
-        const podeAprovar = usuarioLogado && usuarioLogado.role === 'gestor';
-        
-        div.innerHTML = `
-            ${usuarioLogado && usuarioLogado.role === 'gestor ? `
-                <div class="demanda-checkbox">
-                    <input type="checkbox" class="demanda-checkbox" value="${demanda.id}" onchange="updateSelectedDemandasForApproval()">
-                </div>
-            ` : ''}
-            <div class="demanda-info">
-                <strong>${demanda.nomeFuncionario} - ${demanda.nomeDemanda || demanda.descricao}</strong>
-                <small>Categoria: ${demanda.categoria} | Local: ${demanda.local || 'N/A'} | Data Limite: ${dataLimiteFormatada}</small>
-                ${atribuidosInfo}
-                <small><strong>TAG:</strong> ${demanda.tag}</small>
-                <small><strong>Comentários do Funcionário:</strong> ${demanda.comentarios}</small>
-            </div>
-            <div class="acoes-demandas">
-                ${podeAprovar ? `
-                    <button class="success" onclick="abrirModalAprovacao(${demanda.id})" title="Aprovar">
-                        <i class="fas fa-check"></i>
-                    </button>
-                    <button class="danger" onclick="abrirModalReprovacao(${demanda.id})" title="Reprovar">
-                        <i class="fas fa-times"></i>
-                    </button>
-                ` : ''}
-                <button class="secondary" onclick="verDetalhes(${demanda.id})" title="Ver Detalhes">
-                    <i class="fas fa-eye"></i>
-                </button>
-            </div>
-        `;
-        return div;
+   function criarElementoDemandaEmAnalise(demanda) {
+    const div = document.createElement('div');
+    div.className = `demanda-item ${demanda.status} ${demanda.isRotina ? 'rotina' : ''}`;
+    
+    const dataLimiteFormatada = new Date(demanda.dataLimite).toLocaleDateString('pt-BR');
+    
+    let atribuidosInfo = '';
+    if (demanda.atribuidos && demanda.atribuidos.length > 0) {
+        atribuidosInfo = `<small><strong>Resolvido por:</strong> ${demanda.atribuidos.map(a => a.nome).join(', ')}</small>`;
     }
+    
+    const podeAprovar = usuarioLogado && usuarioLogado.role === 'gestor';
+    
+    div.innerHTML = `
+        ${usuarioLogado && usuarioLogado.role === 'gestor' ? `
+            <div class="demanda-checkbox-container">
+                <input type="checkbox" class="demanda-checkbox" value="${demanda.id}" onchange="updateSelectedDemandasForApproval()">
+            </div>
+        ` : ''}
+        <div class="demanda-info">
+            <strong>${demanda.nomeFuncionario} - ${demanda.nomeDemanda || demanda.descricao}</strong>
+            <small>Categoria: ${demanda.categoria} | Local: ${demanda.local || 'N/A'} | Data Limite: ${dataLimiteFormatada}</small>
+            ${atribuidosInfo}
+            <small><strong>TAG:</strong> ${demanda.tag}</small>
+            <small><strong>Comentários do Funcionário:</strong> ${demanda.comentarios}</small>
+        </div>
+        <div class="acoes-demandas">
+            ${podeAprovar ? `
+                <button class="success" onclick="abrirModalAprovacao('${demanda.id}')" title="Aprovar">
+                    <i class="fas fa-check"></i>
+                </button>
+                <button class="danger" onclick="abrirModalReprovacao('${demanda.id}')" title="Reprovar">
+                    <i class="fas fa-times"></i>
+                </button>
+            ` : ''}
+            <button class="secondary" onclick="verDetalhes('${demanda.id}')" title="Ver Detalhes">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+    `;
+    return div;
+}
 
     function calcularDesempenhoTempo(dataCriacao, dataConclusao, dataLimite) {
         const conclusao = new Date(dataConclusao);
