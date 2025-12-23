@@ -237,7 +237,6 @@
             align-items: center;
         }
 
-        /* MUDANÇA: Ajuste no item de notificação para acomodar os botões de ação */
         .notification-item {
             padding: 12px 15px;
             border-bottom: 1px solid #f0f0f0;
@@ -273,7 +272,6 @@
             color: #aaa;
         }
 
-        /* MUDANÇA: Novo estilo para ações da notificação */
         .notification-actions {
             display: flex;
             gap: 5px;
@@ -282,7 +280,6 @@
             right: 10px;
         }
 
-        /* MUDANÇA: Novo estilo para notificações prioritárias */
         .priority-notification {
             border-left: 4px solid var(--gold);
             background-color: rgba(255, 215, 0, 0.1);
@@ -413,7 +410,6 @@
             gap: 5px;
         }
 
-        /* MUDANÇA: Escondendo os indicadores de tendência */
         .trend-indicator {
             display: none !important;
         }
@@ -1871,7 +1867,6 @@
     let timerInterval;
     let charts = {};
     let filtroFuncionarioAtual = 'todos';
-    // MUDANÇA: Variável global para notificações do usuário
     let userNotifications = []; 
     let pendingAction = null;
     let selectedOverdueItems = [];
@@ -1897,19 +1892,49 @@
         }
     });
 
+    // MUDANÇA: Função para normalizar dados de uma demanda
+    function normalizarDadosDemanda(demanda) {
+        if (!demanda) return demanda;
+
+        // Garante que 'diasSemana' seja um array
+        if (typeof demanda.diasSemana === 'string') {
+            try {
+                demanda.diasSemana = JSON.parse(demanda.diasSemana);
+            } catch (e) {
+                demanda.diasSemana = [];
+            }
+        } else if (!Array.isArray(demanda.diasSemana)) {
+            demanda.diasSemana = [];
+        }
+
+        // Garante que 'atribuidos' seja um array
+        if (typeof demanda.atribuidos === 'string') {
+            try {
+                demanda.atribuidos = JSON.parse(demanda.atribuidos);
+            } catch (e) {
+                demanda.atribuidos = [];
+            }
+        } else if (!Array.isArray(demanda.atribuidos)) {
+            demanda.atribuidos = [];
+        }
+
+        // Garante que 'isRotina' seja um booleano
+        demanda.isRotina = Boolean(demanda.isRotina);
+
+        return demanda;
+    }
+
     function toggleNotificationsDropdown() {
         const dropdown = document.getElementById('notificationsDropdown');
         dropdown.classList.toggle('show');
     }
 
-    // MUDANÇA: Função para salvar notificações no localStorage de forma individual
     function salvarNotificacoesNoStorage() {
         if (!usuarioLogado) return;
         const storageKey = `userNotifications_${usuarioLogado.id}`;
         localStorage.setItem(storageKey, JSON.stringify(userNotifications));
     }
 
-    // MUDANÇA: Função para carregar notificações do localStorage de forma individual
     function carregarNotificacoesDoStorage() {
         if (!usuarioLogado) {
             userNotifications = [];
@@ -1931,7 +1956,6 @@
         updateNotificationCount();
     }
 
-    // MUDANÇA: A função agora aceita dados extras, como a TAG da demanda
     function addUserNotification(type, title, message, data = {}) {
         const notification = {
             id: Date.now() + Math.random(),
@@ -1939,30 +1963,28 @@
             title: title,
             message: message,
             date: new Date(),
-            priority: false, // Inicialmente não é prioridade
+            priority: false,
             ...data
         };
         userNotifications.unshift(notification);
         renderUserNotifications();
         updateNotificationCount();
-        salvarNotificacoesNoStorage(); // Salva imediatamente após adicionar
+        salvarNotificacoesNoStorage();
     }
 
-    // MUDANÇA: Função para marcar uma notificação individual como lida
     function markAsRead(id) {
         userNotifications = userNotifications.filter(n => n.id !== id);
         renderUserNotifications();
         updateNotificationCount();
-        salvarNotificacoesNoStorage(); // Salva imediatamente após marcar como lida
+        salvarNotificacoesNoStorage();
     }
 
-    // MUDANÇA: Função para alternar prioridade de uma notificação
     function togglePriority(id) {
         const notification = userNotifications.find(n => n.id === id);
         if (notification) {
             notification.priority = !notification.priority;
             renderUserNotifications();
-            salvarNotificacoesNoStorage(); // Salva imediatamente após alterar a prioridade
+            salvarNotificacoesNoStorage();
         }
     }
 
@@ -1970,7 +1992,7 @@
         userNotifications = [];
         renderUserNotifications();
         updateNotificationCount();
-        salvarNotificacoesNoStorage(); // Salva imediatamente após limpar
+        salvarNotificacoesNoStorage();
     }
 
     function updateNotificationCount() {
@@ -1981,7 +2003,6 @@
         }
     }
     
-    // MUDANÇA: Renderiza as notificações com os botões de ação e destaque para prioridade
     function renderUserNotifications() {
         const listContainer = document.getElementById('notificationsList');
         if (!listContainer) return;
@@ -2048,7 +2069,6 @@
         }
     }
 
-    // MUDANÇA: Evento de login atualizado para carregar notificações
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -2076,7 +2096,6 @@
         configurarInterfaceUsuario();
         inicializarSistemaPrincipal();
         
-        // MUDANÇA: Carrega as notificações específicas deste usuário do localStorage
         carregarNotificacoesDoStorage();
         
         showNotification('success', 'Bem-vindo!', `Olá, ${usuario.nome}! Você está logado como ${usuario.role === 'gestor' ? 'Gestor' : 'Funcionário'}`);
@@ -2117,7 +2136,6 @@
         gerarNotificacoesAoLogar();
     }
 
-    // MUDANÇA: Evento de logout atualizado para salvar notificações
     function logout() {
         if (confirm('Tem certeza que deseja sair do sistema?')) {
             salvarNotificacoesNoStorage();
@@ -2225,18 +2243,15 @@
         try {
             const response = await fetch(`${SERVER_URL}/api/demandas`);
             if (response.ok) {
+                // O servidor agora já envia os dados processados, mas vamos manter a verificação de segurança
                 const demandasDoServidor = await response.json();
                 
-                demandasDoServidor.forEach(demandaServidor => {
-                    if (demandaServidor.atribuidos && typeof demandaServidor.atribuidos === 'string') {
-                        try {
-                            demandaServidor.atribuidos = JSON.parse(demandaServidor.atribuidos);
-                        } catch (e) {
-                            demandaServidor.atribuidos = [];
-                        }
-                    }
-                    if (!todasDemandas.find(d => d.id === demandaServidor.id)) {
-                        todasDemandas.push(demandaServidor);
+                // MUDANÇA: Normaliza os dados recebidos (redundância, mas garante a robustez)
+                const demandasNormalizadas = demandasDoServidor.map(demanda => normalizarDadosDemanda(demanda));
+                
+                demandasNormalizadas.forEach(demanda => {
+                    if (!todasDemandas.find(d => d.id === demanda.id)) {
+                        todasDemandas.push(demanda);
                     }
                 });
                 
@@ -2318,7 +2333,6 @@
         return false;
     }
 
-    // MUDANÇA: Atualizada para não atualizar o badge do dashboard
     function atualizarBadges() {
         const pendentes = getDemandasParaUsuarioLogado().filter(d => d.status === 'pendente' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'atribuida_pendente_aceitacao').length;
         const atrasadas = getDemandasParaUsuarioLogado().filter(d => {
@@ -2334,11 +2348,10 @@
         updateBadge('completedBadge', concluidas);
     }
 
-    // MUDANÇA: Atualizada para ignorar o badge do dashboard
     function updateBadge(badgeId, count) {
         const badge = document.getElementById(badgeId);
         if (badge) {
-            if (badgeId === 'dashboardBadge') return; // Não atualizar o badge do dashboard
+            if (badgeId === 'dashboardBadge') return;
             
             if (count > 0) {
                 badge.textContent = count;
@@ -2430,7 +2443,6 @@
         return demandasBase;
     }
 
-    // MUDANÇA: Atualizada para não mostrar os indicadores de tendência
     function atualizarDashboard() {
         const demandasFiltradas = getDemandasFiltradas();
         const totalDemandas = demandasFiltradas.length;
@@ -2451,7 +2463,6 @@
         animateValue('rotinaCount', rotina);
     }
 
-    // MUDANÇA: Simplificada para não criar indicadores de tendência
     function animateValue(elementId, value) {
         const element = document.getElementById(elementId);
         if (!element) return;
@@ -3063,121 +3074,118 @@
     }
 
     function criarElementoDemanda(demanda, isAtrasado = false) {
-    // Verificação de segurança para evitar erros
-    if (!demanda || typeof demanda !== 'object') {
-        console.error('Erro: Tentativa de criar elemento com dados inválidos:', demanda);
-        return document.createElement('div');
-    }
-    
-    const div = document.createElement('div');
-    
-    // Acessa as propriedades de forma segura
-    const status = demanda?.status || 'pendente';
-    const isRotina = demanda?.isRotina || false;
-    const dataLimite = demanda?.dataLimite;
-    const statusClass = isAtrasado ? 'atrasado' : status;
-    
-    div.className = `demanda-item ${statusClass} ${isRotina ? 'rotina' : ''}`;
-    
-    let statusIcon = '⏳';
-    switch (status) {
-        case 'aprovada':
-            statusIcon = '✅';
-            break;
-        case 'reprovada':
-        case 'reprovada_pelo_atribuido':
-            statusIcon = '❌';
-            break;
-        case 'finalizado_pendente_aprovacao':
-            statusIcon = '📋';
-            break;
-        case 'atribuida_pendente_aceitacao':
-            statusIcon = '📋';
-            break;
-        default:
-            // statusIcon = '⏳';
-    }
-    
-    const dataLimiteFormatada = dataLimite ? new Date(dataLimite).toLocaleDateString('pt-BR') : '';
-    const rotinaInfo = isRotina ? `<small><i class="fas fa-redo"></i> Tarefa de rotina</small>` : '';
-    
-    let infoAdicional = '';
-    if (status === 'finalizado_pendente_aprovacao') {
-        infoAdicional = `<br><small><strong>Comentários do Funcionário:</strong> ${demanda.comentarios || ''}</small>`;
-    }
-    
-    if (status === 'reprovada_pelo_atribuido') {
-        infoAdicional = `<br><small><strong>Motivo da Reprovação:</strong> ${demanda.comentarioReprovacaoAtribuicao || ''}</small>`;
-    }
-    
-    let diasFormatados = '';
-    if (demanda.isRotina && demanda.diasSemana) {
-        diasFormatados = demanda.diasSemana.map(dia => ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][dia]).join(', ');
-    }
-    
-    let tempoElement = '';
-    if (status === 'aprovada' && demanda.dataConclusao) {
-        const performanceText = calcularDesempenhoTempo(demanda.dataCriacao, demanda.dataConclusao, dataLimite);
-        const performanceClass = performanceText.includes('antes') ? 'early' : 'late';
-        tempoElement = `<div class="time-performance ${performanceClass}">${performanceText}</div>`;
-    } else {
-        const tempoRestante = dataLimite ? calcularTempoRestante(dataLimite) : '';
-        tempoElement = `<div class="time-remaining">${isAtrasado ? 'ATRASADA HÁ ' : 'TEMPO RESTANTE: '}${tempoRestante}</div>`;
-    }
-    
-    const prioridade = demanda?.prioridade || '';
-    const prioridadeBadge = prioridade ? 
-        `<span class="demanda-priority priority-${prioridade.toLowerCase()}">${prioridade}</span>` : '';
-    
-    const podeAprovar = usuarioLogado && usuarioLogado.role === 'gestor';
-    const eDono = usuarioLogado && usuarioLogado.id === demanda.funcionarioId;
-    const eAtribuido = usuarioLogado && Array.isArray(demanda.atribuidos) && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
-    
-    let atribuidosInfo = '';
-    if (demanda.atribuidos && demanda.atribuidos.length > 0) {
-        atribuidosInfo = `<small><strong>Atribuída a:</strong> ${demanda.atribuidos.map(a => a.nome).join(', ')}</small>`;
-    }
-    
-    div.innerHTML = `
-        ${prioridadeBadge}
-        <div class="demanda-info">
-            <strong>${demanda.nomeFuncionario} - ${demanda.nomeDemanda || demanda.descricao}</strong>
-            <small>Categoria: ${demanda.categoria} | ${statusIcon} ${demanda.status.replace(/_/g, ' ')} | Local: ${demanda.local || 'N/A'} | Data Limite: ${dataLimiteFormatada}</small>
-            ${atribuidosInfo}
-            <small><strong>TAG:</strong> ${demanda.tag || ''}</small>
-            ${demanda.comentarioGestor ? `<br><strong>Comentário do Gestor:</strong> ${demanda.comentarioGestor || ''}</small>` : ''}
-            ${infoAdicional}
-            ${rotinaInfo}
-            ${diasFormatados ? `<small><strong>Dias da semana:</strong> ${diasFormatados}</small>` : ''}
-            ${tempoElement}
-        </div>
-        <div class="acoes-demandas">
-            ${(eDono || eAtribuido) && (demanda.status === 'pendente' || demanda.status === 'reprovada') ? `
-                <button class="success" onclick="abrirModalResolucao(${demanda.id})" title="Resolver Demanda">
-                    <i class="fas fa-tools"></i>
+        // MUDANÇA: Usa a função de normalização para garantir que os dados estejam corretos
+        demanda = normalizarDadosDemanda(demanda);
+
+        const div = document.createElement('div');
+        
+        const status = demanda.status || 'pendente';
+        const isRotina = demanda.isRotina || false;
+        const dataLimite = demanda.dataLimite;
+        const statusClass = isAtrasado ? 'atrasado' : status;
+        
+        div.className = `demanda-item ${statusClass} ${isRotina ? 'rotina' : ''}`;
+        
+        let statusIcon = '⏳';
+        switch (status) {
+            case 'aprovada':
+                statusIcon = '✅';
+                break;
+            case 'reprovada':
+            case 'reprovada_pelo_atribuido':
+                statusIcon = '❌';
+                break;
+            case 'finalizado_pendente_aprovacao':
+                statusIcon = '📋';
+                break;
+            case 'atribuida_pendente_aceitacao':
+                statusIcon = '📋';
+                break;
+        }
+        
+        const dataLimiteFormatada = dataLimite ? new Date(dataLimite).toLocaleDateString('pt-BR') : '';
+        const rotinaInfo = isRotina ? `<small><i class="fas fa-redo"></i> Tarefa de rotina</small>` : '';
+        
+        let infoAdicional = '';
+        if (status === 'finalizado_pendente_aprovacao') {
+            infoAdicional = `<br><small><strong>Comentários do Funcionário:</strong> ${demanda.comentarios || ''}</small>`;
+        }
+        
+        if (status === 'reprovada_pelo_atribuido') {
+            infoAdicional = `<br><small><strong>Motivo da Reprovação:</strong> ${demanda.comentarioReprovacaoAtribuicao || ''}</small>`;
+        }
+        
+        let diasFormatados = '';
+        // MUDANÇA: A verificação agora é segura, pois normalizarDadosDemanda garante que é um array
+        if (demanda.isRotina && Array.isArray(demanda.diasSemana) && demanda.diasSemana.length > 0) {
+            diasFormatados = demanda.diasSemana.map(dia => ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][dia]).join(', ');
+        }
+        
+        let tempoElement = '';
+        if (status === 'aprovada' && demanda.dataConclusao) {
+            const performanceText = calcularDesempenhoTempo(demanda.dataCriacao, demanda.dataConclusao, dataLimite);
+            const performanceClass = performanceText.includes('antes') ? 'early' : 'late';
+            tempoElement = `<div class="time-performance ${performanceClass}">${performanceText}</div>`;
+        } else {
+            const tempoRestante = dataLimite ? calcularTempoRestante(dataLimite) : '';
+            tempoElement = `<div class="time-remaining">${isAtrasado ? 'ATRASADA HÁ ' : 'TEMPO RESTANTE: '}${tempoRestante}</div>`;
+        }
+        
+        const prioridade = demanda.prioridade || '';
+        const prioridadeBadge = prioridade ? 
+            `<span class="demanda-priority priority-${prioridade.toLowerCase()}">${prioridade}</span>` : '';
+        
+        const podeAprovar = usuarioLogado && usuarioLogado.role === 'gestor';
+        const eDono = usuarioLogado && usuarioLogado.id === demanda.funcionarioId;
+        // MUDANÇA: A verificação agora é segura, pois normalizarDadosDemanda garante que é um array
+        const eAtribuido = usuarioLogado && Array.isArray(demanda.atribuidos) && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
+        
+        let atribuidosInfo = '';
+        // MUDANÇA: A verificação agora é segura, pois normalizarDadosDemanda garante que é um array
+        if (Array.isArray(demanda.atribuidos) && demanda.atribuidos.length > 0) {
+            atribuidosInfo = `<small><strong>Atribuída a:</strong> ${demanda.atribuidos.map(a => a.nome).join(', ')}</small>`;
+        }
+        
+        div.innerHTML = `
+            ${prioridadeBadge}
+            <div class="demanda-info">
+                <strong>${demanda.nomeFuncionario} - ${demanda.nomeDemanda || demanda.descricao}</strong>
+                <small>Categoria: ${demanda.categoria} | ${statusIcon} ${demanda.status.replace(/_/g, ' ')} | Local: ${demanda.local || 'N/A'} | Data Limite: ${dataLimiteFormatada}</small>
+                ${atribuidosInfo}
+                <small><strong>TAG:</strong> ${demanda.tag || ''}</small>
+                ${demanda.comentarioGestor ? `<br><strong>Comentário do Gestor:</strong> ${demanda.comentarioGestor || ''}</small>` : ''}
+                ${infoAdicional}
+                ${rotinaInfo}
+                ${diasFormatados ? `<small><strong>Dias da semana:</strong> ${diasFormatados}</small>` : ''}
+                ${tempoElement}
+            </div>
+            <div class="acoes-demandas">
+                ${(eDono || eAtribuido) && (demanda.status === 'pendente' || demanda.status === 'reprovada') ? `
+                    <button class="success" onclick="abrirModalResolucao(${demanda.id})" title="Resolver Demanda">
+                        <i class="fas fa-tools"></i>
+                    </button>
+                ` : ''}
+                ${podeAprovar && (demanda.status === 'finalizado_pendente_aprovacao') ? `
+                    <button class="success" onclick="solicitarSenhaParaAprovar(${demanda.id}, '${demanda.nomeFuncionario}')" title="Aprovar">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button class="danger" onclick="solicitarSenhaParaReprovar(${demanda.id}, '${demanda.nomeFuncionario}')" title="Reprovar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                ` : ''}
+                <button class="secondary" onclick="verDetalhes(${demanda.id})" title="Ver Detalhes">
+                    <i class="fas fa-eye"></i>
                 </button>
-            ` : ''}
-            ${podeAprovar && (demanda.status === 'finalizado_pendente_aprovacao') ? `
-                <button class="success" onclick="solicitarSenhaParaAprovar(${demanda.id}, '${demanda.nomeFuncionario}')" title="Aprovar">
-                    <i class="fas fa-check"></i>
-                </button>
-                <button class="danger" onclick="solicitarSenhaParaReprovar(${demanda.id}, '${demanda.nomeFuncionario}')" title="Reprovar">
-                    <i class="fas fa-times"></i>
-                </button>
-            ` : ''}
-            <button class="secondary" onclick="verDetalhes(${demanda.id})" title="Ver Detalhes">
-                <i class="fas fa-eye"></i>
-            </button>
-            ${podeAprovar ? `
-                <button class="danger" onclick="apagarDemanda(${demanda.id})" title="Apagar">
-                    <i class="fas fa-trash"></i>
-                </button>
-            ` : ''}
-        </div>
-    `;
-    
-    return div;
-}
+                ${podeAprovar ? `
+                    <button class="danger" onclick="apagarDemanda(${demanda.id})" title="Apagar">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                ` : ''}
+            </div>
+        `;
+        
+        return div;
+    }
     function calcularDesempenhoTempo(dataCriacao, dataConclusao, dataLimite) {
         const conclusao = new Date(dataConclusao);
         const limite = new Date(dataLimite);
@@ -3242,13 +3250,17 @@
         const demanda = todasDemandas.find(d => d.id === id);
         if (!demanda) return;
         
+        // MUDANÇA: Normaliza os dados antes de exibir
+        demanda = normalizarDadosDemanda(demanda);
+        
         let tempoInfo = '';
         if (demanda.status === 'aprovada' && demanda.dataConclusao) {
             tempoInfo = `<p><strong>Desempenho de Tempo:</strong> ${calcularDesempenhoTempo(demanda.dataCriacao, demanda.dataConclusao, demanda.dataLimite)}</p>`;
         }
         
         let atribuidosInfo = '';
-        if (demanda.atribuidos && demanda.atribuidos.length > 0) {
+        // MUDANÇA: A verificação agora é segura
+        if (Array.isArray(demanda.atribuidos) && demanda.atribuidos.length > 0) {
             atribuidosInfo = `<p><strong>Atribuída a:</strong> ${demanda.atribuidos.map(a => a.nome).join(', ')}</p>`;
         }
         
@@ -3427,6 +3439,7 @@
                 }
             }
 
+            // MUDANÇA: A verificação agora é segura
             if (Array.isArray(demanda.atribuidos)) {
                 demanda.atribuidos.forEach(atribuido => {
                     if (ranking[atribuido.id]) {
@@ -3529,6 +3542,12 @@
         
         filtrarDashboard();
         showNotification('info', 'Filtros Resetados', 'Todos os filtros foram resetados');
+    }
+
+    function filtrarDashboard() {
+        filtroFuncionarioAtual = document.getElementById('filtroFuncionario').value;
+        atualizarDashboard();
+        atualizarGraficos();
     }
 
     function drillDown(type) {
@@ -3939,100 +3958,103 @@
         showNotification('success', 'Exportação Concluída', 'Os dados foram exportados em formato CSV.');
     }
 
-   function importarDemandas() {
-    const fileInput = document.getElementById('importFile');
-    if (!fileInput.files.length) {
-        showNotification('warning', 'Nenhum Arquivo Selecionado', 'Por favor, selecione um arquivo JSON para importar.');
-        return;
+    function renderizarTodasAsAbas() {
+        renderizarDemandas();
+        renderizarCobranca();
+        atualizarDashboard();
+        atualizarRanking();
+        atualizarGraficos();
     }
 
-    const file = fileInput.files[0];
-    const reader = new FileReader();
+    // MUDANÇA: Função de importação reescrita para normalizar os dados antes de processar
+    function importarDemandas() {
+        const fileInput = document.getElementById('importFile');
+        if (!fileInput.files.length) {
+            showNotification('warning', 'Nenhum Arquivo Selecionado', 'Por favor, selecione um arquivo JSON para importar.');
+            return;
+        }
 
-    reader.onload = async function(event) {
-        try {
-            const importedData = JSON.parse(event.target.result);
+        const file = fileInput.files[0];
+        const reader = new FileReader();
 
-            if (!Array.isArray(importedData)) {
-                throw new Error("O arquivo JSON deve conter uma lista de demandas.");
-            }
+        reader.onload = async function(event) {
+            try {
+                let importedData = JSON.parse(event.target.result);
 
-            let updatedCount = 0;
-            let addedCount = 0;
-            let skippedCount = 0;
+                if (!Array.isArray(importedData)) {
+                    throw new Error("O arquivo JSON deve conter uma lista de demandas.");
+                }
 
-            // Primeiro, vamos obter as demandas atuais do servidor para garantir que temos a lista mais recente
-            await carregarDadosDoServidor();
+                let updatedCount = 0;
+                let addedCount = 0;
+                let skippedCount = 0;
 
-            for (const demandaImportada of importedData) {
-                // Verificação mais robusta: usa apenas a TAG como identificador único
-                const demandaExistente = todasDemandas.find(d => d.tag === demandaImportada.tag);
-                
-                if (demandaExistente) {
-                    // Se a demanda existe, vamos atualizá-la
-                    // Mantemos o ID original do servidor para garantir que estamos atualizando o registro correto
-                    const dadosAtualizados = {
-                        ...demandaImportada,
-                        id: demandaExistente.id // Mantém o ID do servidor
-                    };
+                // MUDANÇA: Normaliza cada demanda importada ANTES de qualquer processamento
+                const normalizedImportedData = importedData.map(demanda => normalizarDadosDemanda(demanda));
+
+                // Primeiro, vamos obter as demandas atuais do servidor para garantir que temos a lista mais recente
+                await carregarDadosDoServidor();
+
+                for (const demandaImportada of normalizedImportedData) {
+                    const demandaExistente = todasDemandas.find(d => d.tag === demandaImportada.tag);
                     
-                    // Remove campos que não devem ser atualizados (como data de criação, se necessário)
-                    delete dadosAtualizados.dataCriacao; // Mantém a data de criação original
-                    
-                    const sucesso = await atualizarDemandaNoServidor(demandaExistente.id, dadosAtualizados);
-                    
-                    if (sucesso) {
-                        updatedCount++;
+                    if (demandaExistente) {
+                        const dadosAtualizados = {
+                            ...demandaImportada,
+                            id: demandaExistente.id
+                        };
+                        
+                        delete dadosAtualizados.dataCriacao;
+                        
+                        const sucesso = await atualizarDemandaNoServidor(demandaExistente.id, dadosAtualizados);
+                        
+                        if (sucesso) {
+                            updatedCount++;
+                        } else {
+                            skippedCount++;
+                        }
                     } else {
-                        skippedCount++;
-                    }
-                } else {
-                    // Se a demanda não existe, vamos adicioná-la
-                    // Garante que a demanda importada tenha um ID único
-                    if (!demandaImportada.id) {
-                       demandaImportada.id = Date.now() + Math.random();
-                    }
-                    
-                    // Se não tiver tag, cria uma nova
-                    if (!demandaImportada.tag) {
-                        demandaImportada.tag = `DEM-IMP-${Date.now()}`;
-                    }
-                    
-                    const sucesso = await salvarDemandaNoServidor(demandaImportada);
-                    
-                    if (sucesso) {
-                        addedCount++;
-                    } else {
-                        skippedCount++;
+                        if (!demandaImportada.id) {
+                           demandaImportada.id = Date.now() + Math.random();
+                        }
+                        
+                        if (!demandaImportada.tag) {
+                            demandaImportada.tag = `DEM-IMP-${Date.now()}`;
+                        }
+                        
+                        const sucesso = await salvarDemandaNoServidor(demandaImportada);
+                        
+                        if (sucesso) {
+                            addedCount++;
+                        } else {
+                            skippedCount++;
+                        }
                     }
                 }
+
+                await carregarDadosDoServidor();
+                renderizarTodasAsAbas();
+                
+                let message = `Importação concluída. `;
+                if (updatedCount > 0) message += `${updatedCount} demanda(s) atualizada(s). `;
+                if (addedCount > 0) message += `${addedCount} nova(s) demanda(s) adicionada(s). `;
+                if (skippedCount > 0) message += `${skippedCount} demanda(s) ignorada(s) por erro.`;
+                
+                showNotification('success', 'Importação Concluída', message);
+                fileInput.value = '';
+
+            } catch (error) {
+                console.error('Erro ao importar o arquivo JSON:', error);
+                showNotification('error', 'Erro na Importação', `Falha ao ler o arquivo: ${error.message}. Verifique se o formato está correto.`);
             }
+        };
 
-            // Agora sim, recarrega os dados do servidor para ter a lista atualizada
-            await carregarDadosDoServidor();
-            renderizarTodasAsAbas();
-            atualizarDashboard();
-            
-            let message = `Importação concluída. `;
-            if (updatedCount > 0) message += `${updatedCount} demanda(s) atualizada(s). `;
-            if (addedCount > 0) message += `${addedCount} nova(s) demanda(s) adicionada(s). `;
-            if (skippedCount > 0) message += `${skippedCount} demanda(s) ignorada(s) por erro.`;
-            
-            showNotification('success', 'Importação Concluída', message);
-            fileInput.value = '';
+        reader.onerror = function() {
+            showNotification('error', 'Erro de Leitura', 'Ocorreu um erro ao ler o arquivo selecionado.');
+        };
 
-        } catch (error) {
-            console.error('Erro ao importar o arquivo JSON:', error);
-            showNotification('error', 'Erro na Importação', `Falha ao ler o arquivo: ${error.message}. Verifique se o formato está correto.`);
-        }
-    };
-
-    reader.onerror = function() {
-        showNotification('error', 'Erro de Leitura', 'Ocorreu um erro ao ler o arquivo selecionado.');
-    };
-
-    reader.readAsText(file);
-}
+        reader.readAsText(file);
+    }
 
 </script>
 
