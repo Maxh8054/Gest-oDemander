@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
@@ -18,6 +19,7 @@ const db = new sqlite3.Database(DB_FILE, (err) => {
     console.log('✅ Banco de dados SQLite pronto!');
 });
 
+// MUDANÇA: A tabela agora tem uma coluna 'atribuidos' para separar dos 'diasSemana'.
 // Criar tabela de demandas se não existir
 db.run(`
     CREATE TABLE IF NOT EXISTS demandas (
@@ -38,7 +40,8 @@ db.run(`
         tag TEXT,
         comentarios TEXT,
         comentarioGestor TEXT,
-        dataConclusao TEXT
+        dataConclusao TEXT,
+        atribuidos TEXT -- NOVO: Coluna dedicada para armazenar os atribuídos em JSON
     )
 `);
 
@@ -60,10 +63,11 @@ app.get('/api/demandas', (req, res) => {
 // POST /api/demandas
 app.post('/api/demandas', (req, res) => {
     const d = req.body;
+    // MUDANÇA: Incluindo o campo 'atribuidos' no INSERT.
     const sql = `
         INSERT INTO demandas 
-        (funcionarioId, nomeFuncionario, emailFuncionario, categoria, prioridade, complexidade, descricao, local, dataCriacao, dataLimite, status, isRotina, diasSemana, tag, comentarios, comentarioGestor)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (funcionarioId, nomeFuncionario, emailFuncionario, categoria, prioridade, complexidade, descricao, local, dataCriacao, dataLimite, status, isRotina, diasSemana, tag, comentarios, comentarioGestor, atribuidos)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const params = [
         d.funcionarioId,
@@ -81,7 +85,8 @@ app.post('/api/demandas', (req, res) => {
         d.diasSemana ? JSON.stringify(d.diasSemana) : null,
         d.tag,
         d.comentarios || '',
-        d.comentarioGestor || ''
+        d.comentarioGestor || '',
+        d.atribuidos ? JSON.stringify(d.atribuidos) : null // MUDANÇA: Salvando a lista de atribuídos.
     ];
     db.run(sql, params, function(err) {
         if (err) return res.status(500).json({ success: false, error: err.message });
@@ -93,9 +98,10 @@ app.post('/api/demandas', (req, res) => {
 app.put('/api/demandas/:id', (req, res) => {
     const d = req.body;
     const id = req.params.id;
+    // MUDANÇA: Incluindo o campo 'atribuidos' no UPDATE.
     const sql = `
         UPDATE demandas SET
-        funcionarioId = ?, nomeFuncionario = ?, emailFuncionario = ?, categoria = ?, prioridade = ?, complexidade = ?, descricao = ?, local = ?, dataLimite = ?, status = ?, isRotina = ?, diasSemana = ?, tag = ?, comentarios = ?, comentarioGestor = ?, dataConclusao = ?
+        funcionarioId = ?, nomeFuncionario = ?, emailFuncionario = ?, categoria = ?, prioridade = ?, complexidade = ?, descricao = ?, local = ?, dataLimite = ?, status = ?, isRotina = ?, diasSemana = ?, tag = ?, comentarios = ?, comentarioGestor = ?, dataConclusao = ?, atribuidos = ?
         WHERE id = ?
     `;
     const params = [
@@ -115,6 +121,7 @@ app.put('/api/demandas/:id', (req, res) => {
         d.comentarios || '',
         d.comentarioGestor || '',
         d.dataConclusao || null,
+        d.atribuidos ? JSON.stringify(d.atribuidos) : null, // MUDANÇA: Atualizando a lista de atribuídos.
         id
     ];
     db.run(sql, params, function(err) {
