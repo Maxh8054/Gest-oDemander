@@ -3516,96 +3516,99 @@
         }
     }
 
-    function criarElementoDemanda(demanda, isAtrasada = false) {
-        const div = document.createElement('div');
-        const statusClass = isAtrasada ? 'atrasado' : demanda.status;
-        div.className = `demanda-item ${statusClass} ${demanda.isRotina ? 'rotina' : ''}`;
-        
-        let statusIcon = '⏳';
-        if (demanda.status === 'aprovada') statusIcon = '✅';
-        if (demanda.status === 'reprovada' || demanda.status === 'reprovada_pelo_atribuido') statusIcon = '❌';
-        if (demanda.status === 'finalizado_pendente_aprovacao') statusIcon = '📋';
-        if (isAtrasada) statusIcon = '⚠️';
-        
-        const dataLimiteFormatada = new Date(demanda.dataLimite).toLocaleDateString('pt-BR');
-        const rotinaInfo = demanda.isRotina ? `<small><i class="fas fa-redo"></i> Tarefa de rotina</small>` : '';
+    // Função criarElementoDemanda - corrigindo a exibição do botão de resolução
+function criarElementoDemanda(demanda, isAtrasada = false) {
+    const div = document.createElement('div');
+    const statusClass = isAtrasada ? 'atrasado' : demanda.status;
+    div.className = `demanda-item ${statusClass} ${demanda.isRotina ? 'rotina' : ''}`;
+    
+    let statusIcon = '⏳';
+    if (demanda.status === 'aprovada') statusIcon = '✅';
+    if (demanda.status === 'reprovada' || demanda.status === 'reprovada_pelo_atribuido') statusIcon = '❌';
+    if (demanda.status === 'finalizado_pendente_aprovacao') statusIcon = '📋';
+    if (demanda.status === 'atribuida_pendente_aceitacao') statusIcon = '🔄'; // Ícone para tarefas atribuídas
+    if (isAtrasada) statusIcon = '⚠️';
+    
+    const dataLimiteFormatada = new Date(demanda.dataLimite).toLocaleDateString('pt-BR');
+    const rotinaInfo = demanda.isRotina ? `<small><i class="fas fa-redo"></i> Tarefa de rotina</small>` : '';
 
-        let infoAdicional = '';
-        if (demanda.status === 'finalizado_pendente_aprovacao') {
-            infoAdicional = `<br><small><strong>Comentários do Funcionário:</strong> ${demanda.comentarios}</small>`;
-        }
-        if (demanda.status === 'reprovada_pelo_atribuido') {
-            infoAdicional = `<br><small><strong>Motivo da Reprovação:</strong> ${demanda.comentarioReprovacaoAtribuicao}</small>`;
-        }
-        
-        let diasFormatados = '';
-        if (demanda.isRotina && demanda.diasSemana) {
-            diasFormatados = demanda.diasSemana.map(dia => ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][dia]).join(', ');
-        }
-        
-        let tempoElement = '';
-        if (demanda.status === 'aprovada' && demanda.dataConclusao) {
-            const performanceText = calcularDesempenhoTempo(demanda.dataCriacao, demanda.dataConclusao, demanda.dataLimite);
-            const performanceClass = performanceText.includes('antes') ? 'early' : 'late';
-            tempoElement = `<div class="time-performance ${performanceClass}">${performanceText}</div>`;
-        } else {
-            const tempoRestante = calcularTempoRestante(demanda.dataLimite);
-            tempoElement = `<div class="time-remaining">${isAtrasada ? 'ATRASADA HÁ ' : 'TEMPO RESTANTE: '}${tempoRestante}</div>`;
-        }
-        
-        const priorityBadge = demanda.prioridade ? 
-            `<span class="demanda-priority priority-${demanda.prioridade.toLowerCase()}">${demanda.prioridade}</span>` : '';
-        
-        const podeAprovar = usuarioLogado && usuarioLogado.role === 'gestor';
-        const eDono = usuarioLogado && usuarioLogado.id === demanda.funcionarioId;
-        const eAtribuido = usuarioLogado && Array.isArray(demanda.atribuidos) && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
-        
-        let atribuidosInfo = '';
-        if (demanda.atribuidos && demanda.atribuidos.length > 0) {
-            atribuidosInfo = `<small><strong>Atribuída a:</strong> ${demanda.atribuidos.map(a => a.nome).join(', ')}</small>`;
-        }
-        
-        div.innerHTML = `
-            ${priorityBadge}
-            <div class="demanda-info">
-                <strong>${demanda.nomeFuncionario} - ${demanda.nomeDemanda || demanda.descricao}</strong>
-                <small>Categoria: ${demanda.categoria} | ${statusIcon} ${demanda.status.replace(/_/g, ' ')} | Local: ${demanda.local || 'N/A'} | Data Limite: ${dataLimiteFormatada}</small>
-                ${atribuidosInfo}
-                <small><strong>TAG:</strong> ${demanda.tag}</small>
-                ${demanda.comentarioGestor ? `<br><small><strong>Comentário do Gestor:</strong> ${demanda.comentarioGestor}</small>` : ''}
-                ${infoAdicional}
-                ${rotinaInfo}
-                ${diasFormatados ? `<small><strong>Dias da semana:</strong> ${diasFormatados}</small>` : ''}
-                ${tempoElement}
-            </div>
-            <div class="acoes-demandas">
-                ${ (eDono || eAtribuido) && (demanda.status === 'pendente' || demanda.status === 'reprovada') ? `
-                    <button class="success" onclick="abrirModalResolucao(${demanda.id})" title="Resolver Demanda">
-                        <i class="fas fa-tools"></i>
-                    </button>
-                ` : ''}
-                ${podeAprovar && (demanda.status === 'finalizado_pendente_aprovacao') ? `
-                    <button class="success" onclick="abrirModalAprovacao(${demanda.id})" title="Aprovar">
-                        <i class="fas fa-check"></i>
-                    </button>
-                    <button class="danger" onclick="abrirModalReprovacao(${demanda.id})" title="Reprovar">
-                        <i class="fas fa-times"></i>
-                    </button>
-                ` : ''}
-                <button class="secondary" onclick="verDetalhes(${demanda.id})" title="Ver Detalhes">
-                    <i class="fas fa-eye"></i>
-                </button>
-                ${podeAprovar ? `
-                    <button class="danger" onclick="apagarDemanda(${demanda.id})" title="Apagar">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                ` : ''}
-            </div>
-        `;
-        return div;
+    let infoAdicional = '';
+    if (demanda.status === 'finalizado_pendente_aprovacao') {
+        infoAdicional = `<br><small><strong>Comentários do Funcionário:</strong> ${demanda.comentarios}</small>`;
     }
+    if (demanda.status === 'reprovada_pelo_atribuido') {
+        infoAdicional = `<br><small><strong>Motivo da Reprovação:</strong> ${demanda.comentarioReprovacaoAtribuicao}</small>`;
+    }
+    
+    let diasFormatados = '';
+    if (demanda.isRotina && demanda.diasSemana) {
+        diasFormatados = demanda.diasSemana.map(dia => ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][dia]).join(', ');
+    }
+    
+    let tempoElement = '';
+    if (demanda.status === 'aprovada' && demanda.dataConclusao) {
+        const performanceText = calcularDesempenhoTempo(demanda.dataCriacao, demanda.dataConclusao, demanda.dataLimite);
+        const performanceClass = performanceText.includes('antes') ? 'early' : 'late';
+        tempoElement = `<div class="time-performance ${performanceClass}">${performanceText}</div>`;
+    } else {
+        const tempoRestante = calcularTempoRestante(demanda.dataLimite);
+        tempoElement = `<div class="time-remaining">${isAtrasado ? 'ATRASADA HÁ ' : 'TEMPO RESTANTE: '}${tempoRestante}</div>`;
+    }
+    
+    const priorityBadge = demanda.prioridade ? 
+        `<span class="demanda-priority priority-${demanda.prioridade.toLowerCase()}">${demanda.prioridade}</span>` : '';
+    
+    const podeAprovar = usuarioLogado && usuarioLogado.role === 'gestor';
+    const eDono = usuarioLogado && usuarioLogado.id === demanda.funcionarioId;
+    const eAtribuido = usuarioLogado && Array.isArray(demanda.atribuidos) && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
+    
+    let atribuidosInfo = '';
+    if (demanda.atribuidos && demanda.atribuidos.length > 0) {
+        atribuidosInfo = `<small><strong>Atribuída a:</strong> ${demanda.atribuidos.map(a => a.nome).join(', ')}</small>`;
+    }
+    
+    div.innerHTML = `
+        ${priorityBadge}
+        <div class="demanda-info">
+            <strong>${demanda.nomeFuncionario} - ${demanda.nomeDemanda || demanda.descricao}</strong>
+            <small>Categoria: ${demanda.categoria} | ${statusIcon} ${demanda.status.replace(/_/g, ' ')} | Local: ${demanda.local || 'N/A'} | Data Limite: ${dataLimiteFormatada}</small>
+            ${atribuidosInfo}
+            <small><strong>TAG:</strong> ${demanda.tag}</small>
+            ${demanda.comentarioGestor ? `<br><small><strong>Comentário do Gestor:</strong> ${demanda.comentarioGestor}</small>` : ''}
+            ${infoAdicional}
+            ${rotinaInfo}
+            ${diasFormatados ? `<small><strong>Dias da semana:</strong> ${diasFormatados}</small>` : ''}
+            ${tempoElement}
+        </div>
+        <div class="acoes-demandas">
+            ${ (eDono || eAtribuido) && (demanda.status === 'pendente' || demanda.status === 'reprovada' || demanda.status === 'atribuida_pendente_aceitacao') ? `
+                <button class="success" onclick="abrirModalResolucao(${demanda.id})" title="Resolver Demanda">
+                    <i class="fas fa-tools"></i>
+                </button>
+            ` : ''}
+            ${podeAprovar && (demanda.status === 'finalizado_pendente_aprovacao') ? `
+                <button class="success" onclick="abrirModalAprovacao(${demanda.id})" title="Aprovar">
+                    <i class="fas fa-check"></i>
+                </button>
+                <button class="danger" onclick="abrirModalReprovacao(${demanda.id})" title="Reprovar">
+                    <i class="fas fa-times"></i>
+                </button>
+            ` : ''}
+            <button class="secondary" onclick="verDetalhes(${demanda.id})" title="Ver Detalhes">
+                <i class="fas fa-eye"></i>
+            </button>
+            ${podeAprovar ? `
+                <button class="danger" onclick="apagarDemanda(${demanda.id})" title="Apagar">
+                    <i class="fas fa-trash"></i>
+                </button>
+            ` : ''}
+        </div>
+    `;
+    return div;
+}
 
-   function criarElementoDemandaEmAnalise(demanda) {
+// Também precisamos ajustar a função criarElementoDemandaEmAnalise para usar aspas corretas nos IDs
+function criarElementoDemandaEmAnalise(demanda) {
     const div = document.createElement('div');
     div.className = `demanda-item ${demanda.status} ${demanda.isRotina ? 'rotina' : ''}`;
     
@@ -3633,21 +3636,20 @@
         </div>
         <div class="acoes-demandas">
             ${podeAprovar ? `
-                <button class="success" onclick="abrirModalAprovacao('${demanda.id}')" title="Aprovar">
+                <button class="success" onclick="abrirModalAprovacao(${demanda.id})" title="Aprovar">
                     <i class="fas fa-check"></i>
                 </button>
-                <button class="danger" onclick="abrirModalReprovacao('${demanda.id}')" title="Reprovar">
+                <button class="danger" onclick="abrirModalReprovacao(${demanda.id})" title="Reprovar">
                     <i class="fas fa-times"></i>
                 </button>
             ` : ''}
-            <button class="secondary" onclick="verDetalhes('${demanda.id}')" title="Ver Detalhes">
+            <button class="secondary" onclick="verDetalhes(${demanda.id})" title="Ver Detalhes">
                 <i class="fas fa-eye"></i>
             </button>
         </div>
     `;
     return div;
 }
-
     function calcularDesempenhoTempo(dataCriacao, dataConclusao, dataLimite) {
         const conclusao = new Date(dataConclusao);
         const limite = new Date(dataLimite);
