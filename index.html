@@ -583,6 +583,14 @@
         .demanda-item.aprovada { border-left: 5px solid var(--success-color); }
         .demanda-item.reprovada { border-left: 5px solid var(--danger-color); }
         .demanda-item.finalizado_pendente_aprovacao { border-left: 5px solid var(--primary-color); }
+        .demanda-item.atribuida_pendente_aceitacao { 
+            border-left: 5px solid var(--info-color); 
+            background-color: rgba(23, 162, 184, 0.1);
+        }
+        .demanda-item.reprovada_pelo_atribuido { 
+            border-left: 5px solid var(--warning-color); 
+            background-color: rgba(255, 193, 7, 0.1);
+        }
         .demanda-item.atrasado { 
             border-left: 5px solid var(--overdue-color); 
             background-color: rgba(255, 82, 82, 0.1);
@@ -1240,6 +1248,80 @@
             border-radius: 3px;
             cursor: pointer;
         }
+
+        /* Estilo para o campo de seleção múltipla */
+        .multi-select-container {
+            position: relative;
+        }
+
+        .multi-select-display {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: white;
+            cursor: pointer;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            min-height: 42px;
+            align-items: center;
+        }
+
+        .multi-select-display:hover {
+            border-color: var(--primary-color);
+        }
+
+        .selected-item {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .selected-item i {
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .multi-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .multi-select-option {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .multi-select-option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .multi-select-option.selected {
+            background-color: rgba(0, 86, 179, 0.1);
+        }
+
+        .multi-select-option input {
+            width: auto;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -1535,12 +1617,30 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label for="atribuidoASelect">Atribuir a:</label>
+                            <div class="multi-select-container" id="atribuidoAContainer">
+                                <div class="multi-select-display" id="atribuidoADisplay" onclick="toggleMultiSelect('atribuidoA')">
+                                    <span style="color: #999;">Clique para selecionar funcionários...</span>
+                                </div>
+                                <div class="multi-select-dropdown" id="atribuidoADropdown">
+                                    <!-- Opções serão preenchidas dinamicamente -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label for="demandaInput">Descrição da Demanda:</label>
                             <textarea id="demandaInput" rows="3" required placeholder="Descreva detalhadamente a demanda..."></textarea>
                         </div>
                         <div class="form-group">
                             <label for="dataLimiteInput">Data Limite:</label>
                             <input type="date" id="dataLimiteInput" required onchange="validateDeadline()">
+                        </div>
+                        
+                        <!-- Anexos na Criação -->
+                        <div class="form-group">
+                            <label for="anexosCriacaoInput">Anexar Documentos/Imagens (Opcional):</label>
+                            <input type="file" id="anexosCriacaoInput" multiple>
+                            <div id="anexosCriacaoList" class="file-list"></div>
                         </div>
                         
                         <!-- Tarefa de Rotina -->
@@ -1782,6 +1882,28 @@
     </div>
 </div>
 
+<!-- Modal de Reprovação por Atribuição -->
+<div id="atribuicaoReprovacaoModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('atribuicaoReprovacaoModal')">&times;</span>
+        <h2><i class="fas fa-times-circle"></i> Reprovar Demanda Atribuída</h2>
+        <form id="atribuicaoReprovacaoForm">
+            <div class="form-group">
+                <label for="motivoReprovacaoAtribuicao">Motivo da Reprovação:</label>
+                <textarea id="motivoReprovacaoAtribuicao" rows="4" required placeholder="Por favor, justifique o motivo da reprovação desta demanda para que o solicitante possa entender e ajustar."></textarea>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="danger">
+                    <i class="fas fa-times"></i> Reprovar Demanda
+                </button>
+                <button type="button" class="secondary" onclick="closeModal('atribuicaoReprovacaoModal')">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Sistema de Notificações -->
 <div id="notification" class="notification">
     <h4><i class="fas fa-bell"></i> <span id="notificationTitle">Notificação</span></h4>
@@ -1829,16 +1951,6 @@
             nivel: 'Senior', 
             pontos: 520, 
             conquistas: ['star', 'fire', 'gold'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
-            id: 4, 
-            nome: 'Alvino Alberto Junior', 
-            email: 'alvino-j@zaminebrasil.com', 
-            nivel: 'Pleno', 
-            pontos: 320, 
-            conquistas: ['star'],
             senha: '123456',
             role: 'funcionario'
         },
@@ -1933,19 +2045,9 @@
             role: 'funcionario'
         },
         { 
-            id: 14, 
-            nome: 'Demetrius Rufino', 
-            email: 'demetrius-r@zaminebrasil.com', 
-            nivel: 'Senior', 
-            pontos: 460, 
-            conquistas: ['star', 'fire', 'gold'],
-            senha: '123456',
-            role: 'funcionario'
-        },
-        { 
             id: 99, 
             nome: 'Gestor do Sistema', 
-            email: 'gestor@zaminebrasil.com', 
+            email: 'wallysson-s@zaminebrasil.com', 
             nivel: 'Administrador', 
             pontos: 999, 
             conquistas: ['star', 'fire', 'gold', 'crown'],
@@ -1965,6 +2067,8 @@
     let pendingAction = null;
     let selectedOverdueItems = [];
     let demandaResolucaoAtual = null; // Para armazenar a demanda sendo resolvida
+    let demandaAtribuicaoAtual = null; // Para armazenar a demanda sendo reprovada
+    let selectedUsers = []; // Para armazenar os usuários selecionados no campo de atribuição múltipla
 
     // URL do servidor (altere para o IP do servidor)
    const SERVER_URL = window.location.origin;
@@ -2124,13 +2228,105 @@
         selects.forEach(selectId => {
             const select = document.getElementById(selectId);
             if (select) {
+                // Limpa o select antes de adicionar
+                select.innerHTML = '';
+                
+                // Adiciona a opção padrão
+                if (selectId === 'filtroFuncionario') {
+                    const defaultOption = new Option('Todos os Funcionários', 'todos');
+                    select.add(defaultOption);
+                } else if (selectId === 'cobrancaFuncionario') {
+                    const defaultOption = new Option('Todos os Funcionários com Demandas Atrasadas', 'todos');
+                    select.add(defaultOption);
+                }
+
                 usuarios.filter(u => u.role === 'funcionario').forEach(func => {
-                    const option = new Option(`${func.nome} (${func.nivel})`, func.id);
+                    // Removendo a nomenclatura de nível (pleno, senior, etc.)
+                    const option = new Option(func.nome, func.id);
                     select.add(option);
                 });
                 console.log(`Funcionários carregados no select: ${selectId}`);
             }
         });
+        
+        // Inicializa o campo de seleção múltipla
+        inicializarCampoMultiSelect();
+    }
+
+    // Inicializa o campo de seleção múltipla para atribuição de demandas
+    function inicializarCampoMultiSelect() {
+        const dropdown = document.getElementById('atribuidoADropdown');
+        if (!dropdown) return;
+        
+        // Limpa o dropdown
+        dropdown.innerHTML = '';
+        
+        // Adiciona as opções de usuários
+        usuarios.filter(u => u.role === 'funcionario').forEach(usuario => {
+            const option = document.createElement('div');
+            option.className = 'multi-select-option';
+            option.innerHTML = `
+                <input type="checkbox" id="user_${usuario.id}" value="${usuario.id}">
+                <label for="user_${usuario.id}">${usuario.nome}</label>
+            `;
+            
+            option.addEventListener('click', function(e) {
+                if (e.target.tagName !== 'INPUT') {
+                    const checkbox = this.querySelector('input[type="checkbox"]');
+                    checkbox.checked = !checkbox.checked;
+                }
+                updateSelectedUsers();
+            });
+            
+            dropdown.appendChild(option);
+        });
+    }
+
+    // Alterna a exibição do dropdown de seleção múltipla
+    function toggleMultiSelect(id) {
+        const dropdown = document.getElementById(id + 'Dropdown');
+        if (dropdown.style.display === 'block') {
+            dropdown.style.display = 'none';
+        } else {
+            // Fecha todos os outros dropdowns
+            document.querySelectorAll('.multi-select-dropdown').forEach(d => {
+                d.style.display = 'none';
+            });
+            dropdown.style.display = 'block';
+        }
+    }
+
+    // Atualiza a lista de usuários selecionados
+    function updateSelectedUsers() {
+        selectedUsers = [];
+        const checkboxes = document.querySelectorAll('#atribuidoADropdown input[type="checkbox"]:checked');
+        
+        checkboxes.forEach(checkbox => {
+            const userId = parseInt(checkbox.value);
+            const usuario = usuarios.find(u => u.id === userId);
+            if (usuario) {
+                selectedUsers.push(usuario);
+            }
+        });
+        
+        // Atualiza o display
+        const display = document.getElementById('atribuidoADisplay');
+        if (selectedUsers.length === 0) {
+            display.innerHTML = '<span style="color: #999;">Clique para selecionar funcionários...</span>';
+        } else {
+            display.innerHTML = selectedUsers.map(user => 
+                `<span class="selected-item">${user.nome} <i class="fas fa-times" onclick="removeUser(${user.id})"></i></span>`
+            ).join('');
+        }
+    }
+
+    // Remove um usuário da seleção
+    function removeUser(userId) {
+        const checkbox = document.getElementById(`user_${userId}`);
+        if (checkbox) {
+            checkbox.checked = false;
+            updateSelectedUsers();
+        }
     }
 
     // Carregar dados do servidor
@@ -2244,7 +2440,7 @@
 
     // Atualizar badges nas abas
     function atualizarBadges() {
-        const pendentes = todasDemandas.filter(d => d.status === 'pendente' || d.status === 'finalizado_pendente_aprovacao').length;
+        const pendentes = todasDemandas.filter(d => d.status === 'pendente' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'atribuida_pendente_aceitacao').length;
         const atrasadas = todasDemandas.filter(d => {
             if (d.status === 'aprovada') return false;
             const dataLimite = new Date(d.dataLimite);
@@ -2304,7 +2500,7 @@
     function atualizarDashboard() {
         const demandasFiltradas = getDemandasFiltradas();
         const totalDemandas = demandasFiltradas.length;
-        const pendentes = demandasFiltradas.filter(d => d.status === 'pendente' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'reprovada').length;
+        const pendentes = demandasFiltradas.filter(d => d.status === 'pendente' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'reprovada' || d.status === 'atribuida_pendente_aceitacao').length;
         const atrasadas = demandasFiltradas.filter(d => {
             if (d.status === 'aprovada') return false;
             const dataLimite = new Date(d.dataLimite);
@@ -2489,9 +2685,9 @@
 
         // Atualizar gráfico de status
         const statusData = [
-            demandasFiltradas.filter(d => d.status === 'pendente').length,
+            demandasFiltradas.filter(d => d.status === 'pendente' || d.status === 'atribuida_pendente_aceitacao').length,
             demandasFiltradas.filter(d => d.status === 'aprovada').length,
-            demandasFiltradas.filter(d => d.status === 'reprovada').length,
+            demandasFiltradas.filter(d => d.status === 'reprovada' || d.status === 'reprovada_pelo_atribuido').length,
             demandasFiltradas.filter(d => d.status === 'finalizado_pendente_aprovacao').length
         ];
         charts.status.data.datasets[0].data = statusData;
@@ -2620,6 +2816,10 @@
                 document.getElementById('anexosList').innerHTML = '';
                 demandaResolucaoAtual = null;
             }
+            if (modalId === 'atribuicaoReprovacaoModal') {
+                document.getElementById('atribuicaoReprovacaoForm').reset();
+                demandaAtribuicaoAtual = null;
+            }
         }
     }
 
@@ -2649,6 +2849,7 @@
                 const local = document.getElementById('localSelect').value;
                 const dataLimite = document.getElementById('dataLimiteInput').value;
                 const isRotina = document.getElementById('rotinaCheckbox').checked;
+                const anexosInput = document.getElementById('anexosCriacaoInput');
                 
                 console.log('Dados coletados:', {
                     nomeDemanda, categoria, prioridade, complexidade, descricao, local, dataLimite, isRotina
@@ -2660,6 +2861,18 @@
                     return;
                 }
                 
+                // Coleta os anexos
+                let anexosCriacao = [];
+                if (anexosInput.files.length > 0) {
+                    for (const file of anexosInput.files) {
+                        anexosCriacao.push({
+                            nome: file.name,
+                            tamanho: file.size,
+                            tipo: file.type
+                        });
+                    }
+                }
+                
                 // Coleta os dias da semana se for tarefa de rotina
                 let diasSemana = [];
                 if (isRotina) {
@@ -2667,9 +2880,22 @@
                     diasSemana = Array.from(checkboxes).map(cb => parseInt(cb.value));
                 }
                 
+                // Prepara os dados dos usuários atribuídos
+                const atribuidos = selectedUsers.map(user => ({
+                    id: user.id,
+                    nome: user.nome,
+                    email: user.email
+                }));
+                
+                // Define o status inicial
+                let statusInicial = 'pendente';
+                if (atribuidos.length > 0 && !atribuidos.some(a => a.id === usuarioLogado.id)) {
+                    statusInicial = 'atribuida_pendente_aceitacao'; // Status para demandas atribuídas a outros
+                }
+                
                 // Cria o objeto da demanda
                 const novaDemanda = {
-                    nomeDemanda, // NOVO CAMPO
+                    nomeDemanda,
                     funcionarioId: usuarioLogado.id,
                     nomeFuncionario: usuarioLogado.nome,
                     emailFuncionario: usuarioLogado.email,
@@ -2680,12 +2906,14 @@
                     local,
                     dataLimite,
                     dataCriacao: new Date().toISOString(),
-                    status: 'pendente', // Status inicial como pendente
+                    status: statusInicial,
                     isRotina,
                     diasSemana,
                     tag: `DEM-${Date.now()}`, // TAG única
                     comentarios: '',
-                    comentarioGestor: ''
+                    comentarioGestor: '',
+                    anexosCriacao,
+                    atribuidos: atribuidos
                 };
                 
                 console.log('Nova demanda criada:', novaDemanda);
@@ -2697,8 +2925,16 @@
                     // Recarrega dados do servidor
                     await carregarDadosDoServidor();
                     
+                    // Envia notificações para as partes interessadas
+                    notificarPartesInteressadasNovaDemanda(novaDemanda);
+                    
                     // Limpa o formulário
                     form.reset();
+                    document.getElementById('anexosCriacaoList').innerHTML = '';
+                    
+                    // Limpa a seleção de usuários
+                    selectedUsers = [];
+                    updateSelectedUsers();
                     
                     // Mostra notificação de sucesso
                     showNotification('success', 'Demanda Registrada', `Sua demanda "${nomeDemanda}" foi registrada com sucesso!`);
@@ -2724,10 +2960,24 @@
             });
         }
 
-        // Listener para o input de arquivos
+        // Formulário de reprovação por atribuição
+        const atribuicaoReprovacaoForm = document.getElementById('atribuicaoReprovacaoForm');
+        if (atribuicaoReprovacaoForm) {
+            atribuicaoReprovacaoForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await salvarReprovacaoAtribuicao();
+            });
+        }
+
+        // Listener para os inputs de arquivos
         const anexosInput = document.getElementById('resolucaoAnexos');
         if (anexosInput) {
             anexosInput.addEventListener('change', atualizarListaAnexos);
+        }
+        
+        const anexosCriacaoInput = document.getElementById('anexosCriacaoInput');
+        if (anexosCriacaoInput) {
+            anexosCriacaoInput.addEventListener('change', atualizarListaAnexosCriacao);
         }
         
         // Busca global
@@ -2744,7 +2994,80 @@
             document.body.classList.add('dark-mode');
         }
         
+        // Fecha os dropdowns quando clicar fora
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.multi-select-container')) {
+                document.querySelectorAll('.multi-select-dropdown').forEach(dropdown => {
+                    dropdown.style.display = 'none';
+                });
+            }
+        });
+        
         console.log('Event listeners inicializados!');
+    }
+
+    // Função para atualizar a lista de anexos na tela (criação)
+    function atualizarListaAnexosCriacao() {
+        const anexosInput = document.getElementById('anexosCriacaoInput');
+        const anexosList = document.getElementById('anexosCriacaoList');
+        anexosList.innerHTML = '';
+
+        if (anexosInput.files.length === 0) {
+            anexosList.innerHTML = '<p>Nenhum arquivo selecionado.</p>';
+            return;
+        }
+
+        for (const file of anexosInput.files) {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+            `;
+            anexosList.appendChild(fileItem);
+        }
+    }
+
+    // Função para notificar todas as partes interessadas na criação de uma nova demanda
+    function notificarPartesInteressadasNovaDemanda(demanda) {
+        const criador = usuarios.find(u => u.id === demanda.funcionarioId);
+        const gestor = usuarios.find(u => u.role === 'gestor');
+
+        // 1. Envia email para o gestor (se a demanda não foi criada por ele)
+        if (gestor && gestor.id !== demanda.funcionarioId) {
+            const assunto = encodeURIComponent(`Nova Demanda Registrada: ${demanda.nomeDemanda}`);
+            let corpo = `Prezado Gestor,\n\nUma nova demanda foi registrada por ${demanda.nomeFuncionario}:\n\n--- Detalhes da Demanda ---\nNome: ${demanda.nomeDemanda}\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nPrioridade: ${demanda.prioridade}\nComplexidade: ${demanda.complexidade}\nLocal: ${demanda.local}\nData Limite: ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n`;
+            
+            if (demanda.atribuidos && demanda.atribuidos.length > 0) {
+                corpo += `\n--- Atribuição ---\nEsta demanda foi atribuída a: ${demanda.atribuidos.map(a => a.nome).join(', ')}\n`;
+            }
+            if (demanda.anexosCriacao && demanda.anexosCriacao.length > 0) {
+                corpo += `\n--- Anexos ---\nForam anexados ${demanda.anexosCriacao.length} arquivo(s) no momento do registro.\n`;
+            }
+            corpo += `\n\nPor favor, acesse o sistema para analisar e aprovar ou reprovar esta demanda.\n\nAtenciosamente,\nSistema Automático`;
+            
+            window.open(`mailto:${gestor.email}?subject=${assunto}&body=${encodeURIComponent(corpo)}`, '_blank');
+        }
+
+        // 2. Envia email para os funcionários atribuídos (se houver)
+        if (demanda.atribuidos && demanda.atribuidos.length > 0) {
+            demanda.atribuidos.forEach(atribuido => {
+                if (atribuido.id !== demanda.funcionarioId) {
+                    const assuntoAtribuido = encodeURIComponent(`Nova Demanda Atribuída: ${demanda.nomeDemanda}`);
+                    let corpoAtribuido = `Prezado(a) ${atribuido.nome},\n\nUma nova demanda foi atribuída a você por ${demanda.nomeFuncionario}:\n\n--- Detalhes da Demanda ---\nNome: ${demanda.nomeDemanda}\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nPrioridade: ${demanda.prioridade}\nComplexidade: ${demanda.complexidade}\nLocal: ${demanda.local}\nData Limite: ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n`;
+                    corpoAtribuido += `\nPor favor, acesse o sistema para ACEITAR ou REPROVAR esta demanda.\n\nAtenciosamente,\nSistema Automático`;
+                    
+                    window.open(`mailto:${atribuido.email}?subject=${assuntoAtribuido}&body=${encodeURIComponent(corpoAtribuido)}`, '_blank');
+                }
+            });
+        }
+
+        // 3. Envia email de confirmação para o criador (se a demanda não foi atribuída a ele mesmo)
+        if (demanda.atribuidos && demanda.atribuidos.length > 0 && !demanda.atribuidos.some(a => a.id === demanda.funcionarioId)) {
+            const assuntoCriador = encodeURIComponent(`Sua Demanda Foi Enviada: ${demanda.nomeDemanda}`);
+            let corpoCriador = `Prezado(a) ${demanda.nomeFuncionario},\n\nSua demanda "${demanda.nomeDemanda}" foi registrada e atribuída a ${demanda.atribuidos.map(a => a.nome).join(', ')}.\n\nEles(as) receberão um email separado para análise.\n\n--- Detalhes da Demanda ---\nNome: ${demanda.nomeDemanda}\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nPrioridade: ${demanda.prioridade}\nComplexidade: ${demanda.complexidade}\nLocal: ${demanda.local}\nData Limite: ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n\nAcompanhe o andamento pelo sistema.\n\nAtenciosamente,\nSistema Automático`;
+            
+            window.open(`mailto:${demanda.emailFuncionario}?subject=${assuntoCriador}&body=${encodeURIComponent(corpoCriador)}`, '_blank');
+        }
     }
 
     // Função para abrir o modal de resolução
@@ -2756,7 +3079,16 @@
         showModal('resolucaoModal', `Resolver Demanda: ${demandaResolucaoAtual.nomeDemanda}`);
     }
 
-    // Função para atualizar a lista de anexos na tela
+    // Função para abrir o modal de reprovação por atribuição
+    function abrirModalReprovarAtribuicao(demandaId) {
+        demandaAtribuicaoAtual = todasDemandas.find(d => d.id === demandaId);
+        if (!demandaAtribuicaoAtual) return;
+
+        document.getElementById('motivoReprovacaoAtribuicao').value = '';
+        showModal('atribuicaoReprovacaoModal', `Reprovar Demanda: ${demandaAtribuicaoAtual.nomeDemanda}`);
+    }
+
+    // Função para atualizar a lista de anexos na tela (resolução)
     function atualizarListaAnexos() {
         const anexosInput = document.getElementById('resolucaoAnexos');
         const anexosList = document.getElementById('anexosList');
@@ -2841,6 +3173,39 @@
         }
     }
 
+    // Função para salvar a reprovação por atribuição
+    async function salvarReprovacaoAtribuicao() {
+        if (!demandaAtribuicaoAtual) return;
+
+        const motivo = document.getElementById('motivoReprovacaoAtribuicao').value;
+        if (!motivo) {
+            showNotification('warning', 'Motivo Obrigatório', 'Por favor, informe o motivo da reprovação.');
+            return;
+        }
+
+        const dadosAtualizados = {
+            status: 'reprovada_pelo_atribuido',
+            comentarioReprovacaoAtribuicao: motivo,
+            dataConclusao: new Date().toISOString()
+        };
+
+        const sucesso = await atualizarDemandaNoServidor(demandaAtribuicaoAtual.id, dadosAtualizados);
+
+        if (sucesso) {
+            showNotification('warning', 'Demanda Reprovada', `A demanda foi reprovada e o solicitante será notificado.`);
+            closeModal('atribuicaoReprovacaoModal');
+            await carregarDadosDoServidor();
+
+            // Envia email para o criador da demanda
+            const criador = usuarios.find(u => u.id === demandaAtribuicaoAtual.funcionarioId);
+            if (criador) {
+                const assunto = encodeURIComponent(`Sua Demanda Foi Reprovada: ${demandaAtribuicaoAtual.nomeDemanda}`);
+                let corpo = `Prezado(a) ${demandaAtribuicaoAtual.nomeFuncionario},\n\nGostaríamos de informar que sua demanda foi analisada e, infelizmente, **reprovada** pela pessoa a quem foi atribuída.\n\n--- Detalhes da Demanda ---\nNome: ${demandaAtribuicaoAtual.nomeDemanda}\nDescrição: ${demandaAtribuicaoAtual.descricao}\nCategoria: ${demandaAtribuicaoAtual.categoria}\nLocal: ${demandaAtribuicaoAtual.local || 'N/A'}\nTAG da Demanda: ${demandaAtribuicaoAtual.tag}\n${demandaAtribuicaoAtual.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n\n--- Motivo da Reprovação ---\n${motivo}\n\nSugerimos que revise os pontos acima com a pessoa que lhe atribuiu a tarefa e, se necessário, crie uma nova demanda com os ajustes necessários.\n\nAtenciosamente,\nSistema de Gestão`;
+                window.open(`mailto:${criador.email}?subject=${assunto}&body=${encodeURIComponent(corpo)}`, '_blank');
+            }
+        }
+    }
+
     // Continuação das funções existentes...
     function renderizarDemandas() {
         console.log('=== RENDERIZANDO DEMANDAS ===');
@@ -2861,10 +3226,13 @@
         if (aprovadasContainer) aprovadasContainer.innerHTML = '';
         if (atrasadasContainer) atrasadasContainer.innerHTML = '';
 
-        // Filtra as demandas pendentes (incluindo reprovadas e as que esperam aprovação)
+        // Filtra as demandas pendentes (incluindo as que precisam ser reavaliadas)
         const pendentes = todasDemandas.filter(d => {
-            return d.status === 'pendente' || d.status === 'reprovada' || d.status === 'finalizado_pendente_aprovacao';
+            console.log(`Demanda ID ${d.id}: status = ${d.status}`);
+            return d.status === 'pendente' || d.status === 'reprovada' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'atribuida_pendente_aceitacao' || d.status === 'reprovada_pelo_atribuido';
         });
+        
+        console.log('Demandas pendentes encontradas:', pendentes.length);
         
         // Filtra as demandas concluídas
         const concluidas = todasDemandas.filter(d => d.status === 'aprovada');
@@ -2925,8 +3293,9 @@
         
         let statusIcon = '⏳';
         if (demanda.status === 'aprovada') statusIcon = '✅';
-        if (demanda.status === 'reprovada') statusIcon = '❌';
+        if (demanda.status === 'reprovada' || demanda.status === 'reprovada_pelo_atribuido') statusIcon = '❌';
         if (demanda.status === 'finalizado_pendente_aprovacao') statusIcon = '📋';
+        if (demanda.status === 'atribuida_pendente_aceitacao') statusIcon = '👤';
         if (isAtrasada) statusIcon = '⚠️';
         
         const dataLimiteFormatada = new Date(demanda.dataLimite).toLocaleDateString('pt-BR');
@@ -2935,6 +3304,9 @@
         let infoAdicional = '';
         if (demanda.status === 'finalizado_pendente_aprovacao') {
             infoAdicional = `<br><small><strong>Comentários do Funcionário:</strong> ${demanda.comentarios}</small>`;
+        }
+        if (demanda.status === 'reprovada_pelo_atribuido') {
+            infoAdicional = `<br><small><strong>Motivo da Reprovação:</strong> ${demanda.comentarioReprovacaoAtribuicao}</small>`;
         }
         
         let diasFormatados = '';
@@ -2957,15 +3329,23 @@
         const priorityBadge = demanda.prioridade ? 
             `<span class="demanda-priority priority-${demanda.prioridade.toLowerCase()}">${demanda.prioridade}</span>` : '';
         
-        // Verifica se o usuário logado pode aprovar ou é o dono da demanda
+        // Verifica quem é o usuário logado e qual seu papel em relação a demanda
         const podeAprovar = usuarioLogado && usuarioLogado.role === 'gestor';
         const eDono = usuarioLogado && usuarioLogado.id === demanda.funcionarioId;
+        const eAtribuido = usuarioLogado && demanda.atribuidos && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
+        
+        // Formata a lista de atribuídos
+        let atribuidosInfo = '';
+        if (demanda.atribuidos && demanda.atribuidos.length > 0) {
+            atribuidosInfo = `<small><strong>Atribuída a:</strong> ${demanda.atribuidos.map(a => a.nome).join(', ')}</small>`;
+        }
         
         div.innerHTML = `
             ${priorityBadge}
             <div class="demanda-info">
                 <strong>${demanda.nomeFuncionario} - ${demanda.nomeDemanda || demanda.descricao}</strong>
                 <small>Categoria: ${demanda.categoria} | ${statusIcon} ${demanda.status.replace(/_/g, ' ')} | Local: ${demanda.local || 'N/A'} | Data Limite: ${dataLimiteFormatada}</small>
+                ${atribuidosInfo}
                 <small><strong>TAG:</strong> ${demanda.tag}</small>
                 ${demanda.comentarioGestor ? `<br><small><strong>Comentário do Gestor:</strong> ${demanda.comentarioGestor}</small>` : ''}
                 ${infoAdicional}
@@ -2977,6 +3357,14 @@
                 ${eDono && (demanda.status === 'pendente' || demanda.status === 'reprovada') ? `
                     <button class="success" onclick="abrirModalResolucao(${demanda.id})" title="Resolver Demanda">
                         <i class="fas fa-tools"></i>
+                    </button>
+                ` : ''}
+                ${eAtribuido && demanda.status === 'atribuida_pendente_aceitacao' ? `
+                    <button class="success" onclick="aceitarDemandaAtribuida(${demanda.id})" title="Aceitar Demanda">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button class="danger" onclick="abrirModalReprovarAtribuicao(${demanda.id})" title="Reprovar Demanda">
+                        <i class="fas fa-times"></i>
                     </button>
                 ` : ''}
                 ${podeAprovar && (demanda.status === 'finalizado_pendente_aprovacao') ? `
@@ -2998,6 +3386,33 @@
             </div>
         `;
         return div;
+    }
+
+    // Função para aceitar uma demanda atribuída
+    async function aceitarDemandaAtribuida(demandaId) {
+        if (!confirm('Tem certeza que deseja aceitar esta demanda? Ela passará para o seu status de "Em Andamento".')) return;
+        
+        const demanda = todasDemandas.find(d => d.id === demandaId);
+        if (demanda) {
+            const dadosAtualizados = {
+                status: 'pendente'
+            };
+            
+            const sucesso = await atualizarDemandaNoServidor(demandaId, dadosAtualizados);
+            
+            if (sucesso) {
+                await carregarDadosDoServidor();
+                showNotification('success', 'Demanda Aceita', `Você aceitou a demanda "${demanda.nomeDemanda}". Ela agora está em seu painel para ser resolvida.`);
+                
+                // Notifica o criador da demanda
+                const criador = usuarios.find(u => u.id === demanda.funcionarioId);
+                if (criador) {
+                    const assunto = encodeURIComponent(`Sua Demanda Foi Aceita: ${demanda.nomeDemanda}`);
+                    const corpo = encodeURIComponent(`Prezado(a) ${criador.nome},\n\nTemos uma boa notícia! A demanda "${demanda.nomeDemanda}" que você atribuiu foi **ACEITA**.\n\nEla agora está sendo trabalhada.\n\nAcompanhe o progresso pelo sistema.\n\nAtenciosamente,\nSistema de Gestão`);
+                    window.open(`mailto:${criador.email}?subject=${assunto}&body=${corpo}`, '_blank');
+                }
+            }
+        }
     }
 
     // Função para calcular o desempenho de tempo
@@ -3080,6 +3495,12 @@
             tempoInfo = `<p><strong>Desempenho de Tempo:</strong> ${calcularDesempenhoTempo(demanda.dataCriacao, demanda.dataConclusao, demanda.dataLimite)}</p>`;
         }
         
+        // Formata a lista de atribuídos
+        let atribuidosInfo = '';
+        if (demanda.atribuidos && demanda.atribuidos.length > 0) {
+            atribuidosInfo = `<p><strong>Atribuída a:</strong> ${demanda.atribuidos.map(a => a.nome).join(', ')}</p>`;
+        }
+        
         const content = `
             <div class="demanda-details">
                 <h3>${demanda.nomeDemanda || demanda.descricao}</h3>
@@ -3092,7 +3513,9 @@
                 ${tempoInfo}
                 ${demanda.comentarios ? `<p><strong>Comentários do Funcionário:</strong> ${demanda.comentarios}</p>` : ''}
                 ${demanda.comentarioGestor ? `<p><strong>Comentário do Gestor:</strong> ${demanda.comentarioGestor}</p>` : ''}
+                ${demanda.comentarioReprovacaoAtribuicao ? `<p><strong>Motivo da Reprovação:</strong> ${demanda.comentarioReprovacaoAtribuicao}</p>` : ''}
                 ${demanda.isRotina ? `<p><strong>Tipo:</strong> Tarefa de Rotina</p>` : ''}
+                ${atribuidosInfo}
             </div>
         `;
         
@@ -3241,7 +3664,6 @@
         usuarios.filter(u => u.role === 'funcionario').forEach(func => {
             ranking[func.id] = {
                 nome: func.nome,
-                nivel: func.nivel,
                 concluidas: 0,
                 andamento: 0,
                 atrasadas: 0
@@ -3252,7 +3674,7 @@
             if (ranking[demanda.funcionarioId]) {
                 if (demanda.status === 'aprovada') {
                     ranking[demanda.funcionarioId].concluidas++;
-                } else if (demanda.status === 'pendente' || demanda.status === 'finalizado_pendente_aprovacao' || demanda.status === 'reprovada') {
+                } else if (demanda.status === 'pendente' || demanda.status === 'finalizado_pendente_aprovacao' || demanda.status === 'reprovada' || demanda.status === 'atribuida_pendente_aceitacao' || demanda.status === 'reprovada_pelo_atribuido') {
                     ranking[demanda.funcionarioId].andamento++;
                 }
                 
@@ -3279,7 +3701,7 @@
                 li.innerHTML = `
                     <div class="ranking-position">${index + 1}</div>
                     <div class="ranking-info">
-                        <strong>${item.nome} - ${item.nivel}</strong>
+                        <strong>${item.nome}</strong>
                         <div class="ranking-stats">
                             <div class="ranking-stat">
                                 <span class="stat-badge concluidas">${item.concluidas} concluídas</span>
@@ -3601,6 +4023,7 @@
             const dataLimite = new Date(demanda.dataLimite);
             const hoje = new Date();
             const diasAtraso = Math.floor((hoje - dataLimite) / (1000 * 60 * 60 * 24));
+            const tempoAtraso = calcularTempoRestante(demanda.dataLimite);
             
             corpoEmail += `• ${demanda.nomeDemanda || demanda.descricao}\n`;
             corpoEmail += `  Categoria: ${demanda.categoria}\n`;
@@ -3694,6 +4117,7 @@
             const dataLimite = new Date(demanda.dataLimite);
             const hoje = new Date();
             const diasAtraso = Math.floor((hoje - dataLimite) / (1000 * 60 * 60 * 24));
+            const tempoAtraso = calcularTempoRestante(demanda.dataLimite);
             
             corpoEmail += `• ${demanda.nomeDemanda || demanda.descricao}\n`;
             corpoEmail += `  Categoria: ${demanda.categoria}\n`;
@@ -3725,6 +4149,7 @@
         if (e.key === 'Escape') {
             closePasswordModal();
             closeModal('resolucaoModal');
+            closeModal('atribuicaoReprovacaoModal');
         }
     });
 </script>
