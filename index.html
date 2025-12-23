@@ -212,10 +212,83 @@
             border-radius: 4px;
             cursor: pointer;
             transition: background 0.3s ease;
+            position: relative;
         }
 
         .header-controls button:hover {
             background: rgba(255,255,255,0.3);
+        }
+        
+        /* Estilo para o dropdown de notificações */
+        .notifications-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 350px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none; /* Controlado por JavaScript */
+            color: var(--dark-color);
+            margin-top: 5px;
+        }
+
+        .notifications-dropdown.show {
+            display: block;
+        }
+
+        .notifications-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .notification-item:hover {
+            background-color: var(--light-color);
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item h4 {
+            margin: 0 0 5px 0;
+            font-size: 0.9rem;
+            color: var(--primary-color);
+        }
+
+        .notification-item p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--gray-color);
+        }
+
+        .notification-item small {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.7rem;
+            color: #aaa;
+        }
+
+        .clear-notifications-btn {
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            cursor: pointer;
+            font-size: 0.8rem;
         }
 
         .filter-container {
@@ -1354,10 +1427,22 @@
                     <i class="fas fa-user"></i>
                     <span id="userName">Carregando...</span>
                 </div>
-                <button onclick="showNotifications()" title="Notificações">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge">3</span>
-                </button>
+                <!-- Botão de Notificações com Dropdown -->
+                <div style="position: relative;">
+                    <button onclick="toggleNotificationsDropdown()" title="Notificações">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge" id="notificationCount">0</span>
+                    </button>
+                    <div id="notificationsDropdown" class="notifications-dropdown">
+                        <div class="notifications-header">
+                            <span>Notificações</span>
+                            <button class="clear-notifications-btn" onclick="clearAllNotifications()">Limpar</button>
+                        </div>
+                        <div id="notificationsList">
+                            <p style="padding: 15px; text-align: center; color: #aaa;">Nenhuma notificação</p>
+                        </div>
+                    </div>
+                </div>
                 <button onclick="logout()" title="Sair">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
@@ -1452,7 +1537,7 @@
                     <i class="fas fa-envelope"></i> Cobrança
                 </div>
                 <div class="tab" id="gestorTab2" style="display: none;" onclick="switchTab('exportar')">
-                    <i class="fas fa-download"></i> Exportar
+                    <i class="fas fa-download"></i> Exportar/Importar
                 </div>
             </div>
 
@@ -1770,45 +1855,35 @@
                 </div>
             </div>
 
-            <!-- Aba Exportar (apenas gestor) -->
+            <!-- Aba Exportar/Importar (apenas gestor) -->
             <div id="exportar" class="tab-content">
                 <div class="card">
                     <h2><i class="fas fa-download"></i> Exportar Dados</h2>
+                    <p>Exporte todas as demandas do sistema para análise ou backup.</p>
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="exportFormat">Formato:</label>
                             <select id="exportFormat">
+                                <!-- CORREÇÃO: Limitado para CSV e JSON -->
                                 <option value="csv">CSV</option>
-                                <option value="excel">Excel</option>
-                                <option value="pdf">PDF</option>
                                 <option value="json">JSON</option>
-                                <option value="xml">XML</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="exportPeriod">Período:</label>
-                            <select id="exportPeriod">
-                                <option value="7">Últimos 7 dias</option>
-                                <option value="30">Últimos 30 dias</option>
-                                <option value="90">Últimos 90 dias</option>
-                                <option value="365">Último ano</option>
-                                <option value="all">Todo o período</option>
                             </select>
                         </div>
                     </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="includeCharts" checked>
-                        <label for="includeCharts">Incluir gráficos</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="includeComments" checked>
-                        <label for="includeComments">Incluir comentários</label>
-                    </div>
-                    <button onclick="exportData()">
-                        <i class="fas fa-download"></i> Exportar Dados
+                    <button onclick="exportarDemandas()">
+                        <i class="fas fa-download"></i> Exportar Todas as Demandas
                     </button>
-                    <button onclick="scheduleExport()">
-                        <i class="fas fa-clock"></i> Agendar Exportação
+                </div>
+
+                <div class="card">
+                    <h2><i class="fas fa-upload"></i> Importar Dados</h2>
+                    <p>Importe demandas a partir de um arquivo JSON. As demandas serão adicionadas às existentes.</p>
+                    <div class="form-group">
+                        <label for="importFile">Selecione o arquivo JSON:</label>
+                        <input type="file" id="importFile" accept=".json">
+                    </div>
+                    <button onclick="importarDemandas()">
+                        <i class="fas fa-file-import"></i> Importar Demandas
                     </button>
                 </div>
             </div>
@@ -1882,7 +1957,7 @@
     </div>
 </div>
 
-<!-- Sistema de Notificações -->
+<!-- Sistema de Notificações Toast -->
 <div id="notification" class="notification">
     <h4><i class="fas fa-bell"></i> <span id="notificationTitle">Notificação</span></h4>
     <p id="notificationMessage">Mensagem da notificação</p>
@@ -2060,12 +2135,13 @@
     let timerInterval;
     let charts = {};
     let filtroFuncionarioAtual = 'todos';
-    let notifications = [];
+    // NOVO: Array para armazenar notificações persistentes do usuário
+    let userNotifications = []; 
     let pendingAction = null;
     let selectedOverdueItems = [];
-    let demandaResolucaoAtual = null; // Para armazenar a demanda sendo resolvida
-    let demandaAtribuicaoAtual = null; // Para armazenar a demanda sendo reprovada
-    let selectedUsers = []; // Para armazenar os usuários selecionados no campo de atribuição múltipla
+    let demandaResolucaoAtual = null;
+    let demandaAtribuicaoAtual = null;
+    let selectedUsers = [];
 
     // URL do servidor (altere para o IP do servidor)
    const SERVER_URL = window.location.origin;
@@ -2091,6 +2167,70 @@
         }
         
         console.log('Sistema inicializado com sucesso!');
+    });
+
+    // NOVO: Função para alternar o dropdown de notificações
+    function toggleNotificationsDropdown() {
+        const dropdown = document.getElementById('notificationsDropdown');
+        dropdown.classList.toggle('show');
+    }
+
+    // NOVO: Função para adicionar notificação à caixa do usuário
+    function addUserNotification(type, title, message) {
+        const notification = {
+            id: Date.now(),
+            type: type,
+            title: title,
+            message: message,
+            date: new Date()
+        };
+        userNotifications.unshift(notification); // Adiciona no início
+        renderUserNotifications();
+        updateNotificationCount();
+    }
+
+    // NOVO: Função para renderizar as notificações na UI
+    function renderUserNotifications() {
+        const listContainer = document.getElementById('notificationsList');
+        if (!listContainer) return;
+
+        if (userNotifications.length === 0) {
+            listContainer.innerHTML = '<p style="padding: 15px; text-align: center; color: #aaa;">Nenhuma notificação</p>';
+            return;
+        }
+
+        listContainer.innerHTML = userNotifications.map(not => `
+            <div class="notification-item" onclick="markAsRead(${not.id})">
+                <h4>${not.title}</h4>
+                <p>${not.message}</p>
+                <small>${formatDate(not.date)}</small>
+            </div>
+        `).join('');
+    }
+    
+    // NOVO: Função para limpar todas as notificações
+    function clearAllNotifications() {
+        userNotifications = [];
+        renderUserNotifications();
+        updateNotificationCount();
+    }
+
+    // NOVO: Função para atualizar o contador de notificações
+    function updateNotificationCount() {
+        const countElement = document.getElementById('notificationCount');
+        if (countElement) {
+            countElement.textContent = userNotifications.length;
+            countElement.style.display = userNotifications.length > 0 ? 'inline-block' : 'none';
+        }
+    }
+    
+    // Fecha o dropdown se clicar fora
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('notificationsDropdown');
+        const button = event.target.closest('button[onclick="toggleNotificationsDropdown()"]');
+        if (!button && !dropdown.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
     });
 
     // Verificar status do servidor
@@ -2225,10 +2365,8 @@
         selects.forEach(selectId => {
             const select = document.getElementById(selectId);
             if (select) {
-                // Limpa o select antes de adicionar
                 select.innerHTML = '';
                 
-                // Adiciona a opção padrão
                 if (selectId === 'filtroFuncionario') {
                     const defaultOption = new Option('Todos os Funcionários', 'todos');
                     select.add(defaultOption);
@@ -2238,7 +2376,6 @@
                 }
 
                 usuarios.filter(u => u.role === 'funcionario').forEach(func => {
-                    // Removendo a nomenclatura de nível (pleno, senior, etc.)
                     const option = new Option(func.nome, func.id);
                     select.add(option);
                 });
@@ -2255,10 +2392,8 @@
         const dropdown = document.getElementById('atribuidoADropdown');
         if (!dropdown) return;
         
-        // Limpa o dropdown
         dropdown.innerHTML = '';
         
-        // Adiciona as opções de usuários
         usuarios.filter(u => u.role === 'funcionario').forEach(usuario => {
             const option = document.createElement('div');
             option.className = 'multi-select-option';
@@ -2285,7 +2420,6 @@
         if (dropdown.style.display === 'block') {
             dropdown.style.display = 'none';
         } else {
-            // Fecha todos os outros dropdowns
             document.querySelectorAll('.multi-select-dropdown').forEach(d => {
                 d.style.display = 'none';
             });
@@ -2306,7 +2440,6 @@
             }
         });
         
-        // Atualiza o display
         const display = document.getElementById('atribuidoADisplay');
         if (selectedUsers.length === 0) {
             display.innerHTML = '<span style="color: #999;">Clique para selecionar funcionários...</span>';
@@ -2334,7 +2467,6 @@
             if (response.ok) {
                 const demandasDoServidor = await response.json();
                 
-                // Adiciona novas demandas sem substituir as existentes
                 demandasDoServidor.forEach(demandaServidor => {
                     if (!todasDemandas.find(d => d.id === demandaServidor.id)) {
                         todasDemandas.push(demandaServidor);
@@ -2387,14 +2519,12 @@
     async function atualizarDemandaNoServidor(id, dadosAtualizados) {
         console.log('Atualizando demanda no servidor...');
         try {
-            // CORREÇÃO: Busca a demanda existente primeiro para não apagar dados
             const demandaExistente = todasDemandas.find(d => d.id === id);
             if (!demandaExistente) {
                 showNotification('error', 'Erro ao Atualizar', 'Demanda não encontrada.');
                 return false;
             }
 
-            // Mescla os dados existentes com os novos
             const dadosCompletos = { ...demandaExistente, ...dadosAtualizados };
 
             const response = await fetch(`${SERVER_URL}/api/demandas/${id}`, {
@@ -2455,7 +2585,7 @@
         
         updateBadge('pendingBadge', pendentes);
         updateBadge('overdueBadge', atrasadas);
-        updateBadge('dashboardBadge', Math.floor(Math.random() * 10)); // Simulado
+        updateBadge('dashboardBadge', Math.floor(Math.random() * 10));
     }
 
     function updateBadge(badgeId, count) {
@@ -2502,7 +2632,6 @@
         const aprovadas = demandasFiltradas.filter(d => d.status === 'aprovada').length;
         const rotina = demandasFiltradas.filter(d => d.isRotina).length;
 
-        // Atualiza cards com animação
         animateValue('totalDemandas', totalDemandas);
         animateValue('pendentesCount', pendentes);
         animateValue('atrasadasCount', atrasadas);
@@ -2544,7 +2673,6 @@
         
         Chart.register(ChartDataLabels);
 
-        // Gráfico de pizza - Status
         const statusCtx = document.getElementById('statusChart');
         if (statusCtx) {
             charts.status = new Chart(statusCtx.getContext('2d'), {
@@ -2587,7 +2715,6 @@
             });
         }
 
-        // Gráfico de barras - Categorias
         const categoriaCtx = document.getElementById('categoriaChart');
         if (categoriaCtx) {
             charts.categoria = new Chart(categoriaCtx.getContext('2d'), {
@@ -2627,7 +2754,6 @@
             });
         }
 
-        // Gráfico de produtividade
         const productivityCtx = document.getElementById('productivityChart');
         if (productivityCtx) {
             charts.productivity = new Chart(productivityCtx.getContext('2d'), {
@@ -2675,7 +2801,6 @@
 
         const demandasFiltradas = getDemandasFiltradas();
 
-        // Atualizar gráfico de status
         const statusData = [
             demandasFiltradas.filter(d => d.status === 'pendente' || d.status === 'atribuida_pendente_aceitacao').length,
             demandasFiltradas.filter(d => d.status === 'aprovada').length,
@@ -2685,7 +2810,6 @@
         charts.status.data.datasets[0].data = statusData;
         charts.status.update();
 
-        // Atualizar gráfico de categorias
         const categorias = ['Prospecção', 'Reunião', 'Relatório', 'Suporte', 'Desenvolvimento', 'Outros'];
         const categoriaData = categorias.map(cat => 
             demandasFiltradas.filter(d => d.categoria === cat).length
@@ -2693,7 +2817,6 @@
         charts.categoria.data.datasets[0].data = categoriaData;
         charts.categoria.update();
 
-        // Atualizar gráfico de produtividade
         charts.productivity.data.datasets[0].data = usuarios.filter(u => u.role === 'funcionario').map(f => 
             demandasFiltradas.filter(d => d.funcionarioId === f.id && d.status === 'aprovada').length
         );
@@ -2713,7 +2836,6 @@
     function switchTab(tabName) {
         console.log(`Mudando para aba: ${tabName}`);
         
-        // Remove a classe active de todas as abas e conteúdos
         document.querySelectorAll('.tab').forEach(tab => {
             tab.classList.remove('active');
         });
@@ -2722,7 +2844,6 @@
             content.classList.remove('active');
         });
         
-        // Encontra a aba correta pelo atributo onclick ou pelo texto
         let targetTab = null;
         document.querySelectorAll('.tab').forEach(tab => {
             if (tab.onclick && tab.onclick.toString().includes(tabName)) {
@@ -2732,7 +2853,6 @@
             }
         });
         
-        // Se não encontrar, tenta pelo índice
         if (!targetTab) {
             const tabNames = ['dashboard', 'nova', 'pendentes', 'atrasadas', 'aprovadas', 'ranking', 'cobranca', 'exportar'];
             const index = tabNames.indexOf(tabName);
@@ -2743,33 +2863,27 @@
         
         if (targetTab) {
             targetTab.classList.add('active');
-            console.log('Aba ativada:', targetTab.textContent);
         }
         
-        // Ativa o conteúdo correspondente
         const contentElement = document.getElementById(tabName);
         if (contentElement) {
             contentElement.classList.add('active');
-            console.log('Conteúdo ativado:', tabName);
         } else {
             console.error('Conteúdo não encontrado:', tabName);
         }
 
-        // Se for a aba de pendentes, renderiza novamente
         if (tabName === 'pendentes') {
             setTimeout(() => {
                 renderizarDemandas();
             }, 100);
         }
         
-        // Se for a aba de cobrança, renderiza novamente
         if (tabName === 'cobranca') {
             setTimeout(() => {
                 renderizarCobranca();
             }, 100);
         }
 
-        // Se for a aba de dashboard, atualiza os gráficos
         if (tabName === 'dashboard') {
             setTimeout(() => {
                 atualizarGraficos();
@@ -2779,10 +2893,9 @@
 
     function showModal(modalId, title, content) {
         const modal = document.getElementById(modalId);
-        const modalTitle = document.getElementById('resolucaoModalTitle'); // Usando o ID específico
-        const modalBody = document.getElementById('modalBody'); // Este não existe no resolucaoModal, vamos ajustar
+        const modalTitle = document.getElementById('resolucaoModalTitle');
+        const modalBody = document.getElementById('modalBody');
         
-        // O modal de resolução tem uma estrutura diferente
         if (modalId === 'resolucaoModal') {
             if (modal && modalTitle) {
                 modalTitle.textContent = title;
@@ -2823,7 +2936,6 @@
     function inicializarEventListeners() {
         console.log('Inicializando event listeners...');
         
-        // Formulário de demanda
         const form = document.getElementById('demandaForm');
         if (form) {
             console.log('Formulário encontrado, adicionando listener...');
@@ -2832,7 +2944,6 @@
                 e.preventDefault();
                 console.log('Formulário submetido!');
                 
-                // Coleta os dados do formulário
                 const nomeDemanda = document.getElementById('nomeDemandaInput').value;
                 const categoria = document.getElementById('categoriaSelect').value;
                 const prioridade = document.getElementById('prioridadeSelect').value;
@@ -2843,17 +2954,11 @@
                 const isRotina = document.getElementById('rotinaCheckbox').checked;
                 const anexosInput = document.getElementById('anexosCriacaoInput');
                 
-                console.log('Dados coletados:', {
-                    nomeDemanda, categoria, prioridade, complexidade, descricao, local, dataLimite, isRotina
-                });
-                
-                // Validação básica
                 if (!nomeDemanda || !categoria || !prioridade || !complexidade || !descricao || !local || !dataLimite) {
                     showNotification('error', 'Erro', 'Por favor, preencha todos os campos obrigatórios');
                     return;
                 }
                 
-                // Coleta os anexos
                 let anexosCriacao = [];
                 if (anexosInput.files.length > 0) {
                     for (const file of anexosInput.files) {
@@ -2865,27 +2970,23 @@
                     }
                 }
                 
-                // Coleta os dias da semana se for tarefa de rotina
                 let diasSemana = [];
                 if (isRotina) {
                     const checkboxes = document.querySelectorAll('input[name="diaSemana"]:checked');
                     diasSemana = Array.from(checkboxes).map(cb => parseInt(cb.value));
                 }
                 
-                // Prepara os dados dos usuários atribuídos
                 const atribuidos = selectedUsers.map(user => ({
                     id: user.id,
                     nome: user.nome,
                     email: user.email
                 }));
                 
-                // Define o status inicial
                 let statusInicial = 'pendente';
                 if (atribuidos.length > 0 && !atribuidos.some(a => a.id === usuarioLogado.id)) {
-                    statusInicial = 'pendente'; // Status simplificado, sem necessidade de aceitação
+                    statusInicial = 'pendente';
                 }
                 
-                // Cria o objeto da demanda
                 const novaDemanda = {
                     nomeDemanda,
                     funcionarioId: usuarioLogado.id,
@@ -2901,7 +3002,7 @@
                     status: statusInicial,
                     isRotina,
                     diasSemana,
-                    tag: `DEM-${Date.now()}`, // TAG única
+                    tag: `DEM-${Date.now()}`,
                     comentarios: '',
                     comentarioGestor: '',
                     anexosCriacao,
@@ -2910,28 +3011,26 @@
                 
                 console.log('Nova demanda criada:', novaDemanda);
                 
-                // Salva no servidor
                 const sucesso = await salvarDemandaNoServidor(novaDemanda);
                 
                 if (sucesso) {
-                    // Recarrega dados do servidor
                     await carregarDadosDoServidor();
                     
-                    // Envia notificações para as partes interessadas
+                    // CORREÇÃO: Chamando a função de notificação corrigida
                     notificarPartesInteressadasNovaDemanda(novaDemanda);
                     
-                    // Limpa o formulário
+                    // NOVO: Adiciona notificação para o usuário se a demanda for atribuída a ele
+                    if (atribuidos.some(a => a.id === usuarioLogado.id)) {
+                        addUserNotification('info', 'Nova Tarefa Atribuída', `A demanda "${nomeDemanda}" foi atribuída a você.`);
+                    }
+                    
                     form.reset();
                     document.getElementById('anexosCriacaoList').innerHTML = '';
-                    
-                    // Limpa a seleção de usuários
                     selectedUsers = [];
                     updateSelectedUsers();
                     
-                    // Mostra notificação de sucesso
                     showNotification('success', 'Demanda Registrada', `Sua demanda "${nomeDemanda}" foi registrada com sucesso!`);
                     
-                    // Muda para a aba de pendentes automaticamente
                     setTimeout(() => {
                         switchTab('pendentes');
                     }, 1000);
@@ -2943,7 +3042,6 @@
             console.error('Formulário não encontrado!');
         }
 
-        // Formulário de resolução
         const resolucaoForm = document.getElementById('resolucaoForm');
         if (resolucaoForm) {
             resolucaoForm.addEventListener('submit', async function(e) {
@@ -2952,7 +3050,6 @@
             });
         }
 
-        // Formulário de reprovação por atribuição
         const atribuicaoReprovacaoForm = document.getElementById('atribuicaoReprovacaoForm');
         if (atribuicaoReprovacaoForm) {
             atribuicaoReprovacaoForm.addEventListener('submit', async function(e) {
@@ -2961,7 +3058,6 @@
             });
         }
 
-        // Listener para os inputs de arquivos
         const anexosInput = document.getElementById('resolucaoAnexos');
         if (anexosInput) {
             anexosInput.addEventListener('change', atualizarListaAnexos);
@@ -2972,7 +3068,6 @@
             anexosCriacaoInput.addEventListener('change', atualizarListaAnexosCriacao);
         }
         
-        // Busca global
         const searchInput = document.getElementById('globalSearch');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
@@ -2981,7 +3076,6 @@
             });
         }
         
-        // Fecha os dropdowns quando clicar fora
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.multi-select-container')) {
                 document.querySelectorAll('.multi-select-dropdown').forEach(dropdown => {
@@ -2993,7 +3087,6 @@
         console.log('Event listeners inicializados!');
     }
 
-    // Função para atualizar a lista de anexos na tela (criação)
     function atualizarListaAnexosCriacao() {
         const anexosInput = document.getElementById('anexosCriacaoInput');
         const anexosList = document.getElementById('anexosCriacaoList');
@@ -3014,50 +3107,44 @@
         }
     }
 
-    // Função para notificar todas as partes interessadas na criação de uma nova demanda
+    // CORREÇÃO: Função de notificação reescrita para seguir as regras
     function notificarPartesInteressadasNovaDemanda(demanda) {
-        const criador = usuarios.find(u => u.id === demanda.funcionarioId);
         const gestor = usuarios.find(u => u.role === 'gestor');
 
-        // 1. Envia email para o gestor (se a demanda não foi criada por ele)
-        if (gestor && gestor.id !== demanda.funcionarioId) {
-            const assunto = encodeURIComponent(`Nova Demanda Registrada: ${demanda.nomeDemanda}`);
-            let corpo = `Prezado Gestor,\n\nUma nova demanda foi registrada por ${demanda.nomeFuncionario}:\n\n--- Detalhes da Demanda ---\nNome: ${demanda.nomeDemanda}\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nPrioridade: ${demanda.prioridade}\nComplexidade: ${demanda.complexidade}\nLocal: ${demanda.local}\nData Limite: ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n`;
-            
+        // Regra 1: Gestor cria a demanda
+        if (usuarioLogado.role === 'gestor') {
             if (demanda.atribuidos && demanda.atribuidos.length > 0) {
-                corpo += `\n--- Atribuição ---\nEsta demanda foi atribuída a: ${demanda.atribuidos.map(a => a.nome).join(', ')}\n`;
+                const emailsPara = demanda.atribuidos.map(a => a.email).join(',');
+                const assunto = encodeURIComponent(`Nova Tarefa: ${demanda.nomeDemanda}`);
+                const corpo = encodeURIComponent(`Prezado(a),\n\nUma nova tarefa foi atribuída a você pelo Gestor:\n\n--- Detalhes da Tarefa ---\nNome: ${demanda.nomeDemanda}\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nPrioridade: ${demanda.prioridade}\nLocal: ${demanda.local}\nData Limite: ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}\nTAG: ${demanda.tag}\n\nPor favor, acesse o sistema para começar a trabalhar.\n\nAtenciosamente,\nGestor do Sistema`);
+                window.open(`mailto:${emailsPara}?subject=${assunto}&body=${corpo}`, '_blank');
             }
-            if (demanda.anexosCriacao && demanda.anexosCriacao.length > 0) {
-                corpo += `\n--- Anexos ---\nForam anexados ${demanda.anexosCriacao.length} arquivo(s) no momento do registro.\n`;
-            }
-            corpo += `\n\nPor favor, acesse o sistema para analisar e aprovar ou reprovar esta demanda.\n\nAtenciosamente,\nSistema Automático`;
-            
-            window.open(`mailto:${gestor.email}?subject=${assunto}&body=${encodeURIComponent(corpo)}`, '_blank');
-        }
-
-        // 2. Envia email para os funcionários atribuídos (se houver)
-        if (demanda.atribuidos && demanda.atribuidos.length > 0) {
-            demanda.atribuidos.forEach(atribuido => {
-                if (atribuido.id !== demanda.funcionarioId) {
-                    const assuntoAtribuido = encodeURIComponent(`Nova Demanda Atribuída: ${demanda.nomeDemanda}`);
-                    let corpoAtribuido = `Prezado(a) ${atribuido.nome},\n\nUma nova demanda foi atribuída a você por ${demanda.nomeFuncionario}:\n\n--- Detalhes da Demanda ---\nNome: ${demanda.nomeDemanda}\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nPrioridade: ${demanda.prioridade}\nComplexidade: ${demanda.complexidade}\nLocal: ${demanda.local}\nData Limite: ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n`;
-                    corpoAtribuido += `\nPor favor, acesse o sistema para começar a trabalhar nesta demanda.\n\nAtenciosamente,\nSistema Automático`;
+        } 
+        // Regra 2: Funcionário cria a demanda
+        else {
+            if (gestor) {
+                const emailsCc = demanda.atribuidos && demanda.atribuidos.length > 0 
+                    ? demanda.atribuidos.map(a => a.email).join(',') 
+                    : '';
                     
-                    window.open(`mailto:${atribuido.email}?subject=${assuntoAtribuido}&body=${encodeURIComponent(corpoAtribuido)}`, '_blank');
+                const assunto = encodeURIComponent(`Nova Demanda Registrada: ${demanda.nomeDemanda}`);
+                let corpo = `Prezado Gestor,\n\nUma nova demanda foi registrada por ${demanda.nomeFuncionario}:\n\n--- Detalhes da Demanda ---\nNome: ${demanda.nomeDemanda}\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nPrioridade: ${demanda.prioridade}\nLocal: ${demanda.local}\nData Limite: ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}\nTAG: ${demanda.tag}\n`;
+                
+                if (demanda.atribuidos && demanda.atribuidos.length > 0) {
+                    corpo += `\nEsta demanda foi atribuída a: ${demanda.atribuidos.map(a => a.nome).join(', ')}.\n`;
                 }
-            });
-        }
 
-        // 3. Envia email de confirmação para o criador (se a demanda não foi atribuída a ele mesmo)
-        if (demanda.atribuidos && demanda.atribuidos.length > 0 && !demanda.atribuidos.some(a => a.id === demanda.funcionarioId)) {
-            const assuntoCriador = encodeURIComponent(`Sua Demanda Foi Enviada: ${demanda.nomeDemanda}`);
-            let corpoCriador = `Prezado(a) ${demanda.nomeFuncionario},\n\nSua demanda "${demanda.nomeDemanda}" foi registrada e atribuída a ${demanda.atribuidos.map(a => a.nome).join(', ')}.\n\nEles(as) receberão um email separado para análise.\n\n--- Detalhes da Demanda ---\nNome: ${demanda.nomeDemanda}\nDescrição: ${demanda.descricao}\nCategoria: ${demanda.categoria}\nPrioridade: ${demanda.prioridade}\nComplexidade: ${demanda.complexidade}\nLocal: ${demanda.local}\nData Limite: ${new Date(demanda.dataLimite).toLocaleDateString('pt-BR')}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n\nAcompanhe o andamento pelo sistema.\n\nAtenciosamente,\nSistema Automático`;
-            
-            window.open(`mailto:${demanda.emailFuncionario}?subject=${assuntoCriador}&body=${encodeURIComponent(corpoCriador)}`, '_blank');
+                corpo += `\nPor favor, acesse o sistema para análise.\n\nAtenciosamente,\nSistema Automático`;
+
+                let mailtoLink = `mailto:${gestor.email}?subject=${assunto}&body=${encodeURIComponent(corpo)}`;
+                if (emailsCc) {
+                    mailtoLink += `&cc=${emailsCc}`;
+                }
+                window.open(mailtoLink, '_blank');
+            }
         }
     }
 
-    // Função para abrir o modal de resolução
     function abrirModalResolucao(demandaId) {
         demandaResolucaoAtual = todasDemandas.find(d => d.id === demandaId);
         if (!demandaResolucaoAtual) return;
@@ -3066,7 +3153,6 @@
         showModal('resolucaoModal', `Resolver Demanda: ${demandaResolucaoAtual.nomeDemanda}`);
     }
 
-    // Função para abrir o modal de reprovação por atribuição
     function abrirModalReprovarAtribuicao(demandaId) {
         demandaAtribuicaoAtual = todasDemandas.find(d => d.id === demandaId);
         if (!demandaAtribuicaoAtual) return;
@@ -3075,7 +3161,6 @@
         showModal('atribuicaoReprovacaoModal', `Reprovar Demanda: ${demandaAtribuicaoAtual.nomeDemanda}`);
     }
 
-    // Função para atualizar a lista de anexos na tela (resolução)
     function atualizarListaAnexos() {
         const anexosInput = document.getElementById('resolucaoAnexos');
         const anexosList = document.getElementById('anexosList');
@@ -3096,7 +3181,6 @@
         }
     }
 
-    // Função para salvar a resolução
     async function salvarResolucao() {
         if (!demandaResolucaoAtual) return;
 
@@ -3110,25 +3194,20 @@
         }
 
         try {
-            // 1. Criar o arquivo ZIP
             const zip = new JSZip();
             const dataConclusao = new Date();
             const zipFileName = `${demandaResolucaoAtual.tag}_${dataConclusao.toISOString().split('T')[0]}.zip`;
 
-            // Adicionar comentários como um arquivo de texto
             if (comentarios) {
                 zip.file("comentarios.txt", comentarios);
             }
 
-            // Adicionar os arquivos anexados
             for (const file of files) {
                 zip.file(file.name, file);
             }
 
-            // Gerar o arquivo ZIP
             const zipBlob = await zip.generateAsync({ type: "blob" });
 
-            // 2. Fazer o download do ZIP
             const url = URL.createObjectURL(zipBlob);
             const a = document.createElement('a');
             a.href = url;
@@ -3138,7 +3217,6 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            // 3. Atualizar a demanda no servidor
             const dadosAtualizados = {
                 comentarios: comentarios,
                 status: 'finalizado_pendente_aprovacao'
@@ -3150,8 +3228,13 @@
                 showNotification('success', 'Resolução Salva', `A resolução foi salva e o arquivo ${zipFileName} foi baixado. A demanda agora está em análise.`);
                 closeModal('resolucaoModal');
                 await carregarDadosDoServidor();
-                // Mudar para a aba de pendentes (que agora mostrará "Em Análise")
                 switchTab('pendentes');
+
+                // NOVO: Notifica o gestor sobre a nova resolução
+                const gestor = usuarios.find(u => u.role === 'gestor');
+                if(gestor) {
+                    addUserNotification('info', 'Demanda para Aprovar', `A demanda "${demandaResolucaoAtual.nomeDemanda}" foi resolvida e espera sua aprovação.`);
+                }
             }
 
         } catch (error) {
@@ -3160,7 +3243,6 @@
         }
     }
 
-    // Função para salvar a reprovação por atribuição
     async function salvarReprovacaoAtribuicao() {
         if (!demandaAtribuicaoAtual) return;
 
@@ -3183,48 +3265,30 @@
             closeModal('atribuicaoReprovacaoModal');
             await carregarDadosDoServidor();
 
-            // Envia email para o criador da demanda
             const criador = usuarios.find(u => u.id === demandaAtribuicaoAtual.funcionarioId);
             if (criador) {
                 const assunto = encodeURIComponent(`Sua Demanda Foi Reprovada: ${demandaAtribuicaoAtual.nomeDemanda}`);
-                let corpo = `Prezado(a) ${demandaAtribuicaoAtual.nomeFuncionario},\n\nGostaríamos de informar que sua demanda foi analisada e, infelizmente, **reprovada** pela pessoa a quem foi atribuída.\n\n--- Detalhes da Demanda ---\nNome: ${demandaAtribuicaoAtual.nomeDemanda}\nDescrição: ${demandaAtribuicaoAtual.descricao}\nCategoria: ${demandaAtribuicaoAtual.categoria}\nLocal: ${demandaAtribuicaoAtual.local || 'N/A'}\nTAG da Demanda: ${demandaAtribuicaoAtual.tag}\n${demandaAtribuicaoAtual.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n\n--- Motivo da Reprovação ---\n${motivo}\n\nSugerimos que revise os pontos acima com a pessoa que lhe atribuiu a tarefa e, se necessário, crie uma nova demanda com os ajustes necessários.\n\nAtenciosamente,\nSistema de Gestão`;
-                window.open(`mailto:${criador.email}?subject=${assunto}&body=${encodeURIComponent(corpo)}`, '_blank');
+                const corpo = encodeURIComponent(`Prezado(a) ${demandaAtribuicaoAtual.nomeFuncionario},\n\nSua demanda foi analisada e reprovada.\n\n--- Motivo ---\n${motivo}\n\nPor favor, crie uma nova demanda com os ajustes necessários.\n\nAtenciosamente,\nSistema de Gestão`);
+                window.open(`mailto:${criador.email}?subject=${assunto}&body=${corpo}`, '_blank');
             }
         }
     }
 
-    // Continuação das funções existentes...
     function renderizarDemandas() {
-        console.log('=== RENDERIZANDO DEMANDAS ===');
-        console.log('Total de demandas no sistema:', todasDemandas.length);
-        
         const pendentesContainer = document.getElementById('pendentesContainer');
         const aprovadasContainer = document.getElementById('aprovadasContainer');
         const atrasadasContainer = document.getElementById('atrasadasContainer');
         
-        // Limpa todos os containers
-        if (pendentesContainer) {
-            pendentesContainer.innerHTML = '';
-            console.log('Container pendentes limpo');
-        } else {
-            console.error('Container pendentes NÃO encontrado');
-        }
-        
+        if (pendentesContainer) pendentesContainer.innerHTML = '';
         if (aprovadasContainer) aprovadasContainer.innerHTML = '';
         if (atrasadasContainer) atrasadasContainer.innerHTML = '';
 
-        // Filtra as demandas pendentes (incluindo as que precisam ser reavaliadas)
         const pendentes = todasDemandas.filter(d => {
-            console.log(`Demanda ID ${d.id}: status = ${d.status}`);
             return d.status === 'pendente' || d.status === 'reprovada' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'reprovada_pelo_atribuido';
         });
         
-        console.log('Demandas pendentes encontradas:', pendentes.length);
-        
-        // Filtra as demandas concluídas
         const concluidas = todasDemandas.filter(d => d.status === 'aprovada');
         
-        // Filtra as demandas atrasadas
         const atrasadas = todasDemandas.filter(d => {
             if (d.status === 'aprovada') return false;
             const dataLimite = new Date(d.dataLimite);
@@ -3232,23 +3296,17 @@
             return dataLimite < hoje;
         });
 
-        console.log(`Resumo: Pendentes=${pendentes.length}, Atrasadas=${atrasadas.length}, Concluídas=${concluidas.length}`);
-
-        // Renderiza as demandas pendentes
         if (pendentesContainer) {
             if (pendentes.length === 0) {
                 pendentesContainer.innerHTML = '<p>Nenhuma demanda pendente no momento.</p>';
             } else {
-                pendentes.forEach((demanda, index) => {
-                    console.log(`Adicionando demanda pendente ${index + 1}: ${demanda.nomeDemanda || demanda.descricao}`);
+                pendentes.forEach(demanda => {
                     const elemento = criarElementoDemanda(demanda);
                     pendentesContainer.appendChild(elemento);
                 });
-                console.log('Todas as demandas pendentes foram adicionadas');
             }
         }
 
-        // Renderiza as demandas atrasadas
         if (atrasadasContainer) {
             if (atrasadas.length === 0) {
                 atrasadasContainer.innerHTML = '<p>Nenhuma demanda atrasada no momento.</p>';
@@ -3259,7 +3317,6 @@
             }
         }
 
-        // Renderiza as demandas concluídas
         if (aprovadasContainer) {
             if (concluidas.length === 0) {
                 aprovadasContainer.innerHTML = '<p>Nenhuma demanda concluída a ser exibida.</p>';
@@ -3269,8 +3326,6 @@
                 });
             }
         }
-        
-        console.log('=== FIM DA RENDERIZAÇÃO ===');
     }
 
     function criarElementoDemanda(demanda, isAtrasada = false) {
@@ -3300,7 +3355,6 @@
             diasFormatados = demanda.diasSemana.map(dia => ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][dia]).join(', ');
         }
         
-        // Adiciona o contador de tempo restante ou performance
         let tempoElement = '';
         if (demanda.status === 'aprovada' && demanda.dataConclusao) {
             const performanceText = calcularDesempenhoTempo(demanda.dataCriacao, demanda.dataConclusao, demanda.dataLimite);
@@ -3311,16 +3365,13 @@
             tempoElement = `<div class="time-remaining">${isAtrasada ? 'ATRASADA HÁ ' : 'TEMPO RESTANTE: '}${tempoRestante}</div>`;
         }
         
-        // Badge de prioridade
         const priorityBadge = demanda.prioridade ? 
             `<span class="demanda-priority priority-${demanda.prioridade.toLowerCase()}">${demanda.prioridade}</span>` : '';
         
-        // Verifica quem é o usuário logado e qual seu papel em relação a demanda
         const podeAprovar = usuarioLogado && usuarioLogado.role === 'gestor';
         const eDono = usuarioLogado && usuarioLogado.id === demanda.funcionarioId;
         const eAtribuido = usuarioLogado && demanda.atribuidos && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
         
-        // Formata a lista de atribuídos
         let atribuidosInfo = '';
         if (demanda.atribuidos && demanda.atribuidos.length > 0) {
             atribuidosInfo = `<small><strong>Atribuída a:</strong> ${demanda.atribuidos.map(a => a.nome).join(', ')}</small>`;
@@ -3366,12 +3417,11 @@
         return div;
     }
 
-    // Função para calcular o desempenho de tempo
     function calcularDesempenhoTempo(dataCriacao, dataConclusao, dataLimite) {
         const conclusao = new Date(dataConclusao);
         const limite = new Date(dataLimite);
         
-        const diffMs = conclusao - limite; // Positivo se atrasou, negativo se adiantou
+        const diffMs = conclusao - limite;
         const diffHoras = Math.abs(diffMs) / (1000 * 60 * 60);
         const diffDias = Math.floor(diffHoras / 24);
         const diffHorasRestantes = Math.floor(diffHoras % 24);
@@ -3390,24 +3440,15 @@
         }
     }
 
-    // Sistema de senha para aprovação
     function solicitarSenhaParaAprovar(id, nomeFuncionario) {
-        pendingAction = {
-            type: 'aprovar',
-            id: id,
-            nomeFuncionario: nomeFuncionario
-        };
+        pendingAction = { type: 'aprovar', id: id, nomeFuncionario: nomeFuncionario };
         document.getElementById('passwordModal').style.display = 'block';
         document.getElementById('passwordConfirm').value = '';
         document.getElementById('passwordConfirm').focus();
     }
 
     function solicitarSenhaParaReprovar(id, nomeFuncionario) {
-        pendingAction = {
-            type: 'reprovar',
-            id: id,
-            nomeFuncionario: nomeFuncionario
-        };
+        pendingAction = { type: 'reprovar', id: id, nomeFuncionario: nomeFuncionario };
         document.getElementById('passwordModal').style.display = 'block';
         document.getElementById('passwordConfirm').value = '';
         document.getElementById('passwordConfirm').focus();
@@ -3422,7 +3463,6 @@
             return;
         }
         
-        // Senha correta, executa a ação pendente
         if (pendingAction.type === 'aprovar') {
             aprovarDemanda(pendingAction.id, pendingAction.nomeFuncionario);
         } else if (pendingAction.type === 'reprovar') {
@@ -3446,7 +3486,6 @@
             tempoInfo = `<p><strong>Desempenho de Tempo:</strong> ${calcularDesempenhoTempo(demanda.dataCriacao, demanda.dataConclusao, demanda.dataLimite)}</p>`;
         }
         
-        // Formata a lista de atribuídos
         let atribuidosInfo = '';
         if (demanda.atribuidos && demanda.atribuidos.length > 0) {
             atribuidosInfo = `<p><strong>Atribuída a:</strong> ${demanda.atribuidos.map(a => a.nome).join(', ')}</p>`;
@@ -3479,7 +3518,6 @@
         const diferenca = limite - agora;
         
         if (diferenca < 0) {
-            // Se a data limite já passou, calcula quanto tempo está atrasada
             const diasAtraso = Math.floor(Math.abs(diferenca) / (1000 * 60 * 60 * 24));
             const horasAtraso = Math.floor((Math.abs(diferenca) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutosAtraso = Math.floor((Math.abs(diferenca) % (1000 * 60 * 60)) / (1000 * 60));
@@ -3487,7 +3525,6 @@
             
             return `${diasAtraso}d ${horasAtraso}h ${minutosAtraso}m ${segundosAtraso}s`;
         } else {
-            // Calcula o tempo restante
             const diasRestantes = Math.floor(diferenca / (1000 * 60 * 60 * 24));
             const horasRestantes = Math.floor((diferenca % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutosRestantes = Math.floor((diferenca % (1000 * 60 * 60)) / (1000 * 60));
@@ -3498,14 +3535,12 @@
     }
 
     function atualizarTemposRestantes() {
-        // Atualiza todos os elementos com a classe time-remaining
         document.querySelectorAll('.time-remaining').forEach(element => {
             const divPai = element.closest('.demanda-item');
             if (divPai) {
                 const botoes = divPai.querySelectorAll('button');
                 let demandaId = null;
                 
-                // Procura pelo botão que tem o ID da demanda no onclick
                 botoes.forEach(botao => {
                     const onclick = botao.getAttribute('onclick');
                     if (onclick && onclick.includes('abrirModalResolucao')) {
@@ -3551,18 +3586,14 @@
                 await carregarDadosDoServidor();
                 showNotification('success', 'Demanda Aprovada', `Demanda de ${nomeFuncionario} foi aprovada com sucesso!`);
                 
-                // Envia email para o funcionário
                 const funcionario = usuarios.find(u => u.id === demanda.funcionarioId);
                 if (funcionario) {
                     const assunto = encodeURIComponent(`Sua Demanda Foi Aprovada: ${demanda.nomeDemanda || demanda.descricao}`);
-                    let corpo = `Prezado(a) ${nomeFuncionario},\n\nGostaríamos de informar que sua demanda foi analisada e **aprovada**.\n\n--- Detalhes da Demanda ---\nNome: ${demanda.nomeDemanda || demanda.descricao}\nCategoria: ${demanda.categoria}\nLocal: ${demanda.local || 'N/A'}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n\nParabéns pelo excelente trabalho!\n\nAtenciosamente,\nGestão`;
-                    
-                    // Adiciona a nota sobre o anexo se houver comentários (indicando que passou pela resolução)
-                    if (demanda.comentarios) {
-                        corpo += encodeURIComponent('\n\n--- Importante ---\nPor favor, não se esqueça de anexar o arquivo ZIP com a resolução que você baixou no email de resposta, se aplicável.');
-                    }
-
+                    const corpo = encodeURIComponent(`Prezado(a) ${nomeFuncionario},\n\nSua demanda foi analisada e aprovada.\n\n--- Detalhes ---\nNome: ${demanda.nomeDemanda || demanda.descricao}\nTAG: ${demanda.tag}\n\nParabéns pelo excelente trabalho!\n\nAtenciosamente,\nGestão`);
                     window.open(`mailto:${funcionario.email}?subject=${assunto}&body=${corpo}`, '_blank');
+                    
+                    // NOVO: Notifica o funcionário
+                    addUserNotification('success', 'Demanda Aprovada', `Sua demanda "${demanda.nomeDemanda}" foi aprovada!`);
                 }
             }
         }
@@ -3586,12 +3617,14 @@
                 await carregarDadosDoServidor();
                 showNotification('warning', 'Demanda Reprovada', `Demanda de ${nomeFuncionario} foi reprovada.`);
                 
-                // Envia email para o funcionário
                 const funcionario = usuarios.find(u => u.id === demanda.funcionarioId);
                 if (funcionario) {
                     const assunto = encodeURIComponent(`Sua Demanda Foi Reprovada: ${demanda.nomeDemanda || demanda.descricao}`);
-                    const corpo = encodeURIComponent(`Prezado(a) ${nomeFuncionario},\n\nGostaríamos de informar que sua demanda foi analisada e, infelizmente, **reprovada** neste momento.\n\n--- Detalhes da Demanda ---\nNome: ${demanda.nomeDemanda || demanda.descricao}\nCategoria: ${demanda.categoria}\nLocal: ${demanda.local || 'N/A'}\nTAG da Demanda: ${demanda.tag}\n${demanda.isRotina ? 'Tipo: Tarefa de Rotina\n' : ''}\n\n--- Motivo da Reprovação ---\n${motivo}\n\nSugerimos que revise os pontos acima e, se necessário, entre em contato para maiores esclarecimentos.\n\nAtenciosamente,\nGestão`);
+                    const corpo = encodeURIComponent(`Prezado(a) ${nomeFuncionario},\n\nSua demanda foi analisada e reprovada.\n\n--- Motivo ---\n${motivo}\n\nPor favor, revise e crie uma nova demanda se necessário.\n\nAtenciosamente,\nGestão`);
                     window.open(`mailto:${funcionario.email}?subject=${assunto}&body=${corpo}`, '_blank');
+
+                    // NOVO: Notifica o funcionário
+                    addUserNotification('warning', 'Demanda Reprovada', `Sua demanda "${demanda.nomeDemanda}" foi reprovada.`);
                 }
             }
         }
@@ -3609,7 +3642,6 @@
     }
 
     function atualizarRanking() {
-        // Conta as demandas por status para cada funcionário
         const ranking = {};
         
         usuarios.filter(u => u.role === 'funcionario').forEach(func => {
@@ -3637,10 +3669,8 @@
             }
         });
         
-        // Converte o objeto em array e ordena por número de demandas concluídas
         const rankingArray = Object.values(ranking).sort((a, b) => b.concluidas - a.concluidas);
         
-        // Renderiza o ranking
         const rankingList = document.getElementById('rankingList');
         if (rankingList) {
             rankingList.innerHTML = '';
@@ -3672,7 +3702,6 @@
         }
     }
 
-    // Funções de validação
     function validateDeadline() {
         const deadlineInput = document.getElementById('dataLimiteInput');
         if (!deadlineInput) return;
@@ -3687,7 +3716,6 @@
         }
     }
 
-    // Funções de rotina
     function toggleRoutineFields() {
         const rotinaCheckbox = document.getElementById('rotinaCheckbox');
         const diasSemanaGroup = document.getElementById('diasSemanaGroup');
@@ -3697,7 +3725,6 @@
         }
     }
 
-    // Sistema de notificações
     function showNotification(type, title, message) {
         const notification = document.getElementById('notification');
         const titleElement = document.getElementById('notificationTitle');
@@ -3712,21 +3739,11 @@
         titleElement.textContent = title;
         messageElement.textContent = message;
         
-        // Adiciona ao array de notificações
-        notifications.push({
-            tipo: type,
-            titulo: title,
-            mensagem: message,
-            data: new Date()
-        });
-        
-        // Remove notificação após 5 segundos
         setTimeout(() => {
             notification.classList.remove('show');
         }, 5000);
     }
 
-    // Funções auxiliares adicionais
     function resetFilters() {
         document.getElementById('filtroFuncionario').value = 'todos';
         document.getElementById('filtroPeriodo').value = '7';
@@ -3740,7 +3757,6 @@
     function drillDown(type) {
         showNotification('info', 'Análise Detalhada', `Analisando detalhes de ${type}...`);
         
-        // Implementar drill down real
         setTimeout(() => {
             switchTab('pendentes');
         }, 1000);
@@ -3796,13 +3812,11 @@
         }
     }
 
-    // Funções de importação (mantidas para compatibilidade)
     function inicializarImportacaoJSON() {
         // Mantido para compatibilidade futura
     }
 
     function inicializarNotificacoesTempoReal() {
-        // Simula chegada de notificações
         setInterval(() => {
             if (Math.random() > 0.9) {
                 const tipos = ['success', 'warning', 'info'];
@@ -3818,15 +3832,13 @@
                 
                 showNotification(tipo, 'Notificação do Sistema', mensagem);
             }
-        }, 45000); // A cada 45 segundos
+        }, 45000);
     }
 
-    // Funções para a aba de Cobrança
     function renderizarCobranca() {
         const cobrancaContainer = document.getElementById('cobrancaContainer');
         if (!cobrancaContainer) return;
         
-        // Filtra as demandas atrasadas
         const funcionarioFilter = document.getElementById('cobrancaFuncionario').value;
         const prioridadeFilter = document.getElementById('cobrancaPrioridade').value;
         
@@ -3837,7 +3849,6 @@
             return dataLimite < hoje;
         });
         
-        // Aplica filtros adicionais
         if (funcionarioFilter !== 'todos') {
             atrasadas = atrasadas.filter(d => d.funcionarioId == funcionarioFilter);
         }
@@ -3846,7 +3857,6 @@
             atrasadas = atrasadas.filter(d => d.prioridade === prioridadeFilter);
         }
         
-        // Limpa o container
         cobrancaContainer.innerHTML = '';
         
         if (atrasadas.length === 0) {
@@ -3854,7 +3864,6 @@
             return;
         }
         
-        // Agrupa por funcionário
         const demandasPorFuncionario = {};
         atrasadas.forEach(demanda => {
             if (!demandasPorFuncionario[demanda.funcionarioId]) {
@@ -3867,7 +3876,6 @@
             demandasPorFuncionario[demanda.funcionarioId].demandas.push(demanda);
         });
         
-        // Renderiza os cards de cobrança
         Object.values(demandasPorFuncionario).forEach(funcionario => {
             const card = document.createElement('div');
             card.className = 'card';
@@ -3911,7 +3919,6 @@
             cobrancaContainer.appendChild(card);
         });
         
-        // Atualiza a prévia do email
         atualizarPreviaEmail();
     }
 
@@ -3938,12 +3945,10 @@
     }
 
     function toggleFuncionarioSelection(nomeFuncionario) {
-        // Esta função pode ser usada para lógica adicional quando um funcionário é selecionado/deselecionado
         console.log(`Seleção alterada para: ${nomeFuncionario}`);
     }
 
     function enviarEmailCobranca(nomeFuncionario, emailFuncionario) {
-        // Obtém as demandas atrasadas do funcionário
         const demandasAtrasadas = todasDemandas.filter(d => {
             if (d.status === 'aprovada') return false;
             if (d.nomeFuncionario !== nomeFuncionario) return false;
@@ -3957,7 +3962,6 @@
             return;
         }
         
-        // Prepara o conteúdo do email
         let corpoEmail = `Prezado(a) ${nomeFuncionario},\n\n`;
         corpoEmail += `Identificamos que você possui ${demandasAtrasadas.length} demanda(s) em atraso. Por favor, verifique e regularize a situação o mais breve possível.\n\n`;
         corpoEmail += `--- Demandas em Atraso ---\n\n`;
@@ -3982,7 +3986,6 @@
         const assunto = encodeURIComponent(`Cobrança de Demandas em Atraso - ${demandasAtrasadas.length} pendente(s)`);
         const corpo = encodeURIComponent(corpoEmail);
         
-        // Abre o cliente de email padrão
         window.open(`mailto:${emailFuncionario}?subject=${assunto}&body=${corpo}`, '_blank');
         
         showNotification('success', 'Email de Cobrança', `Email de cobrança para ${nomeFuncionario} foi aberto para envio.`);
@@ -4000,7 +4003,6 @@
             return;
         }
         
-        // Coleta os emails dos funcionários selecionados
         const emails = [];
         checkboxes.forEach(checkbox => {
             const card = checkbox.closest('.card');
@@ -4014,11 +4016,10 @@
             }
         });
         
-        // Envia emails um por um
         emails.forEach((item, index) => {
             setTimeout(() => {
                 enviarEmailCobranca(item.nome, item.email);
-            }, index * 1000); // Aguarda 1 segundo entre cada email para evitar problemas
+            }, index * 1000);
         });
     }
 
@@ -4036,7 +4037,6 @@
             return dataLimite < hoje;
         });
         
-        // Aplica filtros adicionais
         if (funcionarioFilter !== 'todos') {
             atrasadas = atrasadas.filter(d => d.funcionarioId == funcionarioFilter);
         }
@@ -4050,12 +4050,10 @@
             return;
         }
         
-        // Prepara uma prévia do email
         let corpoEmail = `Prezado(a) [Nome do Funcionário],\n\n`;
         corpoEmail += `Identificamos que você possui ${atrasadas.length} demanda(s) em atraso. Por favor, verifique e regularize a situação o mais breve possível.\n\n`;
         corpoEmail += `--- Demandas em Atraso ---\n\n`;
         
-        // Adiciona apenas as 3 primeiras demandas como exemplo
         atrasadas.slice(0, 3).forEach(demanda => {
             const dataLimite = new Date(demanda.dataLimite);
             const hoje = new Date();
@@ -4080,14 +4078,12 @@
         emailPreview.textContent = corpoEmail;
     }
 
-    // Tecla Enter no modal de senha
     document.getElementById('passwordConfirm').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             confirmPassword();
         }
     });
 
-    // Tecla Esc para fechar modal de senha
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closePasswordModal();
@@ -4096,123 +4092,58 @@
         }
     });
 
-    // Função para exportar dados em diferentes formatos
-    function exportData() {
+    // CORREÇÃO: Função de exportação reescrita para ser simples e funcional
+    function exportarDemandas() {
         const format = document.getElementById('exportFormat').value;
-        const period = document.getElementById('exportPeriod').value;
-        const includeCharts = document.getElementById('includeCharts').checked;
-        const includeComments = document.getElementById('includeComments').checked;
         
-        // Filtra as demandas com base no período
-        let demandasFiltradas = [...todasDemandas];
-        
-        if (period !== 'all') {
-            const daysAgo = parseInt(period);
-            const cutoffDate = new Date();
-            cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
-            
-            demandasFiltradas = demandasFiltradas.filter(d => {
-                const dataCriacao = new Date(d.dataCriacao);
-                return dataCriacao >= cutoffDate;
-            });
+        // Exporta TODAS as demandas, sem filtros
+        const dadosParaExportar = todasDemandas;
+
+        if (dadosParaExportar.length === 0) {
+            showNotification('warning', 'Sem Dados', 'Não há demandas para exportar.');
+            return;
         }
-        
-        // Prepara os dados para exportação
-        const dadosExportacao = demandasFiltradas.map(demanda => {
-            const dados = {
-                id: demanda.id,
-                tag: demanda.tag,
-                nomeDemanda: demanda.nomeDemanda || demanda.descricao,
-                nomeFuncionario: demanda.nomeFuncionario,
-                emailFuncionario: demanda.emailFuncionario,
-                categoria: demanda.categoria,
-                prioridade: demanda.prioridade,
-                complexidade: demanda.complexidade,
-                local: demanda.local,
-                status: demanda.status,
-                dataCriacao: new Date(demanda.dataCriacao).toLocaleString('pt-BR'),
-                dataLimite: new Date(demanda.dataLimite).toLocaleString('pt-BR'),
-                isRotina: demanda.isRotina || false
-            };
-            
-            // Adiciona campos opcionais
-            if (demanda.dataConclusao) {
-                dados.dataConclusao = new Date(demanda.dataConclusao).toLocaleString('pt-BR');
-            }
-            
-            if (includeComments) {
-                if (demanda.comentarios) dados.comentarios = demanda.comentarios;
-                if (demanda.comentarioGestor) dados.comentarioGestor = demanda.comentarioGestor;
-                if (demanda.comentarioReprovacaoAtribuicao) dados.comentarioReprovacaoAtribuicao = demanda.comentarioReprovacaoAtribuicao;
-            }
-            
-            if (demanda.atribuidos && demanda.atribuidos.length > 0) {
-                dados.atribuidos = demanda.atribuidos.map(a => a.nome).join(', ');
-            }
-            
-            if (demanda.diasSemana && demanda.diasSemana.length > 0) {
-                dados.diasSemana = demanda.diasSemana.map(dia => 
-                    ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][dia]
-                ).join(', ');
-            }
-            
-            return dados;
-        });
-        
-        // Exporta com base no formato selecionado
-        switch (format) {
-            case 'json':
-                exportarJSON(dadosExportacao);
-                break;
-            case 'csv':
-                exportarCSV(dadosExportacao);
-                break;
-            case 'excel':
-                exportarExcel(dadosExportacao);
-                break;
-            case 'pdf':
-                exportarPDF(dadosExportacao);
-                break;
-            case 'xml':
-                exportarXML(dadosExportacao);
-                break;
-            default:
-                showNotification('error', 'Formato Inválido', 'Formato de exportação não suportado.');
+
+        if (format === 'json') {
+            exportarJSON(dadosParaExportar);
+        } else if (format === 'csv') {
+            exportarCSV(dadosParaExportar);
+        } else {
+            showNotification('error', 'Formato Inválido', 'Selecione um formato de exportação válido (CSV ou JSON).');
         }
     }
 
-    // Função para exportar em formato JSON
     function exportarJSON(dados) {
-        const json = JSON.stringify(dados, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `demandas_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showNotification('success', 'Exportação Concluída', 'Os dados foram exportados em formato JSON.');
+        try {
+            const jsonString = JSON.stringify(dados, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `demandas_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('success', 'Exportação Concluída', 'Os dados foram exportados em formato JSON.');
+        } catch (error) {
+            console.error('Erro ao exportar JSON:', error);
+            showNotification('error', 'Erro na Exportação', 'Ocorreu um erro ao gerar o arquivo JSON.');
+        }
     }
 
-    // Função para exportar em formato CSV
     function exportarCSV(dados) {
         if (dados.length === 0) {
             showNotification('warning', 'Sem Dados', 'Não há dados para exportar.');
             return;
         }
         
-        // Obtém os cabeçalhos (chaves do primeiro objeto)
         const headers = Object.keys(dados[0]);
-        
-        // Cria o conteúdo CSV
         let csvContent = headers.join(',') + '\n';
         
         dados.forEach(item => {
             const values = headers.map(header => {
-                // Escapa aspas e adiciona aspas se necessário
                 let value = item[header] || '';
                 if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
                     value = `"${value.replace(/"/g, '""')}"`;
@@ -4222,7 +4153,6 @@
             csvContent += values.join(',') + '\n';
         });
         
-        // Cria e baixa o arquivo
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -4236,121 +4166,66 @@
         showNotification('success', 'Exportação Concluída', 'Os dados foram exportados em formato CSV.');
     }
 
-    // Função para exportar em formato Excel
-    function exportarExcel(dados) {
-        if (typeof XLSX === 'undefined') {
-            showNotification('error', 'Biblioteca Não Carregada', 'A biblioteca XLSX não foi carregada. Não é possível exportar para Excel.');
+    // CORREÇÃO: Função de importação implementada
+    function importarDemandas() {
+        const fileInput = document.getElementById('importFile');
+        if (!fileInput.files.length) {
+            showNotification('warning', 'Nenhum Arquivo Selecionado', 'Por favor, selecione um arquivo JSON para importar.');
             return;
         }
-        
-        if (dados.length === 0) {
-            showNotification('warning', 'Sem Dados', 'Não há dados para exportar.');
-            return;
-        }
-        
-        // Cria uma nova planilha
-        const ws = XLSX.utils.json_to_sheet(dados);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Demandas');
-        
-        // Gera o arquivo e faz o download
-        XLSX.writeFile(wb, `demandas_${new Date().toISOString().split('T')[0]}.xlsx`);
-        
-        showNotification('success', 'Exportação Concluída', 'Os dados foram exportados em formato Excel.');
-    }
 
-    // Função para exportar em formato PDF
-    function exportarPDF(dados) {
-        if (typeof jspdf === 'undefined' || typeof jspdf.autotable === 'undefined') {
-            showNotification('error', 'Biblioteca Não Carregada', 'As bibliotecas jsPDF e AutoTable não foram carregadas. Não é possível exportar para PDF.');
-            return;
-        }
-        
-        if (dados.length === 0) {
-            showNotification('warning', 'Sem Dados', 'Não há dados para exportar.');
-            return;
-        }
-        
-        // Cria um novo documento PDF
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        
-        // Adiciona título
-        doc.setFontSize(16);
-        doc.text('Relatório de Demandas', 14, 15);
-        
-        // Prepara os dados para a tabela
-        const headers = Object.keys(dados[0]);
-        const rows = dados.map(item => headers.map(header => item[header] || ''));
-        
-        // Adiciona a tabela
-        doc.autoTable({
-            head: [headers],
-            body: rows,
-            startY: 25,
-            theme: 'grid',
-            styles: { fontSize: 8 },
-            headStyles: { fillColor: [0, 86, 179] }
-        });
-        
-        // Salva o PDF
-        doc.save(`demandas_${new Date().toISOString().split('T')[0]}.pdf`);
-        
-        showNotification('success', 'Exportação Concluída', 'Os dados foram exportados em formato PDF.');
-    }
+        const file = fileInput.files[0];
+        const reader = new FileReader();
 
-    // Função para exportar em formato XML
-    function exportarXML(dados) {
-        if (dados.length === 0) {
-            showNotification('warning', 'Sem Dados', 'Não há dados para exportar.');
-            return;
-        }
-        
-        // Cria o documento XML
-        let xmlContent = '<?xml version="1.0" encoding="UTF-8"?>\n';
-        xmlContent += '<demandas>\n';
-        
-        dados.forEach(demanda => {
-            xmlContent += '  <demanda>\n';
-            
-            Object.keys(demanda).forEach(chave => {
-                // Escapa caracteres especiais XML
-                let valor = demanda[chave] || '';
-                if (typeof valor === 'string') {
-                    valor = valor
-                        .replace(/&/g, '&amp;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&apos;');
+        reader.onload = async function(event) {
+            try {
+                const importedData = JSON.parse(event.target.result);
+
+                if (!Array.isArray(importedData)) {
+                    throw new Error("O arquivo JSON deve conter uma lista de demandas.");
                 }
-                
-                xmlContent += `    <${chave}>${valor}</${chave}>\n`;
-            });
-            
-            xmlContent += '  </demanda>\n';
-        });
-        
-        xmlContent += '</demandas>';
-        
-        // Cria e baixa o arquivo
-        const blob = new Blob([xmlContent], { type: 'application/xml' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `demandas_${new Date().toISOString().split('T')[0]}.xml`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showNotification('success', 'Exportação Concluída', 'Os dados foram exportados em formato XML.');
+
+                let importCount = 0;
+                for (const demandaImportada of importedData) {
+                    // Verifica se a demanda já existe pelo ID ou TAG para evitar duplicatas
+                    const jaExiste = todasDemandas.find(d => d.id === demandaImportada.id || d.tag === demandaImportada.tag);
+                    
+                    if (!jaExiste) {
+                        // Garante que a demanda importada tenha um ID único se não tiver
+                        if (!demandaImportada.id) {
+                           demandaImportada.id = Date.now() + Math.random();
+                        }
+                        
+                        todasDemandas.push(demandaImportada);
+                        await salvarDemandaNoServidor(demandaImportada); // Salva cada uma no servidor
+                        importCount++;
+                    }
+                }
+
+                if (importCount > 0) {
+                    await carregarDadosDoServidor(); // Recarrega do servidor para sincronizar
+                    renderizarDemandas();
+                    atualizarDashboard();
+                    showNotification('success', 'Importação Concluída', `${importCount} nova(s) demanda(s) foi(ram) importada(s) com sucesso.`);
+                } else {
+                    showNotification('info', 'Nenhuma Novidade', 'Todas as demandas do arquivo já existem no sistema.');
+                }
+
+                fileInput.value = ''; // Limpa o input de arquivo
+
+            } catch (error) {
+                console.error('Erro ao importar o arquivo JSON:', error);
+                showNotification('error', 'Erro na Importação', `Falha ao ler o arquivo: ${error.message}. Verifique se o formato está correto.`);
+            }
+        };
+
+        reader.onerror = function() {
+            showNotification('error', 'Erro de Leitura', 'Ocorreu um erro ao ler o arquivo selecionado.');
+        };
+
+        reader.readAsText(file);
     }
 
-    // Função para agendar exportação (simulada)
-    function scheduleExport() {
-        showNotification('info', 'Agendar Exportação', 'Funcionalidade em desenvolvimento. Em breve você poderá agendar exportações automáticas.');
-    }
 </script>
 
 </body>
