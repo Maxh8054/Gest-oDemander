@@ -13,22 +13,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root {
-            --primary-color: #0056b3;
-            --secondary-color: #004085;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
+            --primary-color: #2c3e50;
+            --secondary-color: #1a252f;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
             --light-color: #f8f9fa;
             --dark-color: #343a40;
             --gray-color: #6c757d;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            --routine-color: #9c27b0;
-            --overdue-color: #ff5252;
-            --info-color: #17a2b8;
-            --gold: #ffd700;
-            --silver: #c0c0c0;
+            --border-radius: 10px;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --routine-color: #9b59b6;
+            --overdue-color: #e74c3c;
+            --gold: #f1c40f;
+            --silver: #bdc3c7;
             --bronze: #cd7f32;
+            --bg-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
         }
 
         * {
@@ -38,8 +39,8 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
             min-height: 100vh;
             color: #333;
             line-height: 1.6;
@@ -104,13 +105,13 @@
         .login-form input:focus, .login-form select:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+            box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
         }
 
         .login-btn {
             width: 100%;
             padding: 14px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: var(--primary-color);
             color: white;
             border: none;
             border-radius: 8px;
@@ -122,8 +123,9 @@
         }
 
         .login-btn:hover {
+            background: var(--secondary-color);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 86, 179, 0.3);
+            box-shadow: 0 8px 25px rgba(44, 62, 80, 0.3);
         }
 
         .user-info {
@@ -147,7 +149,7 @@
         }
 
         header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: var(--primary-color);
             color: white;
             padding: 30px 20px;
             border-radius: var(--border-radius);
@@ -190,8 +192,8 @@
         }
 
         .user-badge.gestor {
-            background: rgba(255, 193, 7, 0.3);
-            border: 1px solid rgba(255, 193, 7, 0.5);
+            background: rgba(241, 196, 15, 0.3);
+            border: 1px solid rgba(241, 196, 15, 0.5);
         }
 
         .header-controls button {
@@ -282,7 +284,7 @@
 
         .priority-notification {
             border-left: 4px solid var(--gold);
-            background-color: rgba(255, 215, 0, 0.1);
+            background-color: rgba(241, 196, 15, 0.1);
         }
 
         .clear-notifications-btn, .priority-btn {
@@ -396,11 +398,11 @@
             100% { transform: scale(1); opacity: 0.1; }
         }
 
-        .stat-icon.primary { background-color: rgba(0, 86, 179, 0.1); color: var(--primary-color); }
-        .stat-icon.success { background-color: rgba(40, 167, 69, 0.1); color: var(--success-color); }
-        .stat-icon.warning { background-color: rgba(255, 193, 7, 0.1); color: var(--warning-color); }
-        .stat-icon.danger { background-color: rgba(220, 53, 69, 0.1); color: var(--danger-color); }
-        .stat-icon.info { background-color: rgba(23, 162, 184, 0.1); color: var(--info-color); }
+        .stat-icon.primary { background-color: rgba(44, 62, 80, 0.1); color: var(--primary-color); }
+        .stat-icon.success { background-color: rgba(39, 174, 96, 0.1); color: var(--success-color); }
+        .stat-icon.warning { background-color: rgba(243, 156, 18, 0.1); color: var(--warning-color); }
+        .stat-icon.danger { background-color: rgba(231, 76, 60, 0.1); color: var(--danger-color); }
+        .stat-icon.info { background-color: rgba(52, 152, 219, 0.1); color: var(--info-color); }
 
         .stat-info h3 {
             font-size: 1.8rem;
@@ -495,7 +497,7 @@
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.2);
+            box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.2);
         }
 
         .checkbox-group {
@@ -570,7 +572,7 @@
         }
 
         button.danger:hover {
-            background-color: #c82333;
+            background-color: #c0392b;
         }
 
         button.success {
@@ -578,7 +580,7 @@
         }
 
         button.success:hover {
-            background-color: #218838;
+            background-color: #229954;
         }
 
         button.secondary {
@@ -618,19 +620,19 @@
         .demanda-item.finalizado_pendente_aprovacao { border-left: 5px solid var(--primary-color); }
         .demanda-item.atribuida_pendente_aceitacao { 
             border-left: 5px solid var(--info-color); 
-            background-color: rgba(23, 162, 184, 0.1);
+            background-color: rgba(52, 152, 219, 0.1);
         }
         .demanda-item.reprovada_pelo_atribuido { 
             border-left: 5px solid var(--warning-color); 
-            background-color: rgba(255, 193, 7, 0.1);
+            background-color: rgba(243, 156, 18, 0.1);
         }
         .demanda-item.atrasado { 
             border-left: 5px solid var(--overdue-color); 
-            background-color: rgba(255, 82, 82, 0.1);
+            background-color: rgba(231, 76, 60, 0.1);
         }
         .demanda-item.rotina { 
             border-left: 5px solid var(--routine-color); 
-            background-color: rgba(156, 39, 176, 0.1);
+            background-color: rgba(155, 89, 182, 0.1);
         }
         .demanda-item.rotina .demanda-info strong {
             color: var(--routine-color);
@@ -694,7 +696,7 @@
             font-weight: bold;
             margin-top: 5px;
             padding: 5px 10px;
-            background: rgba(40, 167, 69, 0.1);
+            background: rgba(39, 174, 96, 0.1);
             border-radius: 4px;
             display: inline-block;
             color: var(--success-color);
@@ -709,12 +711,12 @@
         }
 
         .time-performance.early {
-            background: rgba(40, 167, 69, 0.1);
+            background: rgba(39, 174, 96, 0.1);
             color: var(--success-color);
         }
 
         .time-performance.late {
-            background: rgba(220, 53, 69, 0.1);
+            background: rgba(231, 76, 60, 0.1);
             color: var(--danger-color);
         }
 
@@ -848,17 +850,17 @@
         }
 
         .stat-badge.concluidas {
-            background-color: rgba(40, 167, 69, 0.2);
+            background-color: rgba(39, 174, 96, 0.2);
             color: var(--success-color);
         }
 
         .stat-badge.andamento {
-            background-color: rgba(255, 193, 7, 0.2);
+            background-color: rgba(243, 156, 18, 0.2);
             color: var(--warning-color);
         }
 
         .stat-badge.atrasadas {
-            background-color: rgba(220, 53, 69, 0.2);
+            background-color: rgba(231, 76, 60, 0.2);
             color: var(--danger-color);
         }
 
@@ -881,7 +883,7 @@
         }
 
         .tab:hover {
-            background-color: rgba(0, 86, 179, 0.05);
+            background-color: rgba(44, 62, 80, 0.05);
         }
 
         .tab.active {
@@ -1064,7 +1066,7 @@
 
         .search-bar input:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+            box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
         }
 
         .search-bar i {
@@ -1184,11 +1186,11 @@
         }
 
         .server-status.connected {
-            background: rgba(40, 167, 69, 0.8);
+            background: rgba(39, 174, 96, 0.8);
         }
 
         .server-status.disconnected {
-            background: rgba(220, 53, 69, 0.8);
+            background: rgba(231, 76, 60, 0.8);
         }
 
         .email-template {
@@ -1320,12 +1322,214 @@
         }
 
         .multi-select-option.selected {
-            background-color: rgba(0, 86, 179, 0.1);
+            background-color: rgba(44, 62, 80, 0.1);
         }
 
         .multi-select-option input {
             width: auto;
             margin: 0;
+        }
+
+        .reminder-item {
+            background-color: rgba(243, 156, 18, 0.1);
+            border-left: 4px solid var(--warning-color);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .reminder-item strong {
+            color: var(--warning-color);
+        }
+
+        .mindmap-container {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+            min-height: 400px;
+            position: relative;
+        }
+
+        .mindmap-node {
+            position: absolute;
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: move;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+
+        .mindmap-node:hover {
+            transform: scale(1.05);
+            z-index: 20;
+        }
+
+        .mindmap-node.high-priority {
+            background: var(--danger-color);
+        }
+
+        .mindmap-node.medium-priority {
+            background: var(--warning-color);
+        }
+
+        .mindmap-node.low-priority {
+            background: var(--success-color);
+        }
+
+        .mindmap-connection {
+            position: absolute;
+            background: #ccc;
+            z-index: 1;
+            transform-origin: 0 0;
+        }
+
+        .notes-container {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+        }
+
+        .note-item {
+            background: #f9f9f9;
+            border-left: 4px solid var(--info-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .note-date {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .note-actions button {
+            padding: 2px 6px;
+            font-size: 12px;
+            background: transparent;
+            color: var(--gray-color);
+            border: none;
+            cursor: pointer;
+        }
+
+        .note-actions button:hover {
+            color: var(--danger-color);
+        }
+
+        .feedback-container {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+        }
+
+        .feedback-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .feedback-stat {
+            background: var(--light-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .feedback-stat h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+        }
+
+        .feedback-stat p {
+            margin: 0;
+            color: var(--gray-color);
+        }
+
+        .feedback-chart {
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .category-search {
+            position: relative;
+        }
+
+        .category-search input {
+            padding-right: 40px;
+        }
+
+        .category-search button {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray-color);
+            cursor: pointer;
+        }
+
+        .category-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .category-option {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .category-option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .custom-category-input {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .deadline-extension {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+        }
+
+        .deadline-extension.active {
+            display: block;
         }
     </style>
 </head>
@@ -1461,6 +1665,10 @@
                     <i class="fas fa-clock"></i> Minhas Demandas
                     <span class="badge" id="pendingBadge" style="display: none;">0</span>
                 </div>
+                <div class="tab" onclick="switchTab('analise')">
+                    <i class="fas fa-search"></i> Análise
+                    <span class="badge" id="analysisBadge" style="display: none;">0</span>
+                </div>
                 <div class="tab" onclick="switchTab('atrasadas')">
                     <i class="fas fa-exclamation-triangle"></i> Atrasadas
                     <span class="badge" id="overdueBadge" style="display: none;">0</span>
@@ -1469,13 +1677,26 @@
                     <i class="fas fa-check-circle"></i> Concluídas
                     <span class="badge" id="completedBadge" style="display: none;">0</span>
                 </div>
+                <div class="tab" onclick="switchTab('mindmap')">
+                    <i class="fas fa-project-diagram"></i> Mapa Mental
+                </div>
+                <div class="tab" onclick="switchTab('notes')">
+                    <i class="fas fa-sticky-note"></i> Anotações
+                </div>
                 <div class="tab" onclick="switchTab('ranking')">
                     <i class="fas fa-chart-bar"></i> Ranking
                 </div>
-                <div class="tab" id="gestorTab" style="display: none;" onclick="switchTab('cobranca')">
+                <div class="tab" id="gestorTab" style="display: none;" onclick="switchTab('pendentes-colaboradores')">
+                    <i class="fas fa-users"></i> Pendentes Colaboradores
+                    <span class="badge" id="colabPendingBadge" style="display: none;">0</span>
+                </div>
+                <div class="tab" id="gestorTab2" style="display: none;" onclick="switchTab('feedback')">
+                    <i class="fas fa-comment-dots"></i> Feedbacks
+                </div>
+                <div class="tab" id="gestorTab3" style="display: none;" onclick="switchTab('cobranca')">
                     <i class="fas fa-envelope"></i> Cobrança
                 </div>
-                <div class="tab" id="gestorTab2" style="display: none;" onclick="switchTab('exportar')">
+                <div class="tab" id="gestorTab4" style="display: none;" onclick="switchTab('exportar')">
                     <i class="fas fa-download"></i> Exportar/Importar
                 </div>
             </div>
@@ -1498,11 +1719,40 @@
                     <label for="filtroCategoria">Categoria:</label>
                     <select id="filtroCategoria" onchange="filtrarDashboard()">
                         <option value="todas">Todas</option>
-                        <option value="Prospecção">Prospecção</option>
-                        <option value="Reunião">Reunião</option>
-                        <option value="Relatório">Relatório</option>
-                        <option value="Suporte">Suporte</option>
-                        <option value="Desenvolvimento">Desenvolvimento</option>
+                        <option value="Comercial / Negócio">Comercial / Negócio</option>
+                        <option value="Vendas">Vendas</option>
+                        <option value="Pós-venda">Pós-venda</option>
+                        <option value="Negociação">Negociação</option>
+                        <option value="Proposta / Orçamento">Proposta / Orçamento</option>
+                        <option value="Follow-up">Follow-up</option>
+                        <option value="Fidelização">Fidelização</option>
+                        <option value="Gestão / Administrativo">Gestão / Administrativo</option>
+                        <option value="Planejamento">Planejamento</option>
+                        <option value="Gestão de Projetos">Gestão de Projetos</option>
+                        <option value="Alinhamento Interno">Alinhamento Interno</option>
+                        <option value="Tomada de Decisão">Tomada de Decisão</option>
+                        <option value="Auditoria">Auditoria</option>
+                        <option value="Compliance">Compliance</option>
+                        <option value="Técnico / Operacional">Técnico / Operacional</option>
+                        <option value="Manutenção">Manutenção</option>
+                        <option value="Implantação">Implantação</option>
+                        <option value="Testes">Testes</option>
+                        <option value="Correção de Erros">Correção de Erros</option>
+                        <option value="Monitoramento">Monitoramento</option>
+                        <option value="Otimização">Otimização</option>
+                        <option value="TI / Dados">TI / Dados</option>
+                        <option value="Análise de Dados">Análise de Dados</option>
+                        <option value="Automação">Automação</option>
+                        <option value="Integração de Sistemas">Integração de Sistemas</option>
+                        <option value="Infraestrutura">Infraestrutura</option>
+                        <option value="Segurança">Segurança</option>
+                        <option value="Backup">Backup</option>
+                        <option value="Comunicação">Comunicação</option>
+                        <option value="Apresentação">Apresentação</option>
+                        <option value="Treinamento">Treinamento</option>
+                        <option value="Documentação">Documentação</option>
+                        <option value="Feedback">Feedback</option>
+                        <option value="Atendimento">Atendimento</option>
                         <option value="Outros">Outros</option>
                     </select>
                     
@@ -1519,6 +1769,11 @@
                     </button>
                 </div>
 
+                <div class="reminder-container" id="reminderContainer" style="display: none;">
+                    <h3><i class="fas fa-bell"></i> Lembretes de Prazo</h3>
+                    <div id="reminderList"></div>
+                </div>
+
                 <div class="charts-grid">
                     <div class="chart-container">
                         <h3>
@@ -1529,16 +1784,6 @@
                             </div>
                         </h3>
                         <canvas id="statusChart"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <h3>
-                            <span><i class="fas fa-chart-bar"></i> Demandas por Categoria</span>
-                            <div class="chart-actions">
-                                <button onclick="refreshChart('categoria')"><i class="fas fa-sync-alt"></i></button>
-                                <button onclick="downloadChart('categoria')"><i class="fas fa-download"></i></button>
-                            </div>
-                        </h3>
-                        <canvas id="categoriaChart"></canvas>
                     </div>
                     <div class="chart-container">
                         <h3>
@@ -1564,15 +1809,50 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="categoriaSelect">Categoria:</label>
-                                <select id="categoriaSelect" required>
-                                    <option value="">Selecione...</option>
-                                    <option value="Prospecção">Prospecção</option>
-                                    <option value="Reunião">Reunião</option>
-                                    <option value="Relatório">Relatório</option>
-                                    <option value="Suporte">Suporte</option>
-                                    <option value="Desenvolvimento">Desenvolvimento</option>
-                                    <option value="Outros">Outros</option>
-                                </select>
+                                <div class="category-search">
+                                    <input type="text" id="categoriaInput" placeholder="Digite ou selecione uma categoria" required>
+                                    <button type="button" onclick="toggleCategoryDropdown()"><i class="fas fa-chevron-down"></i></button>
+                                    <div id="categoryDropdown" class="category-dropdown">
+                                        <div class="category-option" onclick="selectCategory('Comercial / Negócio')">Comercial / Negócio</div>
+                                        <div class="category-option" onclick="selectCategory('Vendas')">Vendas</div>
+                                        <div class="category-option" onclick="selectCategory('Pós-venda')">Pós-venda</div>
+                                        <div class="category-option" onclick="selectCategory('Negociação')">Negociação</div>
+                                        <div class="category-option" onclick="selectCategory('Proposta / Orçamento')">Proposta / Orçamento</div>
+                                        <div class="category-option" onclick="selectCategory('Follow-up')">Follow-up</div>
+                                        <div class="category-option" onclick="selectCategory('Fidelização')">Fidelização</div>
+                                        <div class="category-option" onclick="selectCategory('Gestão / Administrativo')">Gestão / Administrativo</div>
+                                        <div class="category-option" onclick="selectCategory('Planejamento')">Planejamento</div>
+                                        <div class="category-option" onclick="selectCategory('Gestão de Projetos')">Gestão de Projetos</div>
+                                        <div class="category-option" onclick="selectCategory('Alinhamento Interno')">Alinhamento Interno</div>
+                                        <div class="category-option" onclick="selectCategory('Tomada de Decisão')">Tomada de Decisão</div>
+                                        <div class="category-option" onclick="selectCategory('Auditoria')">Auditoria</div>
+                                        <div class="category-option" onclick="selectCategory('Compliance')">Compliance</div>
+                                        <div class="category-option" onclick="selectCategory('Técnico / Operacional')">Técnico / Operacional</div>
+                                        <div class="category-option" onclick="selectCategory('Manutenção')">Manutenção</div>
+                                        <div class="category-option" onclick="selectCategory('Implantação')">Implantação</div>
+                                        <div class="category-option" onclick="selectCategory('Testes')">Testes</div>
+                                        <div class="category-option" onclick="selectCategory('Correção de Erros')">Correção de Erros</div>
+                                        <div class="category-option" onclick="selectCategory('Monitoramento')">Monitoramento</div>
+                                        <div class="category-option" onclick="selectCategory('Otimização')">Otimização</div>
+                                        <div class="category-option" onclick="selectCategory('TI / Dados')">TI / Dados</div>
+                                        <div class="category-option" onclick="selectCategory('Análise de Dados')">Análise de Dados</div>
+                                        <div class="category-option" onclick="selectCategory('Automação')">Automação</div>
+                                        <div class="category-option" onclick="selectCategory('Integração de Sistemas')">Integração de Sistemas</div>
+                                        <div class="category-option" onclick="selectCategory('Infraestrutura')">Infraestrutura</div>
+                                        <div class="category-option" onclick="selectCategory('Segurança')">Segurança</div>
+                                        <div class="category-option" onclick="selectCategory('Backup')">Backup</div>
+                                        <div class="category-option" onclick="selectCategory('Comunicação')">Comunicação</div>
+                                        <div class="category-option" onclick="selectCategory('Apresentação')">Apresentação</div>
+                                        <div class="category-option" onclick="selectCategory('Treinamento')">Treinamento</div>
+                                        <div class="category-option" onclick="selectCategory('Documentação')">Documentação</div>
+                                        <div class="category-option" onclick="selectCategory('Feedback')">Feedback</div>
+                                        <div class="category-option" onclick="selectCategory('Atendimento')">Atendimento</div>
+                                        <div class="category-option" onclick="selectCategory('Outros')">Outros</div>
+                                    </div>
+                                </div>
+                                <div id="customCategoryInput" class="custom-category-input">
+                                    <input type="text" id="customCategory" placeholder="Digite uma nova categoria">
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="prioridadeSelect">Prioridade:</label>
@@ -1587,10 +1867,9 @@
                                 <label for="complexidadeSelect">Complexidade:</label>
                                 <select id="complexidadeSelect" required>
                                     <option value="">Selecione...</option>
-                                    <option value="Baixa">Baixa (1-2 dias)</option>
-                                    <option value="Média">Média (3-5 dias)</option>
-                                    <option value="Alta">Alta (6-10 dias)</option>
-                                    <option value="Crítica">Crítica (10+ dias)</option>
+                                    <option value="Fácil">Fácil</option>
+                                    <option value="Médio">Médio</option>
+                                    <option value="Difícil">Difícil</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -1657,8 +1936,39 @@
                 <div class="card">
                     <div class="card-header">
                         <h2><i class="fas fa-clock"></i> Minhas Demandas Pendentes</h2>
+                        <div class="search-bar" style="width: 300px;">
+                            <input type="text" placeholder="Pesquisar por nome ou TAG..." id="pendentesSearch">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="card-actions">
+                            <select id="pendentesFilter" onchange="filterPendentes()">
+                                <option value="todos">Todos</option>
+                                <option value="pendente">Pendente</option>
+                                <option value="reprovada">Reprovada</option>
+                                <option value="atribuida_pendente_aceitacao">Atribuída</option>
+                            </select>
+                        </div>
                     </div>
                     <div id="pendentesContainer"></div>
+                </div>
+            </div>
+
+            <div id="analise" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-search"></i> Demandas em Análise</h2>
+                        <div class="search-bar" style="width: 300px;">
+                            <input type="text" placeholder="Pesquisar por nome ou TAG..." id="analiseSearch">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="card-actions">
+                            <select id="analiseFilter" onchange="filterAnalise()">
+                                <option value="todos">Todos</option>
+                                <option value="finalizado_pendente_aprovacao">Pendente Aprovação</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="analiseContainer"></div>
                 </div>
             </div>
 
@@ -1666,6 +1976,10 @@
                 <div class="card">
                     <div class="card-header">
                         <h2><i class="fas fa-exclamation-triangle"></i> Demandas Atrasadas</h2>
+                        <div class="search-bar" style="width: 300px;">
+                            <input type="text" placeholder="Pesquisar por nome ou TAG..." id="atrasadasSearch">
+                            <i class="fas fa-search"></i>
+                        </div>
                         <div class="card-actions" id="gestorActions2" style="display: none;">
                             <button onclick="reassignOverdue()"><i class="fas fa-user-plus"></i> Reatribuir</button>
                             <button onclick="extendDeadlines()"><i class="fas fa-calendar-plus"></i> Estender Prazos</button>
@@ -1679,12 +1993,43 @@
                 <div class="card">
                     <div class="card-header">
                         <h2><i class="fas fa-check-circle"></i> Minhas Demandas Concluídas</h2>
+                        <div class="search-bar" style="width: 300px;">
+                            <input type="text" placeholder="Pesquisar por nome ou TAG..." id="aprovadasSearch">
+                            <i class="fas fa-search"></i>
+                        </div>
                         <div class="card-actions" id="gestorActions3" style="display: none;">
                             <button onclick="exportCompleted()"><i class="fas fa-download"></i> Exportar Concluídas</button>
                             <button onclick="archiveCompleted()"><i class="fas fa-archive"></i> Arquivar</button>
                         </div>
                     </div>
                     <div id="aprovadasContainer"></div>
+                </div>
+            </div>
+
+            <div id="mindmap" class="tab-content">
+                <div class="mindmap-container">
+                    <div class="card-header">
+                        <h2><i class="fas fa-project-diagram"></i> Mapa Mental de Prioridades</h2>
+                        <div class="card-actions">
+                            <button onclick="resetMindmap()"><i class="fas fa-undo"></i> Resetar</button>
+                            <button onclick="saveMindmapLayout()"><i class="fas fa-save"></i> Salvar Layout</button>
+                        </div>
+                    </div>
+                    <div id="mindmapArea">
+                        <!-- Nós do mapa mental serão adicionados dinamicamente -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="notes" class="tab-content">
+                <div class="notes-container">
+                    <div class="card-header">
+                        <h2><i class="fas fa-sticky-note"></i> Minhas Anotações</h2>
+                        <button onclick="addNewNote()"><i class="fas fa-plus"></i> Nova Anotação</button>
+                    </div>
+                    <div id="notesContainer">
+                        <!-- Anotações serão adicionadas dinamicamente -->
+                    </div>
                 </div>
             </div>
 
@@ -1698,6 +2043,77 @@
                         </div>
                     </div>
                     <ul class="ranking-list" id="rankingList"></ul>
+                </div>
+            </div>
+
+            <div id="pendentes-colaboradores" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-users"></i> Demandas dos Colaboradores</h2>
+                        <div class="search-bar" style="width: 300px;">
+                            <input type="text" placeholder="Pesquisar por nome ou TAG..." id="colabSearch">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="card-actions">
+                            <select id="colabFilter" onchange="filterColabDemandas()">
+                                <option value="todos">Todos</option>
+                                <option value="pendente">Pendente</option>
+                                <option value="finalizado_pendente_aprovacao">Pendente Aprovação</option>
+                                <option value="reprovada">Reprovada</option>
+                                <option value="atribuida_pendente_aceitacao">Atribuída</option>
+                            </select>
+                            <select id="colabFuncFilter" onchange="filterColabDemandas()">
+                                <option value="todos">Todos os Funcionários</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="colabContainer"></div>
+                </div>
+            </div>
+
+            <div id="feedback" class="tab-content">
+                <div class="feedback-container">
+                    <div class="card-header">
+                        <h2><i class="fas fa-comment-dots"></i> Feedback dos Colaboradores</h2>
+                        <div class="card-actions">
+                            <select id="feedbackFuncFilter" onchange="updateFeedback()">
+                                <option value="todos">Todos os Funcionários</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="feedback-summary" id="feedbackSummary">
+                        <!-- Resumo do feedback será adicionado dinamicamente -->
+                    </div>
+                    <div class="feedback-chart">
+                        <canvas id="feedbackChart"></canvas>
+                    </div>
+                    <div class="card">
+                        <h3>Enviar Novo Feedback</h3>
+                        <form id="feedbackForm">
+                            <div class="form-group">
+                                <label for="feedbackFuncSelect">Funcionário:</label>
+                                <select id="feedbackFuncSelect" required>
+                                    <option value="">Selecione um funcionário</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="feedbackType">Tipo de Feedback:</label>
+                                <select id="feedbackType" required>
+                                    <option value="">Selecione</option>
+                                    <option value="positivo">Positivo</option>
+                                    <option value="construtivo">Construtivo</option>
+                                    <option value="negativo">Negativo</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="feedbackMessage">Mensagem:</label>
+                                <textarea id="feedbackMessage" rows="4" required placeholder="Digite seu feedback..."></textarea>
+                            </div>
+                            <button type="submit">
+                                <i class="fas fa-paper-plane"></i> Enviar Feedback
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
 
@@ -1813,18 +2229,59 @@
     </div>
 </div>
 
-<div id="atribuicaoReprovacaoModal" class="modal">
+<div id="reprovacaoModal" class="modal">
     <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('atribuicaoReprovacaoModal')">&times;</span>
-        <h2><i class="fas fa-times-circle"></i> Reprovar Demanda Atribuída</h2>
-        <form id="atribuicaoReprovacaoForm">
+        <span class="close-btn" onclick="closeModal('reprovacaoModal')">&times;</span>
+        <h2><i class="fas fa-times-circle"></i> Reprovar Demanda</h2>
+        <form id="reprovacaoForm">
             <div class="form-group">
-                <label for="motivoReprovacaoAtribuicao">Motivo da Reprovação:</label>
-                <textarea id="motivoReprovacaoAtribuicao" rows="4" required placeholder="Por favor, justifique o motivo da reprovação desta demanda para que o solicitante possa entender e ajustar."></textarea>
+                <label for="motivoReprovacao">Motivo da Reprovação:</label>
+                <textarea id="motivoReprovacao" rows="4" required placeholder="Por favor, justifique o motivo da reprovação..."></textarea>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="extendDeadline" onchange="toggleDeadlineExtension()">
+                <label for="extendDeadline">Estender prazo para nova data</label>
+            </div>
+            <div id="deadlineExtension" class="deadline-extension">
+                <div class="form-group">
+                    <label for="novaDataLimite">Nova Data Limite:</label>
+                    <input type="date" id="novaDataLimite">
+                </div>
             </div>
             <div class="form-group">
                 <button type="submit" class="danger"><i class="fas fa-times"></i> Reprovar Demanda</button>
-                <button type="button" class="secondary" onclick="closeModal('atribuicaoReprovacaoModal')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                <button type="button" class="secondary" onclick="closeModal('reprovacaoModal')"><i class="fas fa-arrow-left"></i> Voltar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="noteModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('noteModal')">&times;</span>
+        <h2 id="noteModalTitle">Nova Anotação</h2>
+        <form id="noteForm">
+            <div class="form-group">
+                <label for="noteTitle">Título:</label>
+                <input type="text" id="noteTitle" required placeholder="Dê um título para sua anotação">
+            </div>
+            <div class="form-group">
+                <label for="noteContent">Conteúdo:</label>
+                <textarea id="noteContent" rows="6" required placeholder="Digite sua anotação..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="noteColor">Cor:</label>
+                <select id="noteColor">
+                    <option value="#3498db">Azul</option>
+                    <option value="#2ecc71">Verde</option>
+                    <option value="#e74c3c">Vermelho</option>
+                    <option value="#f39c12">Amarelo</option>
+                    <option value="#9b59b6">Roxo</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="success"><i class="fas fa-save"></i> Salvar Anotação</button>
+                <button type="button" class="secondary" onclick="closeModal('noteModal')"><i class="fas fa-times"></i> Cancelar</button>
             </div>
         </form>
     </div>
@@ -1844,6 +2301,10 @@
         </div>
     </div>
 </div>
+
+<button class="floating-action-btn" onclick="quickAction()">
+    <i class="fas fa-plus"></i>
+</button>
 
 <script>
     const usuarios = [
@@ -1873,6 +2334,9 @@
     let demandaResolucaoAtual = null;
     let demandaAtribuicaoAtual = null;
     let selectedUsers = [];
+    let notes = [];
+    let feedbacks = [];
+    let mindmapNodes = [];
 
     const SERVER_URL = window.location.origin;
     let serverConnected = false;
@@ -1892,7 +2356,7 @@
         }
     });
 
-    // MUDANÇA: Função para normalizar dados de uma demanda
+    // Função para normalizar dados de uma demanda
     function normalizarDadosDemanda(demanda) {
         if (!demanda) return demanda;
 
@@ -2113,6 +2577,8 @@
                 userBadge.innerHTML = '<i class="fas fa-user-shield"></i> <span>' + usuarioLogado.nome + ' (Gestor)</span>';
                 document.getElementById('gestorTab').style.display = 'block';
                 document.getElementById('gestorTab2').style.display = 'block';
+                document.getElementById('gestorTab3').style.display = 'block';
+                document.getElementById('gestorTab4').style.display = 'block';
                 document.getElementById('gestorActions2').style.display = 'flex';
                 document.getElementById('gestorActions3').style.display = 'flex';
                 document.getElementById('exportRankingBtn').style.display = 'inline-block';
@@ -2126,12 +2592,16 @@
         carregarFuncionariosNosSelect();
         await carregarDadosDoServidor();
         inicializarImportacaoJSON();
+        carregarAnotacoes();
+        carregarFeedbacks();
+        carregarMindmapLayout();
         atualizarDashboard();
         atualizarRanking();
         inicializarGraficos();
         
         timerInterval = setInterval(atualizarTemposRestantes, 1000);
         inicializarNotificacoesTempoReal();
+        verificarLembretes();
         
         gerarNotificacoesAoLogar();
     }
@@ -2139,6 +2609,8 @@
     function logout() {
         if (confirm('Tem certeza que deseja sair do sistema?')) {
             salvarNotificacoesNoStorage();
+            salvarAnotacoes();
+            salvarFeedbacks();
             sessionStorage.removeItem('usuarioLogado');
             usuarioLogado = null;
             location.reload();
@@ -2146,18 +2618,21 @@
     }
 
     function carregarFuncionariosNosSelect() {
-        const selects = ['filtroFuncionario', 'cobrancaFuncionario'];
+        const selects = ['filtroFuncionario', 'cobrancaFuncionario', 'colabFuncFilter', 'feedbackFuncFilter', 'feedbackFuncSelect'];
         
         selects.forEach(selectId => {
             const select = document.getElementById(selectId);
             if (select) {
                 select.innerHTML = '';
                 
-                if (selectId === 'filtroFuncionario') {
+                if (selectId === 'filtroFuncionario' || selectId === 'colabFuncFilter' || selectId === 'feedbackFuncFilter') {
                     const defaultOption = new Option('Todos os Funcionários', 'todos');
                     select.add(defaultOption);
                 } else if (selectId === 'cobrancaFuncionario') {
                     const defaultOption = new Option('Todos os Funcionários com Demandas Atrasadas', 'todos');
+                    select.add(defaultOption);
+                } else if (selectId === 'feedbackFuncSelect') {
+                    const defaultOption = new Option('Selecione um funcionário', '');
                     select.add(defaultOption);
                 }
 
@@ -2246,7 +2721,7 @@
                 // O servidor agora já envia os dados processados, mas vamos manter a verificação de segurança
                 const demandasDoServidor = await response.json();
                 
-                // MUDANÇA: Normaliza os dados recebidos (redundância, mas garante a robustez)
+                // Normaliza os dados recebidos (redundância, mas garante a robustez)
                 const demandasNormalizadas = demandasDoServidor.map(demanda => normalizarDadosDemanda(demanda));
                 
                 demandasNormalizadas.forEach(demanda => {
@@ -2266,6 +2741,7 @@
         renderizarDemandas();
         renderizarCobranca();
         atualizarBadges();
+        atualizarMindmap();
     }
 
     async function salvarDemandaNoServidor(demanda) {
@@ -2335,6 +2811,7 @@
 
     function atualizarBadges() {
         const pendentes = getDemandasParaUsuarioLogado().filter(d => d.status === 'pendente' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'atribuida_pendente_aceitacao').length;
+        const analise = getDemandasParaUsuarioLogado().filter(d => d.status === 'finalizado_pendente_aprovacao').length;
         const atrasadas = getDemandasParaUsuarioLogado().filter(d => {
             if (d.status === 'aprovada') return false;
             const dataLimite = new Date(d.dataLimite);
@@ -2342,10 +2819,13 @@
             return dataLimite < hoje;
         }).length;
         const concluidas = getDemandasParaUsuarioLogado().filter(d => d.status === 'aprovada').length;
+        const colabPendentes = getDemandasDosColaboradores().filter(d => d.status === 'pendente' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'atribuida_pendente_aceitacao').length;
 
         updateBadge('pendingBadge', pendentes);
+        updateBadge('analysisBadge', analise);
         updateBadge('overdueBadge', atrasadas);
         updateBadge('completedBadge', concluidas);
+        updateBadge('colabPendingBadge', colabPendentes);
     }
 
     function updateBadge(badgeId, count) {
@@ -2413,6 +2893,14 @@
             });
         }
         return [];
+    }
+
+    function getDemandasDosColaboradores() {
+        if (!usuarioLogado || usuarioLogado.role !== 'gestor') return [];
+        
+        return todasDemandas.filter(demanda => {
+            return usuarios.some(u => u.role === 'funcionario' && u.id === demanda.funcionarioId);
+        });
     }
 
     function getDemandasFiltradas() {
@@ -2504,7 +2992,7 @@
                     labels: ['Em Andamento', 'Aprovadas', 'Reprovadas', 'Em Análise'],
                     datasets: [{
                         data: [0, 0, 0, 0],
-                        backgroundColor: ['rgba(255,193, 7, 0.8)', 'rgba(40, 167, 69, 0.8)', 'rgba(220, 53, 69, 0.8)', 'rgba(0, 86, 179, 0.8)'],
+                        backgroundColor: ['rgba(243, 156, 18, 0.8)', 'rgba(39, 174, 96, 0.8)', 'rgba(231, 76, 60, 0.8)', 'rgba(44, 62, 80, 0.8)'],
                         borderWidth: 2,
                         borderColor: '#fff'
                     }]
@@ -2528,38 +3016,6 @@
             });
         }
 
-        const categoriaCtx = document.getElementById('categoriaChart');
-        if (categoriaCtx) {
-            charts.categoria = new Chart(categoriaCtx.getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: ['Prospecção', 'Reunião', 'Relatório', 'Suporte', 'Desenvolvimento', 'Outros'],
-                    datasets: [{
-                        label: 'Demandas',
-                        data: [0, 0, 0, 0, 0, 0],
-                        backgroundColor: 'rgba(0, 86, 179, 0.8)',
-                        borderColor: 'rgba(0, 86, 179, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
-                    },
-                    plugins: {
-                        datalabels: {
-                            anchor: 'end',
-                            align: 'top',
-                            color: '#333',
-                            font: { weight: 'bold' }
-                        }
-                    }
-                }
-            });
-        }
-
         const productivityCtx = document.getElementById('productivityChart');
         if (productivityCtx) {
             charts.productivity = new Chart(productivityCtx.getContext('2d'), {
@@ -2569,21 +3025,33 @@
                     datasets: [{
                         label: 'Demandas Concluídas',
                         data: usuarios.filter(u => u.role === 'funcionario').map(f => Math.floor(Math.random() * 20) + 5),
-                        backgroundColor: 'rgba(40, 167, 69, 0.8)',
-                        borderColor: 'rgba(40, 167, 69, 1)',
+                        backgroundColor: 'rgba(39, 174, 96, 0.8)',
+                        borderColor: 'rgba(39, 174, 96, 1)',
                         borderWidth: 1
                     }]
                 },
                 options: {
+                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: true,
                     scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                        x: { 
+                            beginAtZero: true, 
+                            ticks: { stepSize: 1 },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
                     },
                     plugins: {
                         datalabels: {
                             anchor: 'end',
-                            align: 'top',
+                            align: 'end',
                             color: '#333',
                             font: { weight: 'bold' }
                         }
@@ -2608,13 +3076,6 @@
         ];
         charts.status.data.datasets[0].data = statusData;
         charts.status.update();
-
-        const categorias = ['Prospecção', 'Reunião', 'Relatório', 'Suporte', 'Desenvolvimento', 'Outros'];
-        const categoriaData = categorias.map(cat => 
-            demandasFiltradas.filter(d => d.categoria === cat).length
-        );
-        charts.categoria.data.datasets[0].data = categoriaData;
-        charts.categoria.update();
 
         charts.productivity.data.datasets[0].data = usuarios.filter(u => u.role === 'funcionario').map(f => 
             demandasFiltradas.filter(d => d.funcionarioId === f.id && d.status === 'aprovada').length
@@ -2645,7 +3106,7 @@
         });
         
         if (!targetTab) {
-            const tabNames = ['dashboard', 'nova', 'pendentes', 'atrasadas', 'aprovadas', 'ranking', 'cobranca', 'exportar'];
+            const tabNames = ['dashboard', 'nova', 'pendentes', 'analise', 'atrasadas', 'aprovadas', 'mindmap', 'notes', 'ranking', 'pendentes-colaboradores', 'feedback', 'cobranca', 'exportar'];
             const index = tabNames.indexOf(tabName);
             if (index !== -1) {
                 targetTab = document.querySelectorAll('.tab')[index];
@@ -2663,14 +3124,27 @@
 
         if (tabName === 'pendentes') {
             setTimeout(() => { renderizarDemandas(); }, 100);
-        }
-        
-        if (tabName === 'cobranca') {
+        } else if (tabName === 'analise') {
+            setTimeout(() => { renderizarAnalise(); }, 100);
+        } else if (tabName === 'atrasadas') {
+            setTimeout(() => { renderizarAtrasadas(); }, 100);
+        } else if (tabName === 'aprovadas') {
+            setTimeout(() => { renderizarAprovadas(); }, 100);
+        } else if (tabName === 'pendentes-colaboradores') {
+            setTimeout(() => { renderizarPendentesColaboradores(); }, 100);
+        } else if (tabName === 'feedback') {
+            setTimeout(() => { updateFeedback(); }, 100);
+        } else if (tabName === 'cobranca') {
             setTimeout(() => { renderizarCobranca(); }, 100);
-        }
-
-        if (tabName === 'dashboard') {
-            setTimeout(() => { atualizarGraficos(); }, 100);
+        } else if (tabName === 'notes') {
+            setTimeout(() => { renderizarAnotacoes(); }, 100);
+        } else if (tabName === 'mindmap') {
+            setTimeout(() => { atualizarMindmap(); }, 100);
+        } else if (tabName === 'dashboard') {
+            setTimeout(() => { 
+                atualizarGraficos(); 
+                verificarLembretes();
+            }, 100);
         }
     }
 
@@ -2704,9 +3178,12 @@
                 document.getElementById('anexosList').innerHTML = '';
                 demandaResolucaoAtual = null;
             }
-            if (modalId === 'atribuicaoReprovacaoModal') {
-                document.getElementById('atribuicaoReprovacaoForm').reset();
-                demandaAtribuicaoAtual = null;
+            if (modalId === 'reprovacaoModal') {
+                document.getElementById('reprovacaoForm').reset();
+                document.getElementById('deadlineExtension').classList.remove('active');
+            }
+            if (modalId === 'noteModal') {
+                document.getElementById('noteForm').reset();
             }
         }
     }
@@ -2722,7 +3199,7 @@
                 e.preventDefault();
                 
                 const nomeDemanda = document.getElementById('nomeDemandaInput').value;
-                const categoria = document.getElementById('categoriaSelect').value;
+                const categoria = document.getElementById('categoriaInput').value;
                 const prioridade = document.getElementById('prioridadeSelect').value;
                 const complexidade = document.getElementById('complexidadeSelect').value;
                 const descricao = document.getElementById('demandaInput').value;
@@ -2808,11 +3285,27 @@
             });
         }
 
-        const atribuicaoReprovacaoForm = document.getElementById('atribuicaoReprovacaoForm');
-        if (atribuicaoReprovacaoForm) {
-            atribuicaoReprovacaoForm.addEventListener('submit', async function(e) {
+        const reprovacaoForm = document.getElementById('reprovacaoForm');
+        if (reprovacaoForm) {
+            reprovacaoForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                await salvarReprovacaoAtribuicao();
+                await salvarReprovacao();
+            });
+        }
+
+        const noteForm = document.getElementById('noteForm');
+        if (noteForm) {
+            noteForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                salvarAnotacao();
+            });
+        }
+
+        const feedbackForm = document.getElementById('feedbackForm');
+        if (feedbackForm) {
+            feedbackForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                salvarFeedback();
             });
         }
 
@@ -2832,14 +3325,66 @@
                 const term = e.target.value.toLowerCase();
             });
         }
+
+        const pendentesSearch = document.getElementById('pendentesSearch');
+        if (pendentesSearch) {
+            pendentesSearch.addEventListener('input', (e) => {
+                filterPendentes();
+            });
+        }
+
+        const analiseSearch = document.getElementById('analiseSearch');
+        if (analiseSearch) {
+            analiseSearch.addEventListener('input', (e) => {
+                filterAnalise();
+            });
+        }
+
+        const atrasadasSearch = document.getElementById('atrasadasSearch');
+        if (atrasadasSearch) {
+            atrasadasSearch.addEventListener('input', (e) => {
+                renderizarAtrasadas();
+            });
+        }
+
+        const aprovadasSearch = document.getElementById('aprovadasSearch');
+        if (aprovadasSearch) {
+            aprovadasSearch.addEventListener('input', (e) => {
+                renderizarAprovadas();
+            });
+        }
+
+        const colabSearch = document.getElementById('colabSearch');
+        if (colabSearch) {
+            colabSearch.addEventListener('input', (e) => {
+                filterColabDemandas();
+            });
+        }
         
         document.addEventListener('click', function(e) {
-            if (!e.target.closest('.multi-select-container')) {
-                document.querySelectorAll('.multi-select-dropdown').forEach(dropdown => {
+            if (!e.target.closest('.multi-select-container') && !e.target.closest('.category-search')) {
+                document.querySelectorAll('.multi-select-dropdown, .category-dropdown').forEach(dropdown => {
                     dropdown.style.display = 'none';
                 });
             }
         });
+    }
+
+    function toggleCategoryDropdown() {
+        const dropdown = document.getElementById('categoryDropdown');
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function selectCategory(category) {
+        document.getElementById('categoriaInput').value = category;
+        document.getElementById('categoryDropdown').style.display = 'none';
+        
+        if (category === 'Outros') {
+            document.getElementById('customCategoryInput').style.display = 'block';
+            document.getElementById('customCategory').focus();
+        } else {
+            document.getElementById('customCategoryInput').style.display = 'none';
+        }
     }
 
     function atualizarListaAnexosCriacao() {
@@ -2899,12 +3444,11 @@
         showModal('resolucaoModal', `Resolver Demanda: ${demandaResolucaoAtual.nomeDemanda}`);
     }
 
-    function abrirModalReprovarAtribuicao(demandaId) {
-        demandaAtribuicaoAtual = todasDemandas.find(d => d.id === demandaId);
-        if (!demandaAtribuicaoAtual) return;
-
-        document.getElementById('motivoReprovacaoAtribuicao').value = '';
-        showModal('atribuicaoReprovacaoModal', `Reprovar Demanda: ${demandaAtribuicaoAtual.nomeDemanda}`);
+    function abrirModalReprovar(demandaId) {
+        pendingAction = { type: 'reprovar', id: demandaId };
+        document.getElementById('passwordModal').style.display = 'block';
+        document.getElementById('passwordConfirm').value = '';
+        document.getElementById('passwordConfirm').focus();
     }
 
     function atualizarListaAnexos() {
@@ -2963,7 +3507,8 @@
 
             const dadosAtualizados = {
                 comentarios: comentarios,
-                status: 'finalizado_pendente_aprovacao'
+                status: 'finalizado_pendente_aprovacao',
+                dataConclusao: dataConclusao.toISOString()
             };
 
             const sucesso = await atualizarDemandaNoServidor(demandaResolucaoAtual.id, dadosAtualizados);
@@ -2972,7 +3517,7 @@
                 showNotification('success', 'Resolução Salva', `A resolução foi salva e o arquivo ${zipFileName} foi baixado. A demanda agora está em análise.`);
                 closeModal('resolucaoModal');
                 await carregarDadosDoServidor();
-                switchTab('pendentes');
+                switchTab('analise');
 
                 const gestor = usuarios.find(u => u.role === 'gestor');
                 if(gestor) {
@@ -2986,61 +3531,96 @@
         }
     }
 
-    async function salvarReprovacaoAtribuicao() {
-        if (!demandaAtribuicaoAtual) return;
+    async function salvarReprovacao() {
+        if (!pendingAction) return;
 
-        const motivo = document.getElementById('motivoReprovacaoAtribuicao').value;
+        const id = pendingAction.id;
+        const motivo = document.getElementById('motivoReprovacao').value;
+        const extendDeadline = document.getElementById('extendDeadline').checked;
+        const novaDataLimite = document.getElementById('novaDataLimite').value;
+
         if (!motivo) {
             showNotification('warning', 'Motivo Obrigatório', 'Por favor, informe o motivo da reprovação.');
             return;
         }
 
         const dadosAtualizados = {
-            status: 'reprovada_pelo_atribuido',
-            comentarioReprovacaoAtribuicao: motivo,
+            status: 'reprovada',
+            comentarioGestor: motivo,
             dataConclusao: new Date().toISOString()
         };
 
-        const sucesso = await atualizarDemandaNoServidor(demandaAtribuicaoAtual.id, dadosAtualizados);
+        if (extendDeadline && novaDataLimite) {
+            dadosAtualizados.dataLimite = novaDataLimite;
+            dadosAtualizados.status = 'pendente';
+        }
+
+        const sucesso = await atualizarDemandaNoServidor(id, dadosAtualizados);
 
         if (sucesso) {
-            showNotification('warning', 'Demanda Reprovada', `A demanda foi reprovada e o solicitante será notificado.`);
-            closeModal('atribuicaoReprovacaoModal');
+            const demanda = todasDemandas.find(d => d.id === id);
+            const actionText = extendDeadline ? 'reprovada com prazo estendido' : 'reprovada';
+            showNotification('warning', `Demanda ${actionText}`, `A demanda foi ${actionText} e o solicitante será notificado.`);
+            closeModal('reprovacaoModal');
             await carregarDadosDoServidor();
 
-            const criador = usuarios.find(u => u.id === demandaAtribuicaoAtual.funcionarioId);
-            if (criador) {
-                const assunto = encodeURIComponent(`Sua Demanda Foi Reprovada: ${demandaAtribuicaoAtual.nomeDemanda}`);
-                const corpo = encodeURIComponent(`Prezado(a) ${demandaAtribuicaoAtual.nomeFuncionario},\n\nSua demanda foi analisada e reprovada.\n\n--- Motivo ---\n${motivo}\n\nPor favor, crie uma nova demanda com os ajustes necessários.\n\nAtenciosamente,\nSistema de Gestão`);
-                window.open(`mailto:${criador.email}?subject=${assunto}&body=${corpo}`, '_blank');
+            const funcionario = usuarios.find(u => u.id === demanda.funcionarioId);
+            if (funcionario) {
+                const assunto = encodeURIComponent(`Sua Demanda Foi ${actionText}: ${demanda.nomeDemanda}`);
+                let corpo = `Prezado(a) ${demanda.nomeFuncionario},\n\nSua demanda foi analisada e ${actionText}.\n\n--- Motivo ---\n${motivo}\n\n`;
+                
+                if (extendDeadline && novaDataLimite) {
+                    corpo += `--- Novo Prazo ---\n${new Date(novaDataLimite).toLocaleDateString('pt-BR')}\n\nPor favor, revise e ajuste sua demanda conforme necessário.\n\n`;
+                } else {
+                    corpo += `Por favor, crie uma nova demanda com os ajustes necessários.\n\n`;
+                }
+                
+                corpo += `Atenciosamente,\nGestão`;
+                
+                window.open(`mailto:${funcionario.email}?subject=${assunto}&body=${encodeURIComponent(corpo)}`, '_blank');
+
+                addUserNotification('warning', `Demanda ${actionText}`, `Sua demanda "${demanda.nomeDemanda}" foi ${actionText}.`, { tag: demanda.tag });
             }
+        }
+
+        pendingAction = null;
+    }
+
+    function toggleDeadlineExtension() {
+        const checkbox = document.getElementById('extendDeadline');
+        const extension = document.getElementById('deadlineExtension');
+        
+        if (checkbox.checked) {
+            extension.classList.add('active');
+        } else {
+            extension.classList.remove('active');
         }
     }
 
     function renderizarDemandas() {
         const demandasDoUsuario = getDemandasParaUsuarioLogado();
+        const searchTerm = document.getElementById('pendentesSearch')?.value.toLowerCase() || '';
+        const statusFilter = document.getElementById('pendentesFilter')?.value || 'todos';
 
         const pendentesContainer = document.getElementById('pendentesContainer');
-        const aprovadasContainer = document.getElementById('aprovadasContainer');
-        const atrasadasContainer = document.getElementById('atrasadasContainer');
         
         if (pendentesContainer) pendentesContainer.innerHTML = '';
-        if (aprovadasContainer) aprovadasContainer.innerHTML = '';
-        if (atrasadasContainer) atrasadasContainer.innerHTML = '';
 
-        const pendentes = demandasDoUsuario.filter(d => {
-            return d.status === 'pendente' || d.status === 'reprovada' || d.status === 'finalizado_pendente_aprovacao' || d.status === 'reprovada_pelo_atribuido';
+        let pendentes = demandasDoUsuario.filter(d => {
+            const matchesSearch = !searchTerm || 
+                (d.nomeDemanda && d.nomeDemanda.toLowerCase().includes(searchTerm)) ||
+                (d.tag && d.tag.toLowerCase().includes(searchTerm));
+            
+            const matchesStatus = statusFilter === 'todos' || d.status === statusFilter;
+            
+            return matchesSearch && matchesStatus && (
+                d.status === 'pendente' || 
+                d.status === 'reprovada' || 
+                d.status === 'reprovada_pelo_atribuido' ||
+                d.status === 'atribuida_pendente_aceitacao'
+            );
         });
         
-        const concluidas = demandasDoUsuario.filter(d => d.status === 'aprovada');
-        
-        const atrasadas = demandasDoUsuario.filter(d => {
-            if (d.status === 'aprovada') return false;
-            const dataLimite = new Date(d.dataLimite);
-            const hoje = new Date();
-            return dataLimite < hoje;
-        });
-
         if (pendentesContainer) {
             if (pendentes.length === 0) {
                 pendentesContainer.innerHTML = '<p>Nenhuma demanda pendente no momento.</p>';
@@ -3051,7 +3631,58 @@
                 });
             }
         }
+    }
 
+    function renderizarAnalise() {
+        const demandasDoUsuario = getDemandasParaUsuarioLogado();
+        const searchTerm = document.getElementById('analiseSearch')?.value.toLowerCase() || '';
+        const statusFilter = document.getElementById('analiseFilter')?.value || 'todos';
+
+        const analiseContainer = document.getElementById('analiseContainer');
+        
+        if (analiseContainer) analiseContainer.innerHTML = '';
+
+        let analise = demandasDoUsuario.filter(d => {
+            const matchesSearch = !searchTerm || 
+                (d.nomeDemanda && d.nomeDemanda.toLowerCase().includes(searchTerm)) ||
+                (d.tag && d.tag.toLowerCase().includes(searchTerm));
+            
+            const matchesStatus = statusFilter === 'todos' || d.status === statusFilter;
+            
+            return matchesSearch && matchesStatus && d.status === 'finalizado_pendente_aprovacao';
+        });
+        
+        if (analiseContainer) {
+            if (analise.length === 0) {
+                analiseContainer.innerHTML = '<p>Nenhuma demanda em análise no momento.</p>';
+            } else {
+                analise.forEach(demanda => {
+                    const elemento = criarElementoDemanda(demanda);
+                    analiseContainer.appendChild(elemento);
+                });
+            }
+        }
+    }
+
+    function renderizarAtrasadas() {
+        const demandasDoUsuario = getDemandasParaUsuarioLogado();
+        const searchTerm = document.getElementById('atrasadasSearch')?.value.toLowerCase() || '';
+
+        const atrasadasContainer = document.getElementById('atrasadasContainer');
+        
+        if (atrasadasContainer) atrasadasContainer.innerHTML = '';
+
+        let atrasadas = demandasDoUsuario.filter(d => {
+            if (d.status === 'aprovada') return false;
+            const dataLimite = new Date(d.dataLimite);
+            const hoje = new Date();
+            const matchesSearch = !searchTerm || 
+                (d.nomeDemanda && d.nomeDemanda.toLowerCase().includes(searchTerm)) ||
+                (d.tag && d.tag.toLowerCase().includes(searchTerm));
+            
+            return matchesSearch && dataLimite < hoje;
+        });
+        
         if (atrasadasContainer) {
             if (atrasadas.length === 0) {
                 atrasadasContainer.innerHTML = '<p>Nenhuma demanda atrasada no momento.</p>';
@@ -3061,7 +3692,24 @@
                 });
             }
         }
+    }
 
+    function renderizarAprovadas() {
+        const demandasDoUsuario = getDemandasParaUsuarioLogado();
+        const searchTerm = document.getElementById('aprovadasSearch')?.value.toLowerCase() || '';
+
+        const aprovadasContainer = document.getElementById('aprovadasContainer');
+        
+        if (aprovadasContainer) aprovadasContainer.innerHTML = '';
+
+        let concluidas = demandasDoUsuario.filter(d => {
+            const matchesSearch = !searchTerm || 
+                (d.nomeDemanda && d.nomeDemanda.toLowerCase().includes(searchTerm)) ||
+                (d.tag && d.tag.toLowerCase().includes(searchTerm));
+            
+            return matchesSearch && d.status === 'aprovada';
+        });
+        
         if (aprovadasContainer) {
             if (concluidas.length === 0) {
                 aprovadasContainer.innerHTML = '<p>Nenhuma demanda concluída a ser exibida.</p>';
@@ -3073,8 +3721,52 @@
         }
     }
 
+    function renderizarPendentesColaboradores() {
+        const demandasColaboradores = getDemandasDosColaboradores();
+        const searchTerm = document.getElementById('colabSearch')?.value.toLowerCase() || '';
+        const statusFilter = document.getElementById('colabFilter')?.value || 'todos';
+        const funcFilter = document.getElementById('colabFuncFilter')?.value || 'todos';
+
+        const colabContainer = document.getElementById('colabContainer');
+        
+        if (colabContainer) colabContainer.innerHTML = '';
+
+        let demandas = demandasColaboradores.filter(d => {
+            const matchesSearch = !searchTerm || 
+                (d.nomeDemanda && d.nomeDemanda.toLowerCase().includes(searchTerm)) ||
+                (d.tag && d.tag.toLowerCase().includes(searchTerm));
+            
+            const matchesStatus = statusFilter === 'todos' || d.status === statusFilter;
+            const matchesFunc = funcFilter === 'todos' || d.funcionarioId == funcFilter;
+            
+            return matchesSearch && matchesStatus && matchesFunc;
+        });
+        
+        if (colabContainer) {
+            if (demandas.length === 0) {
+                colabContainer.innerHTML = '<p>Nenhuma demanda dos colaboradores encontrada.</p>';
+            } else {
+                demandas.forEach(demanda => {
+                    colabContainer.appendChild(criarElementoDemanda(demanda));
+                });
+            }
+        }
+    }
+
+    function filterPendentes() {
+        renderizarDemandas();
+    }
+
+    function filterAnalise() {
+        renderizarAnalise();
+    }
+
+    function filterColabDemandas() {
+        renderizarPendentesColaboradores();
+    }
+
     function criarElementoDemanda(demanda, isAtrasado = false) {
-        // MUDANÇA: Usa a função de normalização para garantir que os dados estejam corretos
+        // Usa a função de normalização para garantir que os dados estejam corretos
         demanda = normalizarDadosDemanda(demanda);
 
         const div = document.createElement('div');
@@ -3115,8 +3807,12 @@
             infoAdicional = `<br><small><strong>Motivo da Reprovação:</strong> ${demanda.comentarioReprovacaoAtribuicao || ''}</small>`;
         }
         
+        if (status === 'reprovada') {
+            infoAdicional = `<br><small><strong>Motivo da Reprovação:</strong> ${demanda.comentarioGestor || ''}</small>`;
+        }
+        
         let diasFormatados = '';
-        // MUDANÇA: A verificação agora é segura, pois normalizarDadosDemanda garante que é um array
+        // A verificação agora é segura, pois normalizarDadosDemanda garante que é um array
         if (demanda.isRotina && Array.isArray(demanda.diasSemana) && demanda.diasSemana.length > 0) {
             diasFormatados = demanda.diasSemana.map(dia => ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][dia]).join(', ');
         }
@@ -3137,11 +3833,11 @@
         
         const podeAprovar = usuarioLogado && usuarioLogado.role === 'gestor';
         const eDono = usuarioLogado && usuarioLogado.id === demanda.funcionarioId;
-        // MUDANÇA: A verificação agora é segura, pois normalizarDadosDemanda garante que é um array
+        // A verificação agora é segura, pois normalizarDadosDemanda garante que é um array
         const eAtribuido = usuarioLogado && Array.isArray(demanda.atribuidos) && demanda.atribuidos.some(a => a.id === usuarioLogado.id);
         
         let atribuidosInfo = '';
-        // MUDANÇA: A verificação agora é segura, pois normalizarDadosDemanda garante que é um array
+        // A verificação agora é segura, pois normalizarDadosDemanda garante que é um array
         if (Array.isArray(demanda.atribuidos) && demanda.atribuidos.length > 0) {
             atribuidosInfo = `<small><strong>Atribuída a:</strong> ${demanda.atribuidos.map(a => a.nome).join(', ')}</small>`;
         }
@@ -3169,7 +3865,7 @@
                     <button class="success" onclick="solicitarSenhaParaAprovar(${demanda.id}, '${demanda.nomeFuncionario}')" title="Aprovar">
                         <i class="fas fa-check"></i>
                     </button>
-                    <button class="danger" onclick="solicitarSenhaParaReprovar(${demanda.id}, '${demanda.nomeFuncionario}')" title="Reprovar">
+                    <button class="danger" onclick="abrirModalReprovar(${demanda.id})" title="Reprovar">
                         <i class="fas fa-times"></i>
                     </button>
                 ` : ''}
@@ -3186,6 +3882,7 @@
         
         return div;
     }
+
     function calcularDesempenhoTempo(dataCriacao, dataConclusao, dataLimite) {
         const conclusao = new Date(dataConclusao);
         const limite = new Date(dataLimite);
@@ -3216,13 +3913,6 @@
         document.getElementById('passwordConfirm').focus();
     }
 
-    function solicitarSenhaParaReprovar(id, nomeFuncionario) {
-        pendingAction = { type: 'reprovar', id: id, nomeFuncionario: nomeFuncionario };
-        document.getElementById('passwordModal').style.display = 'block';
-        document.getElementById('passwordConfirm').value = '';
-        document.getElementById('passwordConfirm').focus();
-    }
-
     function confirmPassword() {
         const password = document.getElementById('passwordConfirm').value;
         const gestor = usuarios.find(u => u.role === 'gestor');
@@ -3234,8 +3924,6 @@
         
         if (pendingAction.type === 'aprovar') {
             aprovarDemanda(pendingAction.id, pendingAction.nomeFuncionario);
-        } else if (pendingAction.type === 'reprovar') {
-            reprovarDemanda(pendingAction.id, pendingAction.nomeFuncionario);
         }
         
         closePasswordModal();
@@ -3250,7 +3938,7 @@
         const demanda = todasDemandas.find(d => d.id === id);
         if (!demanda) return;
         
-        // MUDANÇA: Normaliza os dados antes de exibir
+        // Normaliza os dados antes de exibir
         demanda = normalizarDadosDemanda(demanda);
         
         let tempoInfo = '';
@@ -3259,7 +3947,7 @@
         }
         
         let atribuidosInfo = '';
-        // MUDANÇA: A verificação agora é segura
+        // A verificação agora é segura
         if (Array.isArray(demanda.atribuidos) && demanda.atribuidos.length > 0) {
             atribuidosInfo = `<p><strong>Atribuída a:</strong> ${demanda.atribuidos.map(a => a.nome).join(', ')}</p>`;
         }
@@ -3322,8 +4010,8 @@
                     } else if (onclick && onclick.includes('solicitarSenhaParaAprovar')) {
                         const match = onclick.match(/solicitarSenhaParaAprovar\((\d+)/);
                         if (match) demandaId = parseInt(match[1]);
-                    } else if (onclick && onclick.includes('solicitarSenhaParaReprovar')) {
-                        const match = onclick.match(/solicitarSenhaParaReprovar\((\d+)/);
+                    } else if (onclick && onclick.includes('abrirModalReprovar')) {
+                        const match = onclick.match(/abrirModalReprovar\((\d+)/);
                         if (match) demandaId = parseInt(match[1]);
                     } else if (onclick && onclick.includes('apagarDemanda')) {
                         const match = onclick.match(/apagarDemanda\((\d+)/);
@@ -3371,36 +4059,6 @@
         }
     }
 
-    async function reprovarDemanda(id, nomeFuncionario) {
-        const motivo = prompt('Por favor, justifique o motivo da reprovação:');
-        if (!motivo) return;
-
-        const demanda = todasDemandas.find(d => d.id === id);
-        if (demanda) {
-            const dadosAtualizados = {
-                status: 'reprovada',
-                dataConclusao: new Date().toISOString(),
-                comentarioGestor: motivo
-            };
-            
-            const sucesso = await atualizarDemandaNoServidor(id, dadosAtualizados);
-            
-            if (sucesso) {
-                await carregarDadosDoServidor();
-                showNotification('warning', 'Demanda Reprovada', `Demanda de ${nomeFuncionario} foi reprovada.`);
-                
-                const funcionario = usuarios.find(u => u.id === demanda.funcionarioId);
-                if (funcionario) {
-                    const assunto = encodeURIComponent(`Sua Demanda Foi Reprovada: ${demanda.nomeDemanda || demanda.descricao}`);
-                    const corpo = encodeURIComponent(`Prezado(a) ${nomeFuncionario},\n\nSua demanda foi analisada e reprovada.\n\n--- Motivo ---\n${motivo}\n\nPor favor, revise e crie uma nova demanda se necessário.\n\nAtenciosamente,\nGestão`);
-                    window.open(`mailto:${funcionario.email}?subject=${assunto}&body=${corpo}`, '_blank');
-
-                    addUserNotification('warning', 'Demanda Reprovada', `Sua demanda "${demanda.nomeDemanda}" foi reprovada.`, { tag: demanda.tag });
-                }
-            }
-        }
-    }
-    
     async function apagarDemanda(id) {
         if (!confirm('Tem certeza que deseja apagar esta demanda? Esta ação não pode ser desfeita.')) return;
         
@@ -3420,7 +4078,14 @@
                 nome: func.nome,
                 concluidas: 0,
                 andamento: 0,
-                atrasadas: 0
+                atrasadas: 0,
+                facil: 0,
+                medio: 0,
+                dificil: 0,
+                tempoMedioEntrega: 0,
+                totalDiasEntrega: 0,
+                entregasAntesPrazo: 0,
+                entregasAposPrazo: 0
             };
         });
         
@@ -3428,6 +4093,23 @@
             if (ranking[demanda.funcionarioId]) {
                 if (demanda.status === 'aprovada') {
                     ranking[demanda.funcionarioId].concluidas++;
+                    
+                    if (demanda.complexidade === 'Fácil') ranking[demanda.funcionarioId].facil++;
+                    else if (demanda.complexidade === 'Médio') ranking[demanda.funcionarioId].medio++;
+                    else if (demanda.complexidade === 'Difícil') ranking[demanda.funcionarioId].dificil++;
+                    
+                    if (demanda.dataCriacao && demanda.dataConclusao) {
+                        const diasEntrega = Math.ceil((new Date(demanda.dataConclusao) - new Date(demanda.dataCriacao)) / (1000 * 60 * 60 * 24));
+                        ranking[demanda.funcionarioId].totalDiasEntrega += diasEntrega;
+                        
+                        if (demanda.dataLimite) {
+                            if (new Date(demanda.dataConclusao) <= new Date(demanda.dataLimite)) {
+                                ranking[demanda.funcionarioId].entregasAntesPrazo++;
+                            } else {
+                                ranking[demanda.funcionarioId].entregasAposPrazo++;
+                            }
+                        }
+                    }
                 } else if (demanda.status === 'pendente' || demanda.status === 'finalizado_pendente_aprovacao' || demanda.status === 'reprovada' || demanda.status === 'reprovada_pelo_atribuido') {
                     ranking[demanda.funcionarioId].andamento++;
                 }
@@ -3439,12 +4121,29 @@
                 }
             }
 
-            // MUDANÇA: A verificação agora é segura
+            // A verificação agora é segura
             if (Array.isArray(demanda.atribuidos)) {
                 demanda.atribuidos.forEach(atribuido => {
                     if (ranking[atribuido.id]) {
                         if (demanda.status === 'aprovada') {
                             ranking[atribuido.id].concluidas++;
+                            
+                            if (demanda.complexidade === 'Fácil') ranking[atribuido.id].facil++;
+                            else if (demanda.complexidade === 'Médio') ranking[atribuido.id].medio++;
+                            else if (demanda.complexidade === 'Difícil') ranking[atribuido.id].dificil++;
+                            
+                            if (demanda.dataCriacao && demanda.dataConclusao) {
+                                const diasEntrega = Math.ceil((new Date(demanda.dataConclusao) - new Date(demanda.dataCriacao)) / (1000 * 60 * 60 * 24));
+                                ranking[atribuido.id].totalDiasEntrega += diasEntrega;
+                                
+                                if (demanda.dataLimite) {
+                                    if (new Date(demanda.dataConclusao) <= new Date(demanda.dataLimite)) {
+                                        ranking[atribuido.id].entregasAntesPrazo++;
+                                    } else {
+                                        ranking[atribuido.id].entregasAposPrazo++;
+                                    }
+                                }
+                            }
                         } else if (demanda.status === 'pendente' || demanda.status === 'finalizado_pendente_aprovacao' || demanda.status === 'reprovada' || demanda.status === 'reprovada_pelo_atribuido') {
                             ranking[atribuido.id].andamento++;
                         }
@@ -3459,6 +4158,13 @@
             }
         });
         
+        // Calcular tempo médio de entrega
+        Object.keys(ranking).forEach(funcId => {
+            if (ranking[funcId].concluidas > 0) {
+                ranking[funcId].tempoMedioEntrega = Math.round(ranking[funcId].totalDiasEntrega / ranking[funcId].concluidas);
+            }
+        });
+        
         const rankingArray = Object.values(ranking).sort((a, b) => b.concluidas - a.concluidas);
         
         const rankingList = document.getElementById('rankingList');
@@ -3468,6 +4174,8 @@
             rankingArray.forEach((item, index) => {
                 const li = document.createElement('li');
                 li.className = 'ranking-item';
+                
+                const percentualAntesPrazo = item.concluidas > 0 ? Math.round((item.entregasAntesPrazo / item.concluidas) * 100) : 0;
                 
                 li.innerHTML = `
                     <div class="ranking-position">${index + 1}</div>
@@ -3482,6 +4190,25 @@
                             </div>
                             <div class="ranking-stat">
                                 <span class="stat-badge atrasadas">${item.atrasadas} atrasadas</span>
+                            </div>
+                        </div>
+                        <div class="ranking-stats">
+                            <div class="ranking-stat">
+                                <span class="stat-badge">Fácil: ${item.facil}</span>
+                            </div>
+                            <div class="ranking-stat">
+                                <span class="stat-badge">Médio: ${item.medio}</span>
+                            </div>
+                            <div class="ranking-stat">
+                                <span class="stat-badge">Difícil: ${item.dificil}</span>
+                            </div>
+                        </div>
+                        <div class="ranking-stats">
+                            <div class="ranking-stat">
+                                <span class="stat-badge">Tempo médio: ${item.tempoMedioEntrega} dias</span>
+                            </div>
+                            <div class="ranking-stat">
+                                <span class="stat-badge">Pontualidade: ${percentualAntesPrazo}%</span>
                             </div>
                         </div>
                     </div>
@@ -3883,7 +4610,8 @@
         if (e.key === 'Escape') {
             closePasswordModal();
             closeModal('resolucaoModal');
-            closeModal('atribuicaoReprovacaoModal');
+            closeModal('reprovacaoModal');
+            closeModal('noteModal');
         }
     });
 
@@ -3960,13 +4688,17 @@
 
     function renderizarTodasAsAbas() {
         renderizarDemandas();
+        renderizarAnalise();
+        renderizarAtrasadas();
+        renderizarAprovadas();
+        renderizarPendentesColaboradores();
         renderizarCobranca();
         atualizarDashboard();
         atualizarRanking();
         atualizarGraficos();
     }
 
-    // MUDANÇA: Função de importação reescrita para normalizar os dados antes de processar
+    // Função de importação reescrita para normalizar os dados antes de processar
     function importarDemandas() {
         const fileInput = document.getElementById('importFile');
         if (!fileInput.files.length) {
@@ -3989,7 +4721,7 @@
                 let addedCount = 0;
                 let skippedCount = 0;
 
-                // MUDANÇA: Normaliza cada demanda importada ANTES de qualquer processamento
+                // Normaliza cada demanda importada ANTES de qualquer processamento
                 const normalizedImportedData = importedData.map(demanda => normalizarDadosDemanda(demanda));
 
                 // Primeiro, vamos obter as demandas atuais do servidor para garantir que temos a lista mais recente
@@ -4054,6 +4786,538 @@
         };
 
         reader.readAsText(file);
+    }
+
+    // Funções para o mapa mental
+    function atualizarMindmap() {
+    const mindmapArea = document.getElementById('mindmapArea');
+    if (!mindmapArea) return;
+
+    mindmapArea.innerHTML = '';
+
+    const demandas = getDemandasParaUsuarioLogado().filter(d => 
+        d.status !== 'aprovada' && d.status !== 'reprovada'
+    );
+
+    // Adicionar nó central
+    const centralNode = document.createElement('div');
+    centralNode.className = 'mindmap-node';
+    centralNode.style.left = '50%';
+    centralNode.style.top = '50%';
+    centralNode.style.transform = 'translate(-50%, -50%)';
+    centralNode.innerHTML = '<i class="fas fa-user"></i> Minhas Demandas';
+    mindmapArea.appendChild(centralNode);
+
+    // Adicionar nós para cada demanda
+    demandas.forEach((demanda, index) => {
+        const node = document.createElement('div');
+        node.className = 'mindmap-node';
+        
+        // Definir cor com base na prioridade
+        if (demanda.prioridade === 'Importante') {
+            node.classList.add('high-priority');
+        } else if (demanda.prioridade === 'Média') {
+            node.classList.add('medium-priority');
+        } else {
+            node.classList.add('low-priority');
+        }
+        
+        // Posicionar em círculo ao redor do nó central
+        const angleCircle = (index / demandas.length) * 2 * Math.PI;
+        const radius = 30; // Raio em porcentagem do container
+        
+        // Calcular posição em porcentagem
+        const x = 50 + radius * Math.cos(angleCircle);
+        const y = 50 + radius * Math.sin(angleCircle);
+        
+        node.style.left = `${x}%`;
+        node.style.top = `${y}%`;
+        node.style.transform = 'translate(-50%, -50%)'; // Centralizar o nó
+        node.innerHTML = `<strong>${demanda.nomeDemanda || demanda.descricao}</strong><br><small>${demanda.prioridade}</small>`;
+        
+        // Adicionar evento de clique para ver detalhes
+        node.addEventListener('click', () => verDetalhes(demanda.id));
+        
+        // Tornar arrastável
+        makeDraggable(node);
+        
+        // Adicionar ID ao nó para referência
+        node.id = `node-${demanda.id}`;
+        
+        mindmapArea.appendChild(node);
+    });
+
+    // Adicionar linhas de conexão após todos os nós serem criados
+    setTimeout(() => {
+        demandas.forEach((demanda, index) => {
+            const connection = document.createElement('div');
+            connection.className = 'mindmap-connection';
+            
+            // Obter elementos
+            const centralNode = document.querySelector('.mindmap-node:not(.high-priority):not(.medium-priority):not(.low-priority)');
+            const node = document.getElementById(`node-${demanda.id}`);
+            
+            if (!centralNode || !node) return;
+            
+            // Calcular posição e rotação da linha
+            const centralRect = centralNode.getBoundingClientRect();
+            const nodeRect = node.getBoundingClientRect();
+            const mindmapRect = mindmapArea.getBoundingClientRect();
+            
+            // Calcular pontos de conexão (centro dos elementos)
+            const x1 = centralRect.left + centralRect.width / 2 - mindmapRect.left;
+            const y1 = centralRect.top + centralRect.height / 2 - mindmapRect.top;
+            const x2 = nodeRect.left + nodeRect.width / 2 - mindmapRect.left;
+            const y2 = nodeRect.top + nodeRect.height / 2 - mindmapRect.top;
+            
+            // Calcular comprimento e ângulo da linha
+            const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            const connectionAngle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+            
+            // Aplicar estilos à linha
+            connection.style.width = `${length}px`;
+            connection.style.height = '2px';
+            connection.style.left = `${x1}px`;
+            connection.style.top = `${y1}px`;
+            connection.style.transform = `rotate(${connectionAngle}deg)`;
+            connection.style.transformOrigin = '0 0'; // Ponto de rotação no início da linha
+            
+            mindmapArea.appendChild(connection);
+        });
+    }, 100); // Pequeno atraso para garantir que os elementos estejam renderizados
+}
+
+    function makeDraggable(element) {
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        
+        element.onmousedown = dragMouseDown;
+
+        function dragMouseDown(e) {
+            e = e || window.event;
+            e.preventDefault();
+            // get the mouse cursor position at startup:
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            // call a function whenever the cursor moves:
+            document.onmousemove = elementDrag;
+        }
+
+        function elementDrag(e) {
+            e = e || window.event;
+            e.preventDefault();
+            // calculate the new cursor position:
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            // set the element's new position:
+            element.style.top = (element.offsetTop - pos2) + "px";
+            element.style.left = (element.offsetLeft - pos1) + "px";
+        }
+
+        function closeDragElement() {
+            // stop moving when mouse button is released:
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+    }
+
+    function resetMindmap() {
+        atualizarMindmap();
+        showNotification('info', 'Mapa Mental Resetado', 'O layout do mapa mental foi resetado.');
+    }
+
+    function saveMindmapLayout() {
+        // Implementar salvamento do layout do mapa mental
+        showNotification('info', 'Layout Salvo', 'O layout do mapa mental foi salvo.');
+    }
+
+    function carregarMindmapLayout() {
+        // Implementar carregamento do layout do mapa mental
+    }
+
+    // Funções para anotações
+    function carregarAnotacoes() {
+        const storageKey = `notes_${usuarioLogado?.id || 'guest'}`;
+        const saved = localStorage.getItem(storageKey);
+        
+        if (saved) {
+            try {
+                notes = JSON.parse(saved);
+            } catch (e) {
+                console.error('Erro ao carregar anotações:', e);
+                notes = [];
+            }
+        } else {
+            notes = [];
+        }
+        
+        renderizarAnotacoes();
+    }
+
+    function salvarAnotacoes() {
+        if (!usuarioLogado) return;
+        
+        const storageKey = `notes_${usuarioLogado.id}`;
+        localStorage.setItem(storageKey, JSON.stringify(notes));
+    }
+
+    function renderizarAnotacoes() {
+        const notesContainer = document.getElementById('notesContainer');
+        if (!notesContainer) return;
+        
+        if (notes.length === 0) {
+            notesContainer.innerHTML = '<p class="empty-state">Nenhuma anotação encontrada. Crie sua primeira anotação!</p>';
+            return;
+        }
+        
+        notesContainer.innerHTML = '';
+        
+        notes.forEach(note => {
+            const noteElement = document.createElement('div');
+            noteElement.className = 'note-item';
+            noteElement.style.borderLeft = `4px solid ${note.color || '#3498db'}`;
+            
+            noteElement.innerHTML = `
+                <div class="note-header">
+                    <h4>${note.title}</h4>
+                    <div class="note-date">${formatDate(note.date)}</div>
+                    <div class="note-actions">
+                        <button onclick="editNote(${note.id})" title="Editar"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteNote(${note.id})" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="note-content">${note.content.replace(/\n/g, '<br>')}</div>
+            `;
+            
+            notesContainer.appendChild(noteElement);
+        });
+    }
+
+    function addNewNote() {
+        document.getElementById('noteModalTitle').textContent = 'Nova Anotação';
+        document.getElementById('noteForm').reset();
+        document.getElementById('noteModal').style.display = 'block';
+    }
+
+    function salvarAnotacao() {
+        const title = document.getElementById('noteTitle').value;
+        const content = document.getElementById('noteContent').value;
+        const color = document.getElementById('noteColor').value;
+        
+        if (!title || !content) {
+            showNotification('warning', 'Campos Obrigatórios', 'Por favor, preencha o título e o conteúdo da anotação.');
+            return;
+        }
+        
+        const newNote = {
+            id: Date.now(),
+            title,
+            content,
+            color,
+            date: new Date().toISOString()
+        };
+        
+        notes.unshift(newNote);
+        salvarAnotacoes();
+        renderizarAnotacoes();
+        closeModal('noteModal');
+        
+        showNotification('success', 'Anotação Salva', 'Sua anotação foi salva com sucesso.');
+    }
+
+    function editNote(id) {
+        const note = notes.find(n => n.id === id);
+        if (!note) return;
+        
+        document.getElementById('noteModalTitle').textContent = 'Editar Anotação';
+        document.getElementById('noteTitle').value = note.title;
+        document.getElementById('noteContent').value = note.content;
+        document.getElementById('noteColor').value = note.color;
+        
+        // Modificar o formulário para atualizar em vez de criar
+        const form = document.getElementById('noteForm');
+        form.onsubmit = function(e) {
+            e.preventDefault();
+            
+            note.title = document.getElementById('noteTitle').value;
+            note.content = document.getElementById('noteContent').value;
+            note.color = document.getElementById('noteColor').value;
+            
+            salvarAnotacoes();
+            renderizarAnotacoes();
+            closeModal('noteModal');
+            
+            // Restaurar função original
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                salvarAnotacao();
+            };
+            
+            showNotification('success', 'Anotação Atualizada', 'Sua anotação foi atualizada com sucesso.');
+        };
+        
+        document.getElementById('noteModal').style.display = 'block';
+    }
+
+    function deleteNote(id) {
+        if (!confirm('Tem certeza que deseja excluir esta anotação?')) return;
+        
+        notes = notes.filter(n => n.id !== id);
+        salvarAnotacoes();
+        renderizarAnotacoes();
+        
+        showNotification('info', 'Anotação Excluída', 'A anotação foi excluída com sucesso.');
+    }
+
+    // Funções para feedback
+    function carregarFeedbacks() {
+        const storageKey = 'feedbacks';
+        const saved = localStorage.getItem(storageKey);
+        
+        if (saved) {
+            try {
+                feedbacks = JSON.parse(saved);
+            } catch (e) {
+                console.error('Erro ao carregar feedbacks:', e);
+                feedbacks = [];
+            }
+        } else {
+            feedbacks = [];
+        }
+    }
+
+    function salvarFeedbacks() {
+        localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
+    }
+
+    function updateFeedback() {
+        const funcFilter = document.getElementById('feedbackFuncFilter')?.value || 'todos';
+        const feedbackSummary = document.getElementById('feedbackSummary');
+        const feedbackChart = document.getElementById('feedbackChart');
+        
+        if (!feedbackSummary || !feedbackChart) return;
+        
+        // Filtrar feedbacks pelo funcionário
+        let filteredFeedbacks = feedbacks;
+        if (funcFilter !== 'todos') {
+            filteredFeedbacks = feedbacks.filter(f => f.funcionarioId == funcFilter);
+        }
+        
+        // Agrupar feedbacks por funcionário
+        const feedbacksByFunc = {};
+        usuarios.filter(u => u.role === 'funcionario').forEach(func => {
+            feedbacksByFunc[func.id] = {
+                nome: func.nome,
+                positivos: 0,
+                construtivos: 0,
+                negativos: 0,
+                total: 0
+            };
+        });
+        
+        filteredFeedbacks.forEach(feedback => {
+            if (feedbacksByFunc[feedback.funcionarioId]) {
+                feedbacksByFunc[feedback.funcionarioId][feedback.type + 's']++;
+                feedbacksByFunc[feedback.funcionarioId].total++;
+            }
+        });
+        
+        // Calcular estatísticas adicionais
+        Object.keys(feedbacksByFunc).forEach(funcId => {
+            const func = feedbacksByFunc[funcId];
+            const demandasFunc = todasDemandas.filter(d => d.funcionarioId == funcId && d.status === 'aprovada');
+            
+            func.totalDemandas = demandasFunc.length;
+            func.atrasadas = todasDemandas.filter(d => d.funcionarioId == funcId && d.status !== 'aprovada' && new Date(d.dataLimite) < new Date()).length;
+            func.tempoMedio = 0;
+            
+            if (demandasFunc.length > 0) {
+                let totalDias = 0;
+                demandasFunc.forEach(d => {
+                    if (d.dataCriacao && d.dataConclusao) {
+                        totalDias += Math.ceil((new Date(d.dataConclusao) - new Date(d.dataCriacao)) / (1000 * 60 * 60 * 24));
+                    }
+                });
+                func.tempoMedio = Math.round(totalDias / demandasFunc.length);
+            }
+        });
+        
+        // Renderizar resumo
+        feedbackSummary.innerHTML = '';
+        
+        if (funcFilter === 'todos') {
+            // Mostrar todos os funcionários
+            Object.values(feedbacksByFunc).forEach(func => {
+                const statElement = document.createElement('div');
+                statElement.className = 'feedback-stat';
+                
+                statElement.innerHTML = `
+                    <h3>${func.nome}</h3>
+                    <p>Total de Demandas: ${func.totalDemandas}</p>
+                    <p>Feedbacks Positivos: ${func.positivos}</p>
+                    <p>Feedbacks Construtivos: ${func.construtivos}</p>
+                    <p>Feedbacks Negativos: ${func.negativos}</p>
+                    <p>Tempo Médio de Entrega: ${func.tempoMedio} dias</p>
+                    <p>Demandas Atrasadas: ${func.atrasadas}</p>
+                `;
+                
+                feedbackSummary.appendChild(statElement);
+            });
+        } else {
+            // Mostrar apenas o funcionário selecionado
+            const func = feedbacksByFunc[funcFilter];
+            if (func) {
+                const statElement = document.createElement('div');
+                statElement.className = 'feedback-stat';
+                statElement.style.gridColumn = '1 / -1';
+                
+                statElement.innerHTML = `
+                    <h3>${func.nome}</h3>
+                    <p>Total de Demandas: ${func.totalDemandas}</p>
+                    <p>Feedbacks Positivos: ${func.positivos}</p>
+                    <p>Feedbacks Construtivos: ${func.construtivos}</p>
+                    <p>Feedbacks Negativos: ${func.negativos}</p>
+                    <p>Tempo Médio de Entrega: ${func.tempoMedio} dias</p>
+                    <p>Demandas Atrasadas: ${func.atrasadas}</p>
+                `;
+                
+                feedbackSummary.appendChild(statElement);
+            }
+        }
+        
+        // Criar gráfico de feedbacks
+        if (typeof Chart !== 'undefined') {
+            const ctx = feedbackChart.getContext('2d');
+            
+            // Destruir gráfico anterior se existir
+            if (charts.feedback) {
+                charts.feedback.destroy();
+            }
+            
+            const labels = [];
+            const positivosData = [];
+            const construtivosData = [];
+            const negativosData = [];
+            
+            Object.values(feedbacksByFunc).forEach(func => {
+                if (func.total > 0) {
+                    labels.push(func.nome.split(' ')[0]);
+                    positivosData.push(func.positivos);
+                    construtivosData.push(func.construtivos);
+                    negativosData.push(func.negativos);
+                }
+            });
+            
+            charts.feedback = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Positivos',
+                            data: positivosData,
+                            backgroundColor: 'rgba(39, 174, 96, 0.8)'
+                        },
+                        {
+                            label: 'Construtivos',
+                            data: construtivosData,
+                            backgroundColor: 'rgba(243, 156, 18, 0.8)'
+                        },
+                        {
+                            label: 'Negativos',
+                            data: negativosData,
+                            backgroundColor: 'rgba(231, 76, 60, 0.8)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    function salvarFeedback() {
+        const funcionarioId = document.getElementById('feedbackFuncSelect').value;
+        const type = document.getElementById('feedbackType').value;
+        const message = document.getElementById('feedbackMessage').value;
+        
+        if (!funcionarioId || !type || !message) {
+            showNotification('warning', 'Campos Obrigatórios', 'Por favor, preencha todos os campos do feedback.');
+            return;
+        }
+        
+        const newFeedback = {
+            id: Date.now(),
+            funcionarioId,
+            type,
+            message,
+            gestorId: usuarioLogado.id,
+            gestorNome: usuarioLogado.nome,
+            date: new Date().toISOString()
+        };
+        
+        feedbacks.push(newFeedback);
+        salvarFeedbacks();
+        updateFeedback();
+        
+        document.getElementById('feedbackForm').reset();
+        
+        showNotification('success', 'Feedback Enviado', 'Seu feedback foi enviado com sucesso.');
+    }
+
+    // Função para verificar lembretes de demandas próximas do prazo
+    function verificarLembretes() {
+        const reminderContainer = document.getElementById('reminderContainer');
+        const reminderList = document.getElementById('reminderList');
+        
+        if (!reminderContainer || !reminderList) return;
+        
+        const agora = new Date();
+        const amanha = new Date(agora);
+        amanha.setDate(amanha.getDate() + 1);
+        
+        // Filtrar demandas que vencem nas próximas 24 horas
+        const demandasProximas = getDemandasParaUsuarioLogado().filter(d => {
+            if (d.status === 'aprovada' || d.status === 'reprovada') return false;
+            
+            const dataLimite = new Date(d.dataLimite);
+            return dataLimite >= agora && dataLimite <= amanha;
+        });
+        
+        if (demandasProximas.length > 0) {
+            reminderContainer.style.display = 'block';
+            reminderList.innerHTML = '';
+            
+            demandasProximas.forEach(demanda => {
+                const reminderItem = document.createElement('div');
+                reminderItem.className = 'reminder-item';
+                
+                const dataLimite = new Date(demanda.dataLimite);
+                const horasRestantes = Math.floor((dataLimite - agora) / (1000 * 60 * 60));
+                
+                reminderItem.innerHTML = `
+                    <strong>${demanda.nomeDemanda || demanda.descricao}</strong>
+                    <p>Vence em ${horasRestantes} horas</p>
+                    <small>TAG: ${demanda.tag}</small>
+                `;
+                
+                reminderList.appendChild(reminderItem);
+            });
+        } else {
+            reminderContainer.style.display = 'none';
+        }
     }
 
 </script>
